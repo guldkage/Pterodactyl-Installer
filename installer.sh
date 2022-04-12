@@ -99,7 +99,7 @@ webserver(){
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
             fi
-    else :
+    if  [ "$WEBSERVER" =  "apache" ]; then
         apachewebserver
         fi
 }
