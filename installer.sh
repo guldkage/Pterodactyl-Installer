@@ -147,6 +147,7 @@ configuration(){
         --name-last="$LASTNAME" \
         --password="$PASSWORD" \
         --admin=1
+
     extra
 }
 
