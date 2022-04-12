@@ -73,15 +73,19 @@ apachewebserver(){
 }
 
 start(){
-    output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
-    output "Do you agree to this?"
-    output "(Y/N):"
-    read -r AGREE
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
+        output "Do you agree to this?"
+        output "(Y/N):"
+        read -r AGREE
 
-    if [[ "$AGREE" =~ [Yy] ]]; then
-        AGREE=yes
-        web
-    fi
+        if [[ "$AGREE" =~ [Yy] ]]; then
+            AGREE=yes
+            web
+        fi
+    else
+        output "OS is not supported."
+        exit 1
 }
 
 webserver(){
@@ -105,16 +109,14 @@ webserver(){
 }
 
 extra(){
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
-        output "Changing permissions..."
-        chown -R www-data:www-data /var/www/pterodactyl/*
-        curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
-        (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
-        sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
-        sudo systemctl enable --now redis-server
-        sudo systemctl enable --now pteroq.service
-        webserver
-    fi
+    output "Changing permissions..."
+    chown -R www-data:www-data /var/www/pterodactyl/*
+    curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
+    (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
+    sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
+    sudo systemctl enable --now redis-server
+    sudo systemctl enable --now pteroq.service
+    webserver
 }
 
 configuration(){
