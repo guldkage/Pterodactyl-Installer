@@ -18,7 +18,7 @@ LASTNAME=""
 FIRSTNAME=""
 USERNAME=""
 PASSWORD=""
-DATABASE_PASSWORD=""
+DBPASSWORD=""
 WEBSERVER="" 
 
 output(){
@@ -90,39 +90,31 @@ webserver(){
     if  [ "$SSLSTATUS" =  "true" ]; then
         command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
-        output ""
-        output "* INSTALLATION * "
-        output ""
         output "Configuring webserver..."
-        output
+        {
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
-        certbot certonly --standalone -d $FQDN --staple-ocsp -m $EMAIL --agree-tos
+        certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
         systemctl start nginx
+        } &> /dev/null
         finish
         fi
     if  [ "$SSLSTATUS" =  "false" ]; then
         command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
-        output ""
-        output "* INSTALLATION * "
-        output ""
         output "Configuring webserver..."
-        output
+        {
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
+        } &> /dev/null
         finish
         fi
 }
 
 extra(){
-    output ""
-    output "* INSTALLATION * "
-    output ""
     output "Changing permissions..."
-    output ""
     {
     chown -R www-data:www-data /var/www/pterodactyl/*
     curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
@@ -135,17 +127,13 @@ extra(){
 }
 
 configuration(){
-    output ""
-    output "* INSTALLATION * "
-    output ""
     output "Setting up the Panel..."
-    output ""
     {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
     php artisan p:environment:setup --author="$EMAIL" --url="$appurl" --timezone="America/New_York" --cache="redis" --session="redis" --queue="redis" --redis-host="localhost" --redis-pass="null" --redis-port="6379" --settings-ui=true
-    php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DATABASE_PASSWORD"
+    php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
     php artisan migrate --seed --force
     php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1
     } &> /dev/null
@@ -157,17 +145,14 @@ composer(){
     output "* INSTALLATION * "
     output ""
     output "Installing composer.."
-    output ""
+    {
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    } &> /dev/null
     files
 }
 
 files(){
-    output ""
-    output "* INSTALLATION * "
-    output ""
     output "Downloading files... "
-    output ""
     {
     mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl || exit
@@ -189,8 +174,8 @@ database(){
     output "Let's set up your database connection."
     output "Generating a password for you..."
     warning ""
-    DATABASE_PASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
-    mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DATABASE_PASSWORD';"
+    DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+    mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';"
     mysql -u root -e "CREATE DATABASE panel;"
     mysql -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;"
     mysql -u root -e "FLUSH PRIVILEGES;"
