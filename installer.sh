@@ -39,6 +39,8 @@ if ! [ -x "$(command -v curl)" ]; then
   exit 1
 fi
 
+
+
 finish(){
     output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
 }
@@ -103,6 +105,7 @@ webserver(){
 
 extra(){
     if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        output "Changing permissions..."
         chown -R www-data:www-data /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
         * * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1
@@ -113,6 +116,7 @@ extra(){
 }
 
 configuration(){
+    output "Setting up the Panel..."
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
@@ -178,16 +182,15 @@ database(){
 }
 
 required(){
-    if  [ ""$lsb_dist"" =  "ubuntu" ] || [ ""$lsb_dist"" =  "debian" ]; then
-        apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
-        LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        add-apt-repository -y ppa:chris-lea/redis-server
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
-        apt update
-        apt-add-repository universe
-        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-        database
-    fi
+    output "Installing packages..."
+    apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+    add-apt-repository -y ppa:chris-lea/redis-server
+    curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+    apt update
+    apt-add-repository universe
+    apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+    database
 }
 
 begin(){
