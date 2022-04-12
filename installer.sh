@@ -449,7 +449,7 @@ options(){
     output ""
     output "* SELECT OPTION * "
     output ""
-    warning "Please select your installation option:"
+    output "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
     warning "[2] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
     warning "[3] Update Wings. | Updates your Wings to the latest version."
