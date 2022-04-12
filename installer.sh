@@ -83,6 +83,7 @@ start(){
 }
 
 webserver(){
+    apachewebserver
     if  [ "$WEBSERVER" =  "nginx" ]; then
         if  [ "$SSLCONFIRM" =  "true" ]; then
             rm -rf /etc/nginx/sites-enabled/default
@@ -99,9 +100,6 @@ webserver(){
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
             fi
-    if  [ "$WEBSERVER" =  "apache" ]; then
-        apachewebserver
-        fi
 }
 
 extra(){
@@ -167,7 +165,7 @@ files(){
     tar -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
     cp .env.example .env
-    composer install --no-dev --optimize-autoloader
+    command composer install --no-dev --optimize-autoloader
     php artisan key:generate --force
     output "Finished downloading files"
     configuration
