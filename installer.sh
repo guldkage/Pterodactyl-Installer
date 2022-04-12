@@ -165,7 +165,7 @@ files(){
     chmod -R 755 storage/* bootstrap/cache/
     cp .env.example .env
     php artisan key:generate --force
-    configure
+    configuration
 }
 
 database(){
@@ -182,7 +182,9 @@ database(){
 }
 
 required(){
+    output ""
     output "Installing packages..."
+    output ""
     apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
@@ -234,7 +236,8 @@ firstname(){
 }
 
 fqdn(){
-    warning "Enter your FQDN or IP"
+    output ""
+    output "Enter your FQDN or IP"
     read -r FQDN
     required
 }
