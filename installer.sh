@@ -154,6 +154,8 @@ configuration(){
 composer(){
     output "Installing composer.."
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    output "Finished installing composer"
+    sleep 1s
     files
 }
 
@@ -165,7 +167,10 @@ files(){
     tar -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
     cp .env.example .env
+    composer install --no-dev --optimize-autoloader
     php artisan key:generate --force
+    output "Finished downloading files"
+    sleep 1s
     configuration
 }
 
