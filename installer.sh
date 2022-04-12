@@ -296,7 +296,44 @@ web(){
             ssl
             ;;
         * ) output ""
-            warning "Script will exit. Unexcpected outut."
+            warning "Script will exit. Unexpected output."
+            sleep 1s
+            options
+    esac
+}
+
+options(){
+    output "Please select your installation option:"
+    output "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
+    output "[2] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
+    output "[3] Update Wings. | Updates your Wings to the latest version."
+    output "[4] Update Both. | Updates your Panel and Wings to the latest versions."
+    output ""
+    output "[5] Uninstall Wings. | Uninstalls your Wings. THIS WILL ALSO REMOVE ALL OF YOUR SERVERS ON THE PANEL!"
+    output "[6] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
+    output ""
+    read -r option
+    case $option in
+        1 ) option=1
+            updatepanel
+            ;;
+        2 ) option=2
+            updatewings
+            ;;
+        3 ) option=3
+            updateboth
+            ;;
+        4 ) option=4
+            warning "Hang on.... Uninstalling Wings..."
+            uninstallwings
+            ;;
+        5 ) option=5
+            warning "Hang on.... Uninstalling Panel..."
+            uninstallpanel
+            ;;
+        * ) output ""
+            warning "Please enter a valid option."
+            warning "This script will exit."
             sleep 1s
             options
     esac
@@ -312,4 +349,4 @@ output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
 output ""
 sleep 3s
-start
+options
