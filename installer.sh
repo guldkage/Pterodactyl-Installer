@@ -97,16 +97,7 @@ extra() {
         sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
         sudo systemctl enable --now redis-server
         sudo systemctl enable --now pteroq.service
-    else if  [ "$lsb_dist" =  "centos" ]; then
-        chown -R nginx:nginx /var/www/pterodactyl/*
-        curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
-        * * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1
-        sed -i -e "s@<user>@nginx@g" /etc/systemd/system/pteroq.service
-        sudo systemctl enable --now redis-server
-        sudo systemctl enable --now pteroq.service
 }
-
-
 
 configuration() {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
@@ -140,8 +131,6 @@ configuration() {
         --password="$PASSWORD" \
         --admin=1
     extra
-    
-
 }
 
 composer() {
