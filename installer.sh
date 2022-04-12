@@ -78,6 +78,8 @@ apachewebserver(){
             systemctl restart apache2
             finish
             fi
+        }
+    }
 }
 
 start(){
