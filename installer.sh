@@ -38,11 +38,11 @@ if ! [ -x "$(command -v curl)" ]; then
   exit 1
 fi
 
-finish() {
+finish(){
     output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
 }
 
-apachewebserver() {
+apachewebserver(){
     if  [ "$WEBSERVER" =  "apache" ]; then
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             a2dissite 000-default.conf
@@ -67,7 +67,7 @@ apachewebserver() {
             fi
 }
 
-start() {
+start(){
     output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
     output "Do you agree to this?"
     output "(Y/N):"
@@ -79,7 +79,7 @@ start() {
     fi
 }
 
-webserver() {
+webserver(){
     if  [ "$WEBSERVER" =  "nginx" ]; then
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             rm -rf /etc/nginx/sites-enabled/default
@@ -100,7 +100,7 @@ webserver() {
             fi
 }
 
-extra() {
+extra(){
     if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
         chown -R www-data:www-data /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
@@ -111,7 +111,7 @@ extra() {
     fi
 }
 
-configuration() {
+configuration(){
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
@@ -145,13 +145,13 @@ configuration() {
     extra
 }
 
-composer() {
+composer(){
     output "Installing composer.."
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     files
 }
 
-files() {
+files(){
     output "Downloading files... "
     mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl || exit
@@ -163,7 +163,7 @@ files() {
     configure
 }
 
-database() {
+database(){
     warning ""
     output "Let's set up your database connection.
     output "Please enter a password for the pterodactyl user."
@@ -177,7 +177,7 @@ database() {
     firstname
 }
 
-required() {
+required(){
     if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
@@ -189,7 +189,9 @@ required() {
         composer
     else:
         output "System not supported
-begin() {
+}
+
+begin(){
     output ""
     output "Let's begin the installation! Are you ready?"
     output "Continuing in 5 seconds.."
@@ -197,7 +199,7 @@ begin() {
     required
 }
 
-password() {
+password(){
     output ""
     output "Please enter password for account"
     read -r PASSWORD
@@ -206,7 +208,7 @@ password() {
 }
 
 
-username() {
+username(){
     output ""
     output "Please enter username for account"
     read -r USERNAME
@@ -215,7 +217,7 @@ username() {
 }
 
 
-lastname() {
+lastname(){
     output ""
     output "Please enter last name for account"
     read -r LASTNAME
@@ -223,7 +225,7 @@ lastname() {
     username
 }
 
-firstname() {
+firstname(){
     output "In order to create an account on the Panel, we need some more information."
     output "You do not need to type in real first and last name."
     output ""
@@ -233,14 +235,14 @@ firstname() {
     lastname
 }
 
-fqdn() {
+fqdn(){
     warning "Enter your FQDN or IP"
     read -r FQDN
     FQDN=$FQDN
     database
 }
 
-ssl() {
+ssl(){
     output ""
     output "Do you want to use SSL? This requires a domain."
     output "(Y/N):"
@@ -255,7 +257,7 @@ ssl() {
     fi
 }
 
-emailsslyes() {
+emailsslyes(){
     warning ""
     warning "READ THIS"
     output "The script now asks for your email. It will be shared with Let's Encrypt to complete the SSL. It will also be used to setup the Panel."
@@ -267,7 +269,7 @@ emailsslyes() {
     fqdn
 }
 
-emailsslno() {
+emailsslno(){
     warning ""
     warning "READ THIS"
     output "The script now asks for your email. It will be used to setup the Panel."
