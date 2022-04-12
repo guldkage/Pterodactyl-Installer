@@ -174,7 +174,7 @@ files(){
 database(){
     warning ""
     output "Let's set up your database connection."
-    output "Please enter a password for the pterodactyl user."
+    output "Generating a password for you..."
     warning ""
     DATABASE_PASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DATABASE_PASSWORD';"
