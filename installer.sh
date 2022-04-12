@@ -68,6 +68,18 @@ apachewebserver() {
             fi
 }
 
+start() {
+    output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
+    output "Do you agree to this?"
+    output "(Y/N):"
+    read -r AGREE
+
+    if [[ "$AGREE" =~ [Yy] ]]; then
+        AGREE=yes
+        web
+    fi
+}
+
 webserver() {
     if  [ "$WEBSERVER" =  "nginx" ]; then
         if  [ "$SSLCONFIRM" =  "yes" ]; then
@@ -289,18 +301,6 @@ web(){
             sleep 1s
             options
     esac
-}
-
-start() {
-    output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
-    output "Do you agree to this?"
-    output "(Y/N):"
-    read -r AGREE
-
-    if [[ "$AGREE" =~ [Yy] ]]; then
-        AGREE=yes
-        web
-    fi
 }
 
 output ""
