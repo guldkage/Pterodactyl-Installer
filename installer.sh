@@ -91,7 +91,6 @@ webserver(){
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
             systemctl restart nginx
-            apachewebserver
             fi
         else :
             rm -rf /etc/nginx/sites-enabled/default
@@ -99,8 +98,10 @@ webserver(){
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
-            apachewebserver
             fi
+    else :
+        apachewebserver
+        fi
 }
 
 extra(){
@@ -155,7 +156,6 @@ composer(){
     output "Installing composer.."
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     output "Finished installing composer"
-    sleep 1s
     files
 }
 
@@ -170,7 +170,6 @@ files(){
     composer install --no-dev --optimize-autoloader
     php artisan key:generate --force
     output "Finished downloading files"
-    sleep 1s
     configuration
 }
 
