@@ -6,8 +6,10 @@ With this script you can easily install, update and delete Pterodactyl Panel. Ev
 Use this script if you want to install, update or delete your services quickly. The things that are being done are already listed on https://pterodactyl.io, but this clearly makes it faster since it is automatic.
 
 If you find any errors, things you would like changed or queries for things in the future for this script, please write an "Issue".
+Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not associated with the official Pterodactyl Project.
 
 ## Features
+- Install Panel
 - Update Panel
 - Update Wings
 - Uninstall Panel
