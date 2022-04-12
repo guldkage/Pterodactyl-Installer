@@ -98,7 +98,7 @@ webserver(){
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
-        certbot --nginx --redirect --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
+        certbot certonly --standalone -d $FQDN --staple-ocsp -m $EMAIL --agree-tos
         systemctl start nginx
         finish
         fi
