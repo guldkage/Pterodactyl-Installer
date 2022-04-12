@@ -2,9 +2,9 @@
 
 ########################################################################
 #                                                                      #
-#                        Pterodactyl Installer                         #
+#               Pterodactyl Installer, Updater & Remover               #
 #                                                                      #
-# This script is not associated with the official Pterodactyl Panel.   #
+#  This script is not associated with the official Pterodactyl Panel.  #
 #                                                                      #
 ########################################################################
 
