@@ -97,7 +97,8 @@ extra() {
         sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
         sudo systemctl enable --now redis-server
         sudo systemctl enable --now pteroq.service
-};
+    fi
+}
 
 configuration() {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
