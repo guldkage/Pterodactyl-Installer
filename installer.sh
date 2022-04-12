@@ -56,19 +56,34 @@ fi
 
 
 finish(){
-    clear
-    output ""
-    output "* PANEL SUCCESSFULLY INSTALLED *"
-    output ""
-    output "Thank you for using the script. Remember to give it a star."
-    output "The script has ended. https://$appurl to go to your Panel."
-    output ""
-    output "Details:"
-    output "Email: $EMAIL"
-    output "First Name: $FIRSTNAME"
-    output "Last Name: $LASTNAME"
-    output "Password: (Censored)"
-    output ""
+    if  [ "$SSLSTATUS" =  "true" ]; then
+        clear
+        output ""
+        output "* PANEL SUCCESSFULLY INSTALLED *"
+        output ""
+        warning "Thank you for using the script. Remember to give it a star."
+        warning "The script has ended. https://$FQDN to go to your Panel."
+        output ""
+        output "Details:"
+        warning "Email: $EMAIL"
+        warning "First Name: $FIRSTNAME"
+        warning "Last Name: $LASTNAME"
+        warning "Password: (Censored)"
+        output ""
+    if  [ "$SSLSTATUS" =  "false" ]; then
+        clear
+        output ""
+        output "* PANEL SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "The script has ended. http://$FQDN to go to your Panel."
+        output ""
+        output "Details:"
+        output "Email: $EMAIL"
+        output "First Name: $FIRSTNAME"
+        output "Last Name: $LASTNAME"
+        output "Password: (Censored)"
+        output ""
 }
 
 start(){
