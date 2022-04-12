@@ -51,7 +51,7 @@ webserver() {
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
-            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://github.com/guldkage/Pterodactyl-Installer/config/pterodactyl-nginx-ssl.conf
+            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx-ssl.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || FAILED=true
             systemctl restart nginx
@@ -59,7 +59,7 @@ webserver() {
         else:
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
-            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://github.com/guldkage/Pterodactyl-Installer/config/pterodactyl-nginx.conf
+            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
             finish
@@ -67,7 +67,7 @@ webserver() {
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             a2dissite 000-default.conf
             output "Configuring webserver..."
-            curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://github.com/guldkage/Pterodactyl-Installer/config/pterodactyl-apache-ssl.conf
+            curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-apache-ssl.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || FAILED=true
             apt install libapache2-mod-php
@@ -77,7 +77,7 @@ webserver() {
         else:
             a2dissite 000-default.conf
             output "Configuring webserver..."
-            curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://github.com/guldkage/Pterodactyl-Installer/config/pterodactyl-apache.conf
+            curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-apache.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
             apt install libapache2-mod-php
             sudo a2enmod rewrite
@@ -89,14 +89,14 @@ webserver() {
 extra() {
     if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
     chown -R www-data:www-data /var/www/pterodactyl/*
-    curl -o /etc/systemd/system/pteroq.service https://github.com/guldkage/Pterodactyl-Installer/config/pteroq.service
+    curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
     * * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1
     sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
     sudo systemctl enable --now redis-server
     sudo systemctl enable --now pteroq.service
     if  [ "$lsb_dist" =  "centos" ]; then
     chown -R nginx:nginx /var/www/pterodactyl/*
-    curl -o /etc/systemd/system/pteroq.service https://github.com/guldkage/Pterodactyl-Installer/config/pteroq.service
+    curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pteroq.service
     * * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1
     sed -i -e "s@<user>@nginx@g" /etc/systemd/system/pteroq.service
     sudo systemctl enable --now redis-server
