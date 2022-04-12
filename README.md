@@ -17,7 +17,7 @@ Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not assoc
 
 ## Supported webservers & OS
 - Debian based systems
-- Nginx & Apache webserver
+- Nginx webserver
 
 ## Support
 There is no support with this script. The script has been tested multiple times without issues.
