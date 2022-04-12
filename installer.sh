@@ -43,25 +43,7 @@ finish() {
     output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
 }
 
-webserver() {
-    if  [ "$WEBSERVER" =  "nginx" ]; then
-        if  [ "$SSLCONFIRM" =  "yes" ]; then
-            rm -rf /etc/nginx/sites-enabled/default
-            output "Configuring webserver..."
-            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx-ssl.conf
-            sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
-            systemctl restart nginx
-            finish
-            fi
-        else :
-            rm -rf /etc/nginx/sites-enabled/default
-            output "Configuring webserver..."
-            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx.conf
-            sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-            systemctl restart nginx
-            finish
-            fi
+apachewebserver() {
     if  [ "$WEBSERVER" =  "apache" ]; then
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             a2dissite 000-default.conf
@@ -83,6 +65,27 @@ webserver() {
             sudo a2enmod rewrite
             systemctl restart apache2
             finish
+            fi
+}
+
+webserver() {
+    if  [ "$WEBSERVER" =  "nginx" ]; then
+        if  [ "$SSLCONFIRM" =  "yes" ]; then
+            rm -rf /etc/nginx/sites-enabled/default
+            output "Configuring webserver..."
+            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx-ssl.conf
+            sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
+            systemctl restart nginx
+            apachewebserver
+            fi
+        else :
+            rm -rf /etc/nginx/sites-enabled/default
+            output "Configuring webserver..."
+            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx.conf
+            sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+            systemctl restart nginx
+            apachewebserver
             fi
 }
 
