@@ -149,7 +149,7 @@ files(){
     tar -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
     cp .env.example .env
-    command composer install --no-dev --optimize-autoloader
+    command composer install --no-dev --optimize-autoloader --no-interaction
     php artisan key:generate --force
     output "Finished downloading files"
     configuration
