@@ -302,6 +302,89 @@ web(){
     esac
 }
 
+updatepanel(){
+    cd /var/www/pterodactyl || exit || output "Pterodactyl Directory (/var/www/pterodactyl) does not exist." || exit
+    php artisan down
+    curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
+    chmod -R 755 storage/* bootstrap/cache
+    composer install --no-dev --optimize-autoloader -n
+    chown -R www-data:www-data /var/www/pterodactyl/*
+    php artisan view:clear
+    php artisan config:clear
+    php artisan migrate --force
+    php artisan db:seed --force
+    php artisan up
+    php artisan queue:restart
+    output ""
+    output "Pterodactyl Panel has successfully updated."
+}
+
+updatewings(){
+    curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
+    chmod u+x /usr/local/bin/wings
+    systemctl restart wings
+    output ""
+    output "Wings has successfully updated."
+}
+
+updateboth(){
+    if ! [ -x "$(command -v wings)" ]; then
+        echo "Wings is required to update both."
+    fi
+    cd /var/www/pterodactyl || exit || warning "[!] Pterodactyl Directory (/var/www/pterodactyl) does not exist! Exitting..."
+    php artisan down
+    curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
+    chmod -R 755 storage/* bootstrap/cache
+    composer install --no-dev --optimize-autoloader -n
+    chown -R www-data:www-data /var/www/pterodactyl/*
+    php artisan view:clear
+    php artisan config:clear
+    php artisan migrate --force
+    php artisan db:seed --force
+    php artisan up
+    php artisan queue:restart
+    curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
+    chmod u+x /usr/local/bin/wings
+    systemctl restart wings
+    output ""
+    output "Pterodactyl Panel and Wings has successfully updated."
+}
+
+uninstallpanel(){
+    output ""
+    output "Do you really want to delete Pterodactyl Panel? All files & configurations will be deleted. You CANNOT get your files back."
+    output "(Y/N):"
+    read -r UNINSTALLPANEL
+
+    if [[ "$UNINSTALLPANEL" =~ [Yy] ]]; then
+        sudo rm -rf /var/www/pterodactyl # Removes panel files
+        sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
+        sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
+        sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
+        sudo rm -rf /var/www/pterodactyl # Removing panel files
+        output ""
+        output "Your panel has been removed. You are now left with your database and web server."
+        output "If you want to delete your database, simply go into MySQL and type DROP DATABASE (database name);"
+        output "Pterodactyl Panel has successfully been removed."
+    fi
+}
+
+uninstallwings(){
+    output ""
+    output "Do you really want to delete Pterodactyl Wings? All game servers & configurations will be deleted. You CANNOT get your files back."
+    output "(Y/N):"
+    read -r UNINSTALLWINGS
+
+    if [[ "$UNINSTALLWINGS" =~ [Yy] ]]; then
+        sudo systemctl stop wings # Stops wings
+        sudo rm -rf /var/lib/pterodactyl # Removes game servers and backup files
+        sudo rm -rf /etc/pterodactyl # Removes wings config
+        sudo rm /usr/local/bin/wings # Removes wings
+        sudo rm /etc/systemd/system/wings.service # Removes wings service file
+        output "[!] Wings has been removed."
+    fi
+}
+
 options(){
     output "Please select your installation option:"
     output "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
@@ -309,33 +392,31 @@ options(){
     output "[3] Update Wings. | Updates your Wings to the latest version."
     output "[4] Update Both. | Updates your Panel and Wings to the latest versions."
     output ""
-    output "[5] Uninstall Wings. | Uninstalls your Wings. THIS WILL ALSO REMOVE ALL OF YOUR SERVERS ON THE PANEL!"
+    output "[5] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
     output "[6] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
     output ""
     read -r option
     case $option in
         1 ) option=1
+            start
+            ;;
+        1 ) option=2
             updatepanel
             ;;
-        2 ) option=2
+        2 ) option=3
             updatewings
             ;;
-        3 ) option=3
+        3 ) option=4
             updateboth
             ;;
-        4 ) option=4
-            warning "Hang on.... Uninstalling Wings..."
+        4 ) option=5
             uninstallwings
             ;;
-        5 ) option=5
-            warning "Hang on.... Uninstalling Panel..."
+        5 ) option=6
             uninstallpanel
             ;;
         * ) output ""
-            warning "Please enter a valid option."
-            warning "This script will exit."
-            sleep 1s
-            options
+            output "Please enter a valid option."
     esac
 }
 
