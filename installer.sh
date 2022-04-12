@@ -10,6 +10,7 @@
 
 
 SSL_CONFIRM=""
+SSLCONFIRM=""
 SSLSTATUS=""
 FQDN=""
 AGREE=""
@@ -18,7 +19,7 @@ FIRSTNAME=""
 USERNAME=""
 PASSWORD=""
 DATABASE_PASSWORD=""
-WEBSERVER=""
+WEBSERVER="" 
 
 output(){
     echo -e '\e[36m'$1'\e[0m';
@@ -116,7 +117,7 @@ configuration(){
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
     php artisan p:environment:setup \
-        --author="$email" \
+        --author="$EMAIL" \
         --url="$appurl" \
         --timezone="America/New_York" \
         --cache="redis" \
@@ -186,9 +187,9 @@ required(){
         apt update
         apt-add-repository universe
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-        composer
+        database
     else:
-        output "System not supported
+        output "System not supported"
 }
 
 begin(){
@@ -196,14 +197,13 @@ begin(){
     output "Let's begin the installation! Are you ready?"
     output "Continuing in 5 seconds.."
     sleep 5s
-    required
+    composer
 }
 
 password(){
     output ""
     output "Please enter password for account"
     read -r PASSWORD
-    PASSWORD=$PASSWORD
     begin
 }
 
@@ -212,7 +212,6 @@ username(){
     output ""
     output "Please enter username for account"
     read -r USERNAME
-    USERNAME=$USERNAME
     password
 }
 
@@ -221,7 +220,6 @@ lastname(){
     output ""
     output "Please enter last name for account"
     read -r LASTNAME
-    LASTNAME=$LASTNAME
     username
 }
 
@@ -231,15 +229,13 @@ firstname(){
     output ""
     output "Please enter first name for account"
     read -r FIRSTNAME
-    FIRSTNAME=$FIRSTNAME
     lastname
 }
 
 fqdn(){
     warning "Enter your FQDN or IP"
     read -r FQDN
-    FQDN=$FQDN
-    database
+    required
 }
 
 ssl(){
@@ -265,7 +261,6 @@ emailsslyes(){
     warning ""
     output "Please enter your email"
     read -r EMAIL
-    FQDN=$EMAIL
     fqdn
 }
 
@@ -277,7 +272,6 @@ emailsslno(){
     warning ""
     output "Please enter your email"
     read -r EMAIL
-    FQDN=$EMAIL
     fqdn
 }
 
@@ -311,7 +305,6 @@ output ""
 warning "This script is not resposible for any damages. The script has been tested several times without issues."
 warning "Support is not given."
 output ""
-warning "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation!"
+warning "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
 sleep 3s
 start
-}
