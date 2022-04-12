@@ -32,7 +32,7 @@ warning(){
 command 1> /dev/null
 
 if [[ $EUID -ne 0 ]]; then
-  echo "* Sorry, but you need to be root to run this script."
+  output "* Sorry, but you need to be root to run this script."
   exit 1
 fi
 
@@ -102,6 +102,7 @@ webserver(){
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
             systemctl restart nginx
+            finish
             fi
         if  [ "$SSLSTATUS" = "false" ]; then
             rm -rf /etc/nginx/sites-enabled/default
@@ -109,6 +110,7 @@ webserver(){
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
+            finish
             fi
 }
 
