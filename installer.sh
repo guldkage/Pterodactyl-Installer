@@ -2,7 +2,7 @@
 
 ########################################################################
 #                                                                      #
-# Pterodactyl Installer #                         #
+#                        Pterodactyl Installer                         #
 #                                                                      #
 # This script is not associated with the official Pterodactyl Panel.   #
 #                                                                      #
@@ -29,21 +29,28 @@ warning(){
     echo -e '\e[31m'"$1"'\e[0m';
 }
 
-command 1> /dev/null
-
 if [[ $EUID -ne 0 ]]; then
-  output "* Sorry, but you need to be root to run this script."
-  exit 1
+    output ""
+    output "* ERROR *"
+    output ""
+    output "* Sorry, but you need to be root to run this script."
+    exit 1
 fi
 
 if [ "$lsb_dist" =  "fedora" ] || [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" = "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    output ""
+    output "* ERROR *"
+    output ""
     output "* Your OS is not supported."
     exit 1
 fi
 
 if ! [ -x "$(command -v curl)" ]; then
-  echo "* cURL is required to run this script."
-  exit 1
+    output ""
+    output "* ERROR *"
+    output ""
+    output "cURL is required to run this script."
+    exit 1
 fi
 
 
@@ -59,6 +66,9 @@ finish(){
 }
 
 start(){
+    output ""
+    output "* AGREEMENT *"
+    output ""
     output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
     output "Do you agree to this?"
     output "(Y/N):"
@@ -475,8 +485,7 @@ options(){
 
 clear
 output ""
-output "____________________________________________________"
-output ""
+output "* WELCOME * "
 output ""
 warning "Pterodactyl Installer @ v1.0"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
