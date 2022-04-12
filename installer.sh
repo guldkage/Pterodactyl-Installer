@@ -69,16 +69,18 @@ start(){
 
 webserver(){
     if  [ "$SSLSTATUS" =  "true" ]; then
+        command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
         output "Configuring webserver..."
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
-        certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
+        certbot --nginx --redirect --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
         systemctl start nginx
         finish
         fi
     if  [ "$SSLSTATUS" =  "false" ]; then
+        command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
         output "Configuring webserver..."
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
@@ -90,6 +92,7 @@ webserver(){
 
 extra(){
     output "Changing permissions..."
+    command 1> /dev/null
     chown -R www-data:www-data /var/www/pterodactyl/*
     curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
     (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
@@ -101,6 +104,7 @@ extra(){
 
 configuration(){
     output "Setting up the Panel..."
+    command 1> /dev/null
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
@@ -136,6 +140,7 @@ files(){
 
 database(){
     warning ""
+    command 1> /dev/null
     output "Let's set up your database connection."
     output "Generating a password for you..."
     warning ""
@@ -151,13 +156,14 @@ required(){
     output ""
     output "Installing packages..."
     output ""
+    command 1> /dev/null
     apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
     curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     apt update
     apt-add-repository universe
-    apt install certbot -y
+    apt install certbot python3-certbot-nginx -y
     apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
     database
 }
@@ -205,6 +211,7 @@ firstname(){
 fqdn(){
     output ""
     output "Enter your FQDN or IP"
+    output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     read -r FQDN
     required
 }
@@ -267,6 +274,7 @@ web(){
 
 updatepanel(){
     cd /var/www/pterodactyl || exit || output "Pterodactyl Directory (/var/www/pterodactyl) does not exist." || exit
+    command 1> /dev/null
     php artisan down
     curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
     chmod -R 755 storage/* bootstrap/cache
@@ -286,6 +294,7 @@ updatewings(){
     if ! [ -x "$(command -v wings)" ]; then
         echo "Wings is required to update both."
     fi
+    command 1> /dev/null
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
@@ -298,6 +307,7 @@ updateboth(){
         echo "Wings is required to update both."
     fi
     cd /var/www/pterodactyl || exit || warning "[!] Pterodactyl Directory (/var/www/pterodactyl) does not exist! Exitting..."
+    command 1> /dev/null
     php artisan down
     curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
     chmod -R 755 storage/* bootstrap/cache
@@ -323,6 +333,7 @@ uninstallpanel(){
     read -r UNINSTALLPANEL
 
     if [[ "$UNINSTALLPANEL" =~ [Yy] ]]; then
+        command 1> /dev/null
         sudo rm -rf /var/www/pterodactyl # Removes panel files
         sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
         sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
@@ -342,12 +353,16 @@ uninstallwings(){
     read -r UNINSTALLWINGS
 
     if [[ "$UNINSTALLWINGS" =~ [Yy] ]]; then
+        command 1> /dev/null
         sudo systemctl stop wings # Stops wings
         sudo rm -rf /var/lib/pterodactyl # Removes game servers and backup files
         sudo rm -rf /etc/pterodactyl # Removes wings config
         sudo rm /usr/local/bin/wings # Removes wings
         sudo rm /etc/systemd/system/wings.service # Removes wings service file
-        output "[!] Wings has been removed."
+        clear
+        output ""
+        output "Wings has been removed."
+        output ""
     fi
 }
 
