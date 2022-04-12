@@ -42,6 +42,8 @@ fi
 
 
 finish(){
+    output ""
+    output "Thank you for using the script. Remember to give it a star."
     output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
 }
 
@@ -120,34 +122,12 @@ configuration(){
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
-    php artisan p:environment:setup \
-        --author="$EMAIL" \
-        --url="$appurl" \
-        --timezone="America/New_York" \
-        --cache="redis" \
-        --session="redis" \
-        --queue="redis" \
-        --redis-host="localhost" \
-        --redis-pass="null" \
-        --redis-port="6379" \
-        --settings-ui=true
+    php artisan p:environment:setup --author="$EMAIL" --url="$appurl" --timezone="America/New_York" --cache="redis" --session="redis" --queue="redis" --redis-host="localhost" --redis-pass="null" --redis-port="6379" --settings-ui=true
 
-    php artisan p:environment:database \
-        --host="127.0.0.1" \
-        --port="3306" \
-        --database="panel" \
-        --username="pterodactyl" \
-        --password="$DATABASE_PASSWORD"
+    php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DATABASE_PASSWORD"
 
     php artisan migrate --seed --force
-    php artisan p:user:make \
-        --email="$EMAIL" \
-        --username="$USERNAME" \
-        --name-first="$FIRSTNAME" \
-        --name-last="$LASTNAME" \
-        --password="$PASSWORD" \
-        --admin=1
-
+    php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1
     extra
 }
 
