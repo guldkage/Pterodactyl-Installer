@@ -420,7 +420,6 @@ uninstallpanel(){
         sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
         sudo rm -rf /var/www/pterodactyl # Removing panel files
         } &> /dev/null
-        clear
         output ""
         output "* PANEL SUCCESSFULLY UNINSTALLED *"
         output ""
