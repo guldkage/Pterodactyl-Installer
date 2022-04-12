@@ -176,10 +176,11 @@ database(){
     output "Let's set up your database connection."
     output "Please enter a password for the pterodactyl user."
     warning ""
+    password_input DATABASE_PASSWORD
     read -r DATABASE_PASSWORD
     mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '${DATABASE_PASSWORD}';"
     mysql -u root -e "CREATE DATABASE panel;"
-    mysql -u root -e "GRANT ALL PRIVILEGES ON pterodactyl.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;"
+    mysql -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;"
     mysql -u root -e "FLUSH PRIVILEGES;"
     firstname
 }
