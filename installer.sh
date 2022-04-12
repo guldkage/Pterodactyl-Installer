@@ -306,5 +306,6 @@ output ""
 output "This script is not resposible for any damages. The script has been tested several times without issues."
 output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
+output ""
 sleep 3s
 start
