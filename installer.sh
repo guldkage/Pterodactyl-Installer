@@ -60,7 +60,7 @@ apachewebserver(){
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-apache-ssl.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
-            apt install libapache2-mod-php
+            apt install libapache2-mod-php -y
             sudo a2enmod rewrite
             systemctl restart apache2
             finish
@@ -70,7 +70,7 @@ apachewebserver(){
             output "Configuring webserver..."
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-apache.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
-            apt install libapache2-mod-php
+            apt install libapache2-mod-php -y
             sudo a2enmod rewrite
             systemctl restart apache2
             finish
@@ -178,6 +178,7 @@ required(){
     curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     apt update
     apt-add-repository universe
+    apt install certbot -y
     apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
     database
 }
