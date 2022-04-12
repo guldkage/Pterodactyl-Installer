@@ -22,11 +22,11 @@ DATABASE_PASSWORD=""
 WEBSERVER="" 
 
 output(){
-    echo -e '\e[36m'$1'\e[0m';
+    echo -e '\e[36m'"$1"'\e[0m';
 }
 
 warning(){
-    echo -e '\e[31m'$1'\e[0m';
+    echo -e '\e[31m'"$1"'\e[0m';
 }
 
 if [[ $EUID -ne 0 ]]; then
@@ -82,7 +82,7 @@ start(){
 
 webserver(){
     if  [ "$WEBSERVER" =  "nginx" ]; then
-        if  [ "$SSLCONFIRM" =  "yes" ]; then
+        if  [ "$SSLCONFIRM" =  "true" ]; then
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx-ssl.conf
@@ -166,11 +166,10 @@ files(){
 
 database(){
     warning ""
-    output "Let's set up your database connection.
+    output "Let's set up your database connection."
     output "Please enter a password for the pterodactyl user."
     warning ""
     read -r DATABASE_PASSWORD
-    DATABASE_PASSWORD=$DATABASE_PASSWORD
     mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '${DATABASE_PASSWORD}';"
     mysql -u root -e "CREATE DATABASE panel;"
     mysql -u root -e "GRANT ALL PRIVILEGES ON pterodactyl.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;"
@@ -179,7 +178,7 @@ database(){
 }
 
 required(){
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ ""$lsb_dist"" =  "ubuntu" ] || [ ""$lsb_dist"" =  "debian" ]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         add-apt-repository -y ppa:chris-lea/redis-server
@@ -188,8 +187,7 @@ required(){
         apt-add-repository universe
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         database
-    else:
-        output "System not supported"
+    fi
 }
 
 begin(){
@@ -245,7 +243,7 @@ ssl(){
     read -r SSL_CONFIRM
 
     if [[ "$SSL_CONFIRM" =~ [Yy] ]]; then
-        SSLSTATUS=yes
+        SSLSTATUS=true
         emailsslyes
     fi
     if [[ "$SSL_CONFIRM" =~ [Nn] ]]; then
@@ -256,7 +254,7 @@ ssl(){
 emailsslyes(){
     warning ""
     warning "READ THIS"
-    output "The script now asks for your email. It will be shared with Let's Encrypt to complete the SSL. It will also be used to setup the Panel."
+    output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL. It will also be used to setup the Panel."
     output "If you do not agree, stop the script."
     warning ""
     output "Please enter your email"
@@ -297,3 +295,13 @@ web(){
             options
     esac
 }
+
+output ""
+output "Pterodactyl Installer @ v1.0"
+output "https://github.com/guldkage/Pterodactyl-Installer"
+output ""
+output "This script is not resposible for any damages. The script has been tested several times without issues."
+output "Support is not given."
+output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
+sleep 3s
+start
