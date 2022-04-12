@@ -49,6 +49,9 @@ fi
 
 
 finish(){
+    clear
+    output ""
+    output "* PANEL SUCCESSFULLY INSTALLED *"
     output ""
     output "Thank you for using the script. Remember to give it a star."
     output "The script has ended. https://$appurl to go to your Panel."
@@ -71,7 +74,11 @@ webserver(){
     if  [ "$SSLSTATUS" =  "true" ]; then
         command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
+        output ""
+        output "* INSTALLATION * "
+        output ""
         output "Configuring webserver..."
+        output
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
@@ -82,7 +89,11 @@ webserver(){
     if  [ "$SSLSTATUS" =  "false" ]; then
         command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
+        output ""
+        output "* INSTALLATION * "
+        output ""
         output "Configuring webserver..."
+        output
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
@@ -91,7 +102,11 @@ webserver(){
 }
 
 extra(){
+    output ""
+    output "* INSTALLATION * "
+    output ""
     output "Changing permissions..."
+    output ""
     command 1> /dev/null
     chown -R www-data:www-data /var/www/pterodactyl/*
     curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
@@ -103,7 +118,11 @@ extra(){
 }
 
 configuration(){
+    output ""
+    output "* INSTALLATION * "
+    output ""
     output "Setting up the Panel..."
+    output ""
     command 1> /dev/null
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
@@ -118,14 +137,21 @@ configuration(){
 }
 
 composer(){
+    output ""
+    output "* INSTALLATION * "
+    output ""
     output "Installing composer.."
+    output ""
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    output "Finished installing composer"
     files
 }
 
 files(){
+    output ""
+    output "* INSTALLATION * "
+    output ""
     output "Downloading files... "
+    output ""
     mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl || exit
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
@@ -139,7 +165,9 @@ files(){
 }
 
 database(){
-    warning ""
+    output ""
+    output "* INSTALLATION * "
+    output ""
     command 1> /dev/null
     output "Let's set up your database connection."
     output "Generating a password for you..."
@@ -153,6 +181,8 @@ database(){
 }
 
 required(){
+    output ""
+    output "* INSTALLATION * "
     output ""
     output "Installing packages..."
     output ""
@@ -170,15 +200,21 @@ required(){
 
 begin(){
     output ""
-    output "Let's begin the installation! Are you ready?"
-    output "Continuing in 5 seconds.."
-    sleep 5s
+    output "* INSTALLATION * "
+    output ""
+    output "Let's begin the installation!"
+    output "Continuing in 3 seconds.."
+    output 
+    sleep 3s
     composer
 }
 
 password(){
     output ""
+    output "* ACCOUNT CREATION * "
+    output ""
     output "Please enter password for account"
+    output ""
     read -r PASSWORD
     begin
 }
@@ -186,7 +222,10 @@ password(){
 
 username(){
     output ""
+    output "* ACCOUNT CREATION * "
+    output ""
     output "Please enter username for account"
+    output ""
     read -r USERNAME
     password
 }
@@ -194,12 +233,18 @@ username(){
 
 lastname(){
     output ""
+    output "* ACCOUNT CREATION * "
+    output ""
     output "Please enter last name for account"
+    output ""
     read -r LASTNAME
     username
 }
 
 firstname(){
+    output ""
+    output "* ACCOUNT CREATION * "
+    output ""
     output "In order to create an account on the Panel, we need some more information."
     output "You do not need to type in real first and last name."
     output ""
@@ -210,6 +255,8 @@ firstname(){
 
 fqdn(){
     output ""
+    output "* PANEL URL * "
+    output ""
     output "Enter your FQDN or IP"
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     read -r FQDN
@@ -217,6 +264,8 @@ fqdn(){
 }
 
 ssl(){
+    output ""
+    output "* SSL * "
     output ""
     output "Do you want to use SSL? This requires a domain."
     output "(Y/N):"
@@ -233,7 +282,9 @@ ssl(){
 }
 
 emailsslyes(){
-    warning ""
+    output ""
+    output "* EMAIL *"
+    output ""
     warning "Read:"
     output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL. It will also be used to setup the Panel."
     output "If you do not agree, stop the script."
@@ -244,7 +295,9 @@ emailsslyes(){
 }
 
 emailsslno(){
-    warning ""
+    output ""
+    output "* EMAIL *"
+    output ""
     warning "Read:"
     output "The script now asks for your email. It will be used to setup the Panel."
     output "If you do not agree, stop the script."
@@ -255,6 +308,8 @@ emailsslno(){
 }
 
 web(){
+    output ""
+    output "* WEBSERVER * "
     output ""
     output "What webserver would you like to use?"
     output "[1] NGINX"
@@ -286,6 +341,9 @@ updatepanel(){
     php artisan db:seed --force
     php artisan up
     php artisan queue:restart
+    clear
+    output ""
+    output "* SUCCESSFULLY UPDATED *"
     output ""
     output "Pterodactyl Panel has successfully updated."
 }
@@ -298,6 +356,9 @@ updatewings(){
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
+    clear
+    output ""
+    output "* SUCCESSFULLY UPDATED *"
     output ""
     output "Wings has successfully updated."
 }
@@ -322,6 +383,9 @@ updateboth(){
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
+    clear
+    output ""
+    output "* SUCCESSFULLY UPDATED *"
     output ""
     output "Pterodactyl Panel and Wings has successfully updated."
 }
@@ -334,11 +398,14 @@ uninstallpanel(){
 
     if [[ "$UNINSTALLPANEL" =~ [Yy] ]]; then
         command 1> /dev/null
-        sudo rm -rf /var/www/pterodactyl # Removes panel files
+        sudo rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
         sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
         sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
         sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
         sudo rm -rf /var/www/pterodactyl # Removing panel files
+        clear
+        output ""
+        output "* PANEL SUCCESSFULLY UNINSTALLED *"
         output ""
         output "Your panel has been removed. You are now left with your database and web server."
         output "If you want to delete your database, simply go into MySQL and type DROP DATABASE (database name);"
@@ -357,9 +424,11 @@ uninstallwings(){
         sudo systemctl stop wings # Stops wings
         sudo rm -rf /var/lib/pterodactyl # Removes game servers and backup files
         sudo rm -rf /etc/pterodactyl # Removes wings config
-        sudo rm /usr/local/bin/wings # Removes wings
+        sudo rm /usr/local/bin/wings || exit || warning "Wings is not installed!" # Removes wings
         sudo rm /etc/systemd/system/wings.service # Removes wings service file
         clear
+        output ""
+        output "* WINGS SUCCESSFULLY UNINSTALLED *"
         output ""
         output "Wings has been removed."
         output ""
@@ -367,6 +436,9 @@ uninstallwings(){
 }
 
 options(){
+    output ""
+    output "* SELECT OPTION * "
+    output ""
     warning "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
     warning "[2] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
@@ -403,6 +475,9 @@ options(){
 
 clear
 output ""
+output "____________________________________________________"
+output ""
+output ""
 warning "Pterodactyl Installer @ v1.0"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
 output ""
@@ -410,5 +485,5 @@ output "This script is not resposible for any damages. The script has been teste
 output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
 output ""
-sleep 3s
+sleep 2s
 options
