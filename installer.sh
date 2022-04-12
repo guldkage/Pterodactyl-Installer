@@ -73,8 +73,9 @@ webserver(){
         output "Configuring webserver..."
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        systemctl stop nginx
         certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
-        systemctl restart nginx
+        systemctl start nginx
         finish
         fi
     if  [ "$SSLSTATUS" =  "false" ]; then
@@ -351,15 +352,15 @@ uninstallwings(){
 }
 
 options(){
-    output "Please select your installation option:"
-    output "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
-    output "[2] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
-    output "[3] Update Wings. | Updates your Wings to the latest version."
-    output "[4] Update Both. | Updates your Panel and Wings to the latest versions."
-    output ""
-    output "[5] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
-    output "[6] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
-    output ""
+    warning "Please select your installation option:"
+    warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
+    warning "[2] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
+    warning "[3] Update Wings. | Updates your Wings to the latest version."
+    warning "[4] Update Both. | Updates your Panel and Wings to the latest versions."
+    warning ""
+    warning "[5] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
+    warning "[6] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
+    warning ""
     read -r option
     case $option in
         1 ) option=1
