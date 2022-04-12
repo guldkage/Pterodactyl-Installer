@@ -68,7 +68,7 @@ apachewebserver(){
             systemctl restart apache2
             finish
             fi
-        if  [ "$SSLSTATUS" =  "false" ]; then
+        else
             a2dissite 000-default.conf
             output "Configuring webserver..."
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache.conf
@@ -78,8 +78,6 @@ apachewebserver(){
             systemctl restart apache2
             finish
             fi
-        }
-    }
 }
 
 start(){
@@ -106,7 +104,7 @@ webserver(){
             systemctl restart nginx
             finish
             fi
-        if  [ "$SSLSTATUS" = "false" ]; then
+        else
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
