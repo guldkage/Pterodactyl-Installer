@@ -53,7 +53,7 @@ finish(){
 }
 
 apachewebserver(){
-    if  [ "$webserv" =  "apache" ]; then
+    if  [ "$webserv" =~ [apache] ]; then
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             a2dissite 000-default.conf
             output "Configuring webserver..."
@@ -91,7 +91,7 @@ start(){
 
 webserver(){
     apachewebserver
-    if  [ "$webserv" =  "nginx" ]; then
+    if  [ "$webserv" =~ [nginx] ]; then
         if  [ "$SSLCONFIRM" =  "true" ]; then
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
