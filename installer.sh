@@ -8,7 +8,6 @@
 #                                                                      #
 ########################################################################
 
-set -e
 
 SSL_CONFIRM=""
 SSLSTATUS=""
@@ -38,17 +37,6 @@ if ! [ -x "$(command -v curl)" ]; then
   echo "* cURL is required to run this script."
   exit 1
 fi
-
-output ""
-output "Pterodactyl Installer @ v1.0"
-output "https://github.com/guldkage/Pterodactyl-Installer"
-output ""
-warning "This script is not resposible for any damages. The script has been tested several times without issues."
-warning "Support is not given."
-output ""
-warning "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation!"
-sleep 3s
-start
 
 finish() {
     output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
@@ -312,4 +300,16 @@ web(){
             sleep 1s
             options
     esac
+}
+
+output ""
+output "Pterodactyl Installer @ v1.0"
+output "https://github.com/guldkage/Pterodactyl-Installer"
+output ""
+warning "This script is not resposible for any damages. The script has been tested several times without issues."
+warning "Support is not given."
+output ""
+warning "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation!"
+sleep 3s
+start
 }
