@@ -29,6 +29,8 @@ warning(){
     echo -e '\e[31m'"$1"'\e[0m';
 }
 
+command 1> /dev/null
+
 if [[ $EUID -ne 0 ]]; then
   echo "* Sorry, but you need to be root to run this script."
   exit 1
