@@ -85,7 +85,7 @@ start(){
         fi
     else
         output "OS is not supported."
-        exit 1
+        fi
 }
 
 webserver(){
