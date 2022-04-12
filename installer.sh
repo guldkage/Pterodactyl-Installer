@@ -63,6 +63,12 @@ finish(){
     output "Thank you for using the script. Remember to give it a star."
     output "The script has ended. https://$appurl to go to your Panel."
     output ""
+    output "Details:"
+    output "Email: $EMAIL"
+    output "First Name: $FIRSTNAME"
+    output "Last Name: $LASTNAME"
+    output "Password: (Censored)"
+    output ""
 }
 
 start(){
@@ -227,7 +233,6 @@ password(){
     output "* ACCOUNT CREATION * "
     output ""
     output "Please enter password for account"
-    output ""
     read -r PASSWORD
     begin
 }
@@ -238,7 +243,6 @@ username(){
     output "* ACCOUNT CREATION * "
     output ""
     output "Please enter username for account"
-    output ""
     read -r USERNAME
     password
 }
@@ -249,7 +253,6 @@ lastname(){
     output "* ACCOUNT CREATION * "
     output ""
     output "Please enter last name for account"
-    output ""
     read -r LASTNAME
     username
 }
@@ -355,7 +358,6 @@ updatepanel(){
     php artisan up
     php artisan queue:restart
     } &> /dev/null
-    clear
     output ""
     output "* SUCCESSFULLY UPDATED *"
     output ""
@@ -371,7 +373,6 @@ updatewings(){
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
     } &> /dev/null
-    clear
     output ""
     output "* SUCCESSFULLY UPDATED *"
     output ""
@@ -399,7 +400,6 @@ updateboth(){
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
     } &> /dev/null
-    clear
     output ""
     output "* SUCCESSFULLY UPDATED *"
     output ""
@@ -443,7 +443,6 @@ uninstallwings(){
         sudo rm /usr/local/bin/wings || exit || warning "Wings is not installed!" # Removes wings
         sudo rm /etc/systemd/system/wings.service # Removes wings service file
         } &> /dev/null
-        clear
         output ""
         output "* WINGS SUCCESSFULLY UNINSTALLED *"
         output ""
