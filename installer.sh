@@ -37,11 +37,6 @@ if ! [ -x "$(command -v curl)" ]; then
   exit 1
 fi
 
-if ! [ -x "$(command -v nginx)" ]; then
-  echo "* The script currently only supports NGINX."
-  exit 1
-fi
-
 finish() {
     output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
 }
