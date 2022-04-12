@@ -34,6 +34,11 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
+if [ "$lsb_dist" =  "fedora" ] || [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" = "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    output "* Your OS is not supported."
+    exit 1
+fi
+
 if ! [ -x "$(command -v curl)" ]; then
   echo "* cURL is required to run this script."
   exit 1
@@ -73,19 +78,15 @@ apachewebserver(){
 }
 
 start(){
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
-        output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
-        output "Do you agree to this?"
-        output "(Y/N):"
-        read -r AGREE
+    output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
+    output "Do you agree to this?"
+    output "(Y/N):"
+    read -r AGREE
 
-        if [[ "$AGREE" =~ [Yy] ]]; then
-            AGREE=yes
-            web
-        fi
-    else
-        output "OS is not supported."
-        fi
+    if [[ "$AGREE" =~ [Yy] ]]; then
+        AGREE=yes
+        web
+    fi
 }
 
 webserver(){
