@@ -50,7 +50,7 @@ webserver() {
             output "Configuring webserver..."
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx-ssl.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || FAILED=true
+            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
             systemctl restart nginx
             finish
             fi
@@ -68,7 +68,7 @@ webserver() {
             output "Configuring webserver..."
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-apache-ssl.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
-            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || FAILED=true
+            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
             apt install libapache2-mod-php
             sudo a2enmod rewrite
             systemctl restart apache2
@@ -84,7 +84,6 @@ webserver() {
             systemctl restart apache2
             finish
             fi
-    }
 }
 
 extra() {
