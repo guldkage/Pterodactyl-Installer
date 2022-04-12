@@ -49,12 +49,13 @@ fi
 finish(){
     output ""
     output "Thank you for using the script. Remember to give it a star."
-    output "The script has ended. $(hyperlink "$appurl") to go to your Panel."
+    output "The script has ended. https://$appurl to go to your Panel."
+    output ""
 }
 
 apachewebserver(){
-    if  [ "$webserv" =~ [apache] ]; then
-        if  [ "$SSLCONFIRM" =  "yes" ]; then
+    if  [ "$webserv" = "apache" ]; then
+        if  [ "$SSLSTATUS" =  "true" ]; then
             a2dissite 000-default.conf
             output "Configuring webserver..."
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache-ssl.conf
@@ -65,7 +66,7 @@ apachewebserver(){
             systemctl restart apache2
             finish
             fi
-        else :
+        if  [ "$SSLSTATUS" =  "false" ]; then
             a2dissite 000-default.conf
             output "Configuring webserver..."
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache.conf
@@ -91,8 +92,8 @@ start(){
 
 webserver(){
     apachewebserver
-    if  [ "$webserv" =~ [nginx] ]; then
-        if  [ "$SSLCONFIRM" =  "true" ]; then
+    if  [ "$webserv" = "nginx" ]; then
+        if  [ "$SSLSTATUS" =  "true" ]; then
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
@@ -100,7 +101,7 @@ webserver(){
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
             systemctl restart nginx
             fi
-        else :
+        if  [ "$SSLSTATUS" = "false" ]; then
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
@@ -242,6 +243,7 @@ ssl(){
     fi
     if [[ "$SSL_CONFIRM" =~ [Nn] ]]; then
         emailsslno
+        SSLSTATUS=false
     fi
 }
 
