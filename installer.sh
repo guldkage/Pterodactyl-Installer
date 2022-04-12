@@ -55,31 +55,6 @@ finish(){
     output ""
 }
 
-apachewebserver(){
-    if  [ "$webserv" = "apache" ]; then
-        if  [ "$SSLSTATUS" =  "true" ]; then
-            a2dissite 000-default.conf
-            output "Configuring webserver..."
-            curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache-ssl.conf
-            sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
-            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
-            apt install libapache2-mod-php -y
-            sudo a2enmod rewrite
-            systemctl restart apache2
-            finish
-            fi
-        else
-            a2dissite 000-default.conf
-            output "Configuring webserver..."
-            curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache.conf
-            sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
-            apt install libapache2-mod-php -y
-            sudo a2enmod rewrite
-            systemctl restart apache2
-            finish
-            fi
-}
-
 start(){
     output "The script will install Pterodactyl Panel, you will be asked for several things before installation."
     output "Do you agree to this?"
@@ -93,25 +68,23 @@ start(){
 }
 
 webserver(){
-    apachewebserver
-    if  [ "$webserv" = "nginx" ]; then
-        if  [ "$SSLSTATUS" =  "true" ]; then
-            rm -rf /etc/nginx/sites-enabled/default
-            output "Configuring webserver..."
-            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
-            sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-            certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
-            systemctl restart nginx
-            finish
-            fi
-        else
-            rm -rf /etc/nginx/sites-enabled/default
-            output "Configuring webserver..."
-            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
-            sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-            systemctl restart nginx
-            finish
-            fi
+    if  [ "$SSLSTATUS" =  "true" ]; then
+        rm -rf /etc/nginx/sites-enabled/default
+        output "Configuring webserver..."
+        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
+        sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || exit
+        systemctl restart nginx
+        finish
+        fi
+    if  [ "$SSLSTATUS" =  "false" ]; then
+        rm -rf /etc/nginx/sites-enabled/default
+        output "Configuring webserver..."
+        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
+        sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        systemctl restart nginx
+        finish
+        fi
 }
 
 extra(){
@@ -277,18 +250,11 @@ web(){
     output ""
     output "What webserver would you like to use?"
     output "[1] NGINX"
-    output "[2] Apache"
     output ""
     read -r option
     case $option in
         1 ) option=1
-            webserv="nginx"
             output "Selected: NGINX"
-            ssl
-            ;;
-        2 ) option=2
-            webserv="apache"
-            output "Selected: Apache"
             ssl
             ;;
         * ) output ""
