@@ -117,13 +117,14 @@ extra(){
     output ""
     output "Changing permissions..."
     output ""
-    command 1> /dev/null
+    {
     chown -R www-data:www-data /var/www/pterodactyl/*
     curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
     (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
     sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
     sudo systemctl enable --now redis-server
     sudo systemctl enable --now pteroq.service
+    } &> /dev/null
     webserver
 }
 
@@ -133,16 +134,15 @@ configuration(){
     output ""
     output "Setting up the Panel..."
     output ""
-    command 1> /dev/null
+    {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
 
     php artisan p:environment:setup --author="$EMAIL" --url="$appurl" --timezone="America/New_York" --cache="redis" --session="redis" --queue="redis" --redis-host="localhost" --redis-pass="null" --redis-port="6379" --settings-ui=true
-
     php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DATABASE_PASSWORD"
-
     php artisan migrate --seed --force
     php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1
+    } &> /dev/null
     extra
 }
 
@@ -162,6 +162,7 @@ files(){
     output ""
     output "Downloading files... "
     output ""
+    {
     mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl || exit
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
@@ -170,7 +171,7 @@ files(){
     cp .env.example .env
     command composer install --no-dev --optimize-autoloader --no-interaction
     php artisan key:generate --force
-    output "Finished downloading files"
+    } &> /dev/null
     configuration
 }
 
@@ -195,8 +196,9 @@ required(){
     output "* INSTALLATION * "
     output ""
     output "Installing packages..."
+    output "This may take a while."
     output ""
-    command 1> /dev/null
+    {
     apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     add-apt-repository -y ppa:chris-lea/redis-server
@@ -205,6 +207,7 @@ required(){
     apt-add-repository universe
     apt install certbot python3-certbot-nginx -y
     apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+    } &> /dev/null
     database
 }
 
@@ -339,7 +342,7 @@ web(){
 
 updatepanel(){
     cd /var/www/pterodactyl || exit || output "Pterodactyl Directory (/var/www/pterodactyl) does not exist." || exit
-    command 1> /dev/null
+    {
     php artisan down
     curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
     chmod -R 755 storage/* bootstrap/cache
@@ -351,6 +354,7 @@ updatepanel(){
     php artisan db:seed --force
     php artisan up
     php artisan queue:restart
+    } &> /dev/null
     clear
     output ""
     output "* SUCCESSFULLY UPDATED *"
@@ -362,10 +366,11 @@ updatewings(){
     if ! [ -x "$(command -v wings)" ]; then
         echo "Wings is required to update both."
     fi
-    command 1> /dev/null
+    {
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
+    } &> /dev/null
     clear
     output ""
     output "* SUCCESSFULLY UPDATED *"
@@ -378,7 +383,7 @@ updateboth(){
         echo "Wings is required to update both."
     fi
     cd /var/www/pterodactyl || exit || warning "[!] Pterodactyl Directory (/var/www/pterodactyl) does not exist! Exitting..."
-    command 1> /dev/null
+    {
     php artisan down
     curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
     chmod -R 755 storage/* bootstrap/cache
@@ -393,6 +398,7 @@ updateboth(){
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
+    } &> /dev/null
     clear
     output ""
     output "* SUCCESSFULLY UPDATED *"
@@ -407,12 +413,13 @@ uninstallpanel(){
     read -r UNINSTALLPANEL
 
     if [[ "$UNINSTALLPANEL" =~ [Yy] ]]; then
-        command 1> /dev/null
+        {
         sudo rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
         sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
         sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
         sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
         sudo rm -rf /var/www/pterodactyl # Removing panel files
+        } &> /dev/null
         clear
         output ""
         output "* PANEL SUCCESSFULLY UNINSTALLED *"
@@ -430,12 +437,13 @@ uninstallwings(){
     read -r UNINSTALLWINGS
 
     if [[ "$UNINSTALLWINGS" =~ [Yy] ]]; then
-        command 1> /dev/null
+        {
         sudo systemctl stop wings # Stops wings
         sudo rm -rf /var/lib/pterodactyl # Removes game servers and backup files
         sudo rm -rf /etc/pterodactyl # Removes wings config
         sudo rm /usr/local/bin/wings || exit || warning "Wings is not installed!" # Removes wings
         sudo rm /etc/systemd/system/wings.service # Removes wings service file
+        } &> /dev/null
         clear
         output ""
         output "* WINGS SUCCESSFULLY UNINSTALLED *"
