@@ -8,6 +8,8 @@
 #                                                                      #
 ########################################################################
 
+set -e
+
 SSL_CONFIRM=""
 SSLSTATUS=""
 FQDN=""
@@ -51,13 +53,15 @@ webserver() {
             certbot certonly --no-eff-email --email "$EMAIL" -d "$FQDN" || FAILED=true
             systemctl restart nginx
             finish
-        else:
+            fi
+        else :
             rm -rf /etc/nginx/sites-enabled/default
             output "Configuring webserver..."
             curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-nginx.conf
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
             finish
+            fi
     if  [ "$WEBSERVER" =  "apache" ]; then
         if  [ "$SSLCONFIRM" =  "yes" ]; then
             a2dissite 000-default.conf
@@ -69,7 +73,8 @@ webserver() {
             sudo a2enmod rewrite
             systemctl restart apache2
             finish
-        else:
+            fi
+        else :
             a2dissite 000-default.conf
             output "Configuring webserver..."
             curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/config/pterodactyl-apache.conf
@@ -78,6 +83,7 @@ webserver() {
             sudo a2enmod rewrite
             systemctl restart apache2
             finish
+            fi
     }
 }
 
