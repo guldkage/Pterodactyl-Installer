@@ -256,7 +256,7 @@ ssl(){
 
 emailsslyes(){
     warning ""
-    warning "READ THIS"
+    warning "Read:"
     output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL. It will also be used to setup the Panel."
     output "If you do not agree, stop the script."
     warning ""
@@ -267,7 +267,7 @@ emailsslyes(){
 
 emailsslno(){
     warning ""
-    warning "READ THIS"
+    warning "Read:"
     output "The script now asks for your email. It will be used to setup the Panel."
     output "If you do not agree, stop the script."
     warning ""
@@ -279,8 +279,8 @@ emailsslno(){
 web(){
     output ""
     output "What webserver would you like to use?"
-    warning "[1] NGINX"
-    warning "[2] Apache"
+    output "[1] NGINX"
+    output "[2] Apache"
     output ""
     read -r option
     case $option in
@@ -299,9 +299,10 @@ web(){
     esac
 }
 
+clear
 output ""
-output "Pterodactyl Installer @ v1.0"
-output "https://github.com/guldkage/Pterodactyl-Installer"
+warning "Pterodactyl Installer @ v1.0"
+warning "https://github.com/guldkage/Pterodactyl-Installer"
 output ""
 output "This script is not resposible for any damages. The script has been tested several times without issues."
 output "Support is not given."
