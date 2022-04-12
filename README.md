@@ -1,4 +1,4 @@
-[![Logo Image](https://github.com/guldkage/Pterodactyl-Installer/blob/main/configs/PTERODACTYL%20INSTALLER.png?raw=true)]
+![Logo Image](https://github.com/guldkage/Pterodactyl-Installer/blob/main/configs/PTERODACTYL%20INSTALLER.png?raw=true)
 
 
 # Pterodactyl Installer
