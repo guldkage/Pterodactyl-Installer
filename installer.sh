@@ -190,7 +190,7 @@ phpmyadminemailsslyes(){
     output "* EMAIL *"
     output ""
     warning "Read:"
-    output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL. It will also be used to setup PHPMYAdmin."
+    output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL."
     output "If you do not agree, stop the script."
     warning ""
     output "Please enter your email"
