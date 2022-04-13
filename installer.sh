@@ -3,7 +3,9 @@
 
 ########################################################################
 #                                                                      #
-#               Pterodactyl Installer, Updater & Remover               #
+#            Pterodactyl Installer, Updater, Remover and More          #
+#            Copyright 2022, guldkage, <guldkaage@gmail.com>           #
+# https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE  #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
 #                                                                      #
@@ -986,6 +988,7 @@ output ""
 output "* WELCOME *"
 output ""
 warning "Pterodactyl Installer @ v1.0"
+warning "Copyright 2022, guldkage, <guldkaage@gmail.com>"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
 output ""
 output "This script is not resposible for any damages. The script has been tested several times without issues."
