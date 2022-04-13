@@ -368,20 +368,6 @@ required(){
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         } &> /dev/null
         database
-    elif [ "$lsb_dist" =  "fedora" ] || [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
-        {
-        yum -y install software-properties-common curl apt-transport-https ca-certificates gnupg
-        yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        yum install -y yum-utils
-        yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php80
-        yum install -y --enablerepo=remi redis
-        yum install -y MariaDB-common MariaDB-server
-        yum update
-        yum install certbot python3-certbot-nginx -y
-        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache} mariadb-server nginx tar unzip git redis-server
-        } &> /dev/null
-        database
     fi
 }
 
