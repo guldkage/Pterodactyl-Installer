@@ -104,6 +104,7 @@ finish(){
         warning "Last Name: $LASTNAME"
         warning "Password: (Censored)"
         output ""
+    fi
     if  [ "$SSLSTATUS" =  "false" ]; then
         clear
         output ""
@@ -118,6 +119,7 @@ finish(){
         output "Last Name: $LASTNAME"
         output "Password: (Censored)"
         output ""
+    fi
 }
 
 start(){
