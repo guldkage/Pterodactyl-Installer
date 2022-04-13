@@ -489,8 +489,6 @@ begin(){
 
 password(){
     output ""
-    output "* ACCOUNT CREATION * "
-    output ""
     output "Please enter password for account"
     read -r PASSWORD
     begin
@@ -499,8 +497,6 @@ password(){
 
 username(){
     output ""
-    output "* ACCOUNT CREATION * "
-    output ""
     output "Please enter username for account"
     read -r USERNAME
     password
@@ -508,8 +504,6 @@ username(){
 
 
 lastname(){
-    output ""
-    output "* ACCOUNT CREATION * "
     output ""
     output "Please enter last name for account"
     read -r LASTNAME
