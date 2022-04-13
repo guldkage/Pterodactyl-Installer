@@ -611,11 +611,18 @@ http(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "HTTP & HTTPS firewall rule has been applied."
-    {
-    apt install ufw -Y
-    ufw allow 80
-    ufw alllow 443
-    } &> /dev/null
+    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+        {
+        apt install ufw -Y
+        ufw allow 80
+        ufw alllow 443
+        } &> /dev/null
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        firewall-cmd --add-service=http --permanent
+        firewall-cmd --add-service=https --permanent
+        } &> /dev/null
+    fi
 }
 
 pterodactylports(){
@@ -623,13 +630,22 @@ pterodactylports(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "All Pterodactyl Ports firewall rule has been applied."
-    {
-    apt install ufw -Y
-    ufw allow 80
-    ufw alllow 443
-    ufw allow 8080
-    ufw allow 2022
-    } &> /dev/null
+    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+        {
+        apt install ufw -Y
+        ufw allow 80
+        ufw alllow 443
+        ufw allow 8080
+        ufw allow 2022
+        } &> /dev/null
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        firewall-cmd --add-service=http --permanent
+        firewall-cmd --add-service=https --permanent
+        firewall-cmd --permanent --add-port=8080/tcp
+        firewall-cmd --permanent --add-port=2022/tcp
+        } &> /dev/null
+    fi
 }
 
 mysql(){
@@ -637,10 +653,16 @@ mysql(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "MySQL firewall rule has been applied."
-    {
-    apt install ufw -Y
-    ufw alllow 3306
-    } &> /dev/null
+    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+        {
+        apt install ufw -Y
+        ufw alllow 3306
+        } &> /dev/null
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        firewall-cmd --add-service=mysql --permanent
+        } &> /dev/null
+    fi
 }
 
 allfirewall(){
@@ -648,14 +670,24 @@ allfirewall(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "All of them firewall rule has been applied."
-    {
-    apt install ufw -Y
-    ufw allow 80
-    ufw alllow 443
-    ufw allow 8080
-    ufw allow 2022
-    ufw alllow 3306
-    } &> /dev/null
+    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+        {
+        apt install ufw -Y
+        ufw allow 80
+        ufw alllow 443
+        ufw allow 8080
+        ufw allow 2022
+        ufw alllow 3306
+        } &> /dev/null
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        firewall-cmd --add-service=http --permanent
+        firewall-cmd --add-service=https --permanent
+        firewall-cmd --permanent --add-port=8080/tcp
+        firewall-cmd --permanent --add-port=2022/tcp
+        firewall-cmd --add-service=mysql --permanent
+        } &> /dev/null
+    fi
 }
 
 rewnewcertificates(){
