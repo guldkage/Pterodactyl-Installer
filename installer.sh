@@ -114,6 +114,7 @@ phpmyadmininstall(){
     chmod o+rw config
     cp config.sample.inc.php config/config.inc.php
     chmod o+w config/config.inc.php
+    rm -rf /var/www/phpmyadmin/config
     } &> /dev/null
     phpmyadminweb
 }
