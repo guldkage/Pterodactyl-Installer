@@ -170,17 +170,6 @@ startphpmyadmin(){
     fi
 }
 
-wingsfinish(){
-    clear
-    output ""
-    output "* WINGS SUCCESSFULLY INSTALLED *"
-    output ""
-    output "Thank you for using the script. Remember to give it a star."
-    output "All you need is to set up Wings."
-    output "To do this, create the node on your Panel, then press under Configuration,"
-    output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
-    output ""
-
 finish(){
     if  [ "$SSLSTATUS" =  "true" ]; then
         clear
@@ -237,7 +226,15 @@ wingsfiles(){
     curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
     chmod u+x /usr/local/bin/wings
     } &> /dev/null
-    wingsfinish
+    clear
+    output ""
+    output "* WINGS SUCCESSFULLY INSTALLED *"
+    output ""
+    output "Thank you for using the script. Remember to give it a star."
+    output "All you need is to set up Wings."
+    output "To do this, create the node on your Panel, then press under Configuration,"
+    output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
+    output ""
 }
 
 wingsdocker(){
