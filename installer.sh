@@ -403,7 +403,6 @@ composer(){
 files(){
     output "Downloading files... "
     {
-    mkdir -p /var/www/pterodactyl
     cd /var/www/pterodactyl || exit
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
     tar -xzvf panel.tar.gz
@@ -427,6 +426,7 @@ required(){
     output "This may take a while."
     output ""
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
+        mkdir /var/www/pterodactyl || exit || output "Panel is already installed!" || exit
         {
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
