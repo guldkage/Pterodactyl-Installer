@@ -29,6 +29,8 @@ AGREEPHPMYADMIN=""
 PHPMYADMINEMAIL=""
 DOMAINSWITCH=""
 SSLSWTICH=""
+IP=""
+DOMAIN=""
 lsb_dist="$(. /etc/os-release && echo "$ID")"
 
 
