@@ -101,6 +101,7 @@ phpmyadmininstall(){
     output "Installing PHPMyAdmin..."
     {
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+    sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
     apt install nginx -y
     apt install certbot -y
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
@@ -123,6 +124,7 @@ fqdnphpmyadmin(){
     output ""
     output "Enter your FQDN or IP"
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
+    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
     read -r FQDNPHPMYADMIN
     phpmyadmininstall
 }
