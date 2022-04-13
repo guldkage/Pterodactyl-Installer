@@ -72,14 +72,13 @@ wingsfinish(){
     output ""
 
 finishphpmyadmin(){
-    if  [ "$SSLSTATUS" =  "true" ]; then
-        clear
-        output ""
-        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
-        output ""
-        output "Thank you for using the script. Remember to give it a star."
-        output "You nay still need to create a admin account for PHPMYAdmin."
-        output "URL: https://$FQDNPHPMYADMIN or http://$FQDNPHPMYADMIN"
+    clear
+    output ""
+    output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
+    output ""
+    output "Thank you for using the script. Remember to give it a star."
+    output "You nay still need to create a admin account for PHPMYAdmin."
+    output "URL: https://$FQDNPHPMYADMIN or http://$FQDNPHPMYADMIN"
 
 finish(){
     if  [ "$SSLSTATUS" =  "true" ]; then
