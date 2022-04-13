@@ -375,7 +375,7 @@ configuration(){
     {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
-    DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1`
+    DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';"
     mysql -u root -e "CREATE DATABASE panel;"
     mysql -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;"
