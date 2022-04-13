@@ -103,6 +103,7 @@ phpmyadmininstall(){
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
     apt install nginx -y
     apt install certbot -y
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
     apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
     wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
     tar xvzf phpMyAdmin-5.1.3-english.tar.gz
