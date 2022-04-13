@@ -546,6 +546,7 @@ fqdn(){
         output "Please point your servers IP to your FQDN."
         fqdn
     else
+        output "Your FQDN is pointed correctly. Continuing."
         required
     fi
 }
