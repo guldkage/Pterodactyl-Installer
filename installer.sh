@@ -149,6 +149,7 @@ fqdnphpmyadmin(){
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
     read -r FQDNPHPMYADMIN
+    [ -z "$FQDNPHPMYADMIN" ] && output "FQDN can't be empty."
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
     DOMAIN=$(dig +short ${FQDNPHPMYADMIN})
     if [ "${IP}" != "${DOMAIN}" ]; then
@@ -222,6 +223,8 @@ finish(){
         warning "Last Name: $LASTNAME"
         warning "Password: (Censored)"
         output ""
+        output "The Panel may not load if port 80 and 433 is not open. Please check your firewall"
+        output "or rerun this script and select Firewall Configuration."
     fi
 }
 
@@ -538,6 +541,7 @@ fqdn(){
     output "Enter your FQDN or IP"
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     read -r FQDN
+    [ -z "$FQDN" ] && output "FQDN can't be empty."
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
     DOMAIN=$(dig +short ${FQDN})
     if [ "${IP}" != "${DOMAIN}" ]; then
