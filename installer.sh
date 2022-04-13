@@ -147,7 +147,15 @@ fqdnphpmyadmin(){
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
     read -r FQDNPHPMYADMIN
-    phpmyadmininstall
+    IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
+    DOMAIN=$(dig +short ${FQDNPHPMYADMIN})
+    if [ "${IP}" != "${DOMAIN}" ]; then
+        output ""
+        output "Your FQDN does not resolve to the IP of current server."
+        output "Please point your servers IP to your FQDN."
+        fqdnphpmyadmin
+    else
+        phpmyadmininstall
 }
 
 phpmyadminemailsslyes(){
@@ -527,7 +535,15 @@ fqdn(){
     output "Enter your FQDN or IP"
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     read -r FQDN
-    required
+    IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
+    DOMAIN=$(dig +short ${FQDN})
+    if [ "${IP}" != "${DOMAIN}" ]; then
+        output ""
+        output "Your FQDN does not resolve to the IP of current server."
+        output "Please point your servers IP to your FQDN."
+        fqdn
+    else
+        required
 }
 
 ssl(){
@@ -634,7 +650,7 @@ updateboth(){
     if ! [ -x "$(command -v wings)" ]; then
         echo "Wings is required to update both."
     fi
-    cd /var/www/pterodactyl || exit || warning "[!] Pterodactyl Directory (/var/www/pterodactyl) does not exist! Exitting..."
+    cd /var/www/pterodactyl || exit || warning "Pterodactyl Directory (/var/www/pterodactyl) does not exist!"
     {
     php artisan down
     curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
@@ -883,11 +899,11 @@ options(){
 
 oscheck(){
     output "* Checking your OS.."
-    sleep 1s
+    sleep 2s
     if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
         output "* Your OS, $lsb_dist, is fully supported. Continuing.."
         output ""
-        sleep 1s
+        sleep 2s
         options
     elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
         output "* Your OS, $lsb_dist, is not fully supported."
