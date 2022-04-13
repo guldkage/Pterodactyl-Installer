@@ -325,7 +325,6 @@ webserver(){
         rm -rf /etc/nginx/sites-enabled/default
         output "Configuring webserver..."
         {
-        php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
@@ -339,7 +338,6 @@ webserver(){
         rm -rf /etc/nginx/sites-enabled/default
         output "Configuring webserver..."
         {
-        php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
@@ -373,6 +371,7 @@ extra(){
 
 configuration(){
     output "Setting up the Panel..."
+    {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
     DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
@@ -381,6 +380,7 @@ configuration(){
     php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
     php artisan migrate --seed --force
     php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1
+    } &> /dev/null
     extra
 }
 
@@ -762,7 +762,7 @@ pterodactylports(){
     fi
 }
 
-mysql(){
+mainmysql(){
     output ""
     output "* FIREWALL CONFIGURATION * "
     output ""
@@ -889,7 +889,7 @@ options(){
             pterodactlports
             ;;
         3 ) option=3
-            mysql
+            mainmysql
             ;;
         4 ) option=4
             allfirewall
