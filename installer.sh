@@ -375,15 +375,7 @@ required(){
         yum-config-manager --disable remi-php54
         yum-config-manager --enable remi-php80
         yum install -y --enablerepo=remi redis
-        cat <<EOF > /etc/yum.repos.d/mariadb.repo
-        # MariaDB 10.5 CentOS repository list - created 2017-07-14 12:40 UTC
-        # http://downloads.mariadb.org/mariadb/repositories/
-        [mariadb]
-        name = MariaDB
-        baseurl = http://yum.mariadb.org/10.5/centos7-amd64
-        gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-        gpgcheck=1
-        EOF
+        yum install -y MariaDB-common MariaDB-server
         yum update
         yum install certbot python3-certbot-nginx -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache} mariadb-server nginx tar unzip git redis-server
