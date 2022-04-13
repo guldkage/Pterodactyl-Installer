@@ -119,7 +119,7 @@ phpmyadminweb(){
         output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
         output ""
         output "Thank you for using the script. Remember to give it a star."
-        output "You nay still need to create a admin account for PHPMYAdmin."
+        output "You may still need to create a admin account for PHPMYAdmin."
         output "URL: https://$FQDNPHPMYADMIN"
         fi
     if  [ "$SSLSTATUSPHPMYADMIN" =  "false" ]; then
@@ -134,7 +134,7 @@ phpmyadminweb(){
         output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
         output ""
         output "Thank you for using the script. Remember to give it a star."
-        output "You nay still need to create a admin account for PHPMYAdmin."
+        output "You may still need to create a admin account for PHPMYAdmin."
         output "URL: http://$FQDNPHPMYADMIN"
         fi
 }
