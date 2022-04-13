@@ -917,7 +917,7 @@ oscheck(){
 
 options(){
     output "* SELECT OPTION * "
-    warning "Operation System: $dist"
+    output "OS: $dist"
     output ""
     output "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
