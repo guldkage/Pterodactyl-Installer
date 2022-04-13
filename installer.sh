@@ -70,7 +70,7 @@ if ! [ -x "$(command -v curl)" ]; then
     exit 1
 fi
 
-### BEGINNING OF CODE ###
+### PHPMyAdmin Install Complete ###
 
 phpmyadminweb(){
     if  [ "$SSLSTATUSPHPMYADMIN" =  "true" ]; then
@@ -106,6 +106,8 @@ phpmyadminweb(){
         output "URL: http://$FQDNPHPMYADMIN"
         fi
 }
+
+### PHPMyAdmin Install ###
 
 phpmyadmininstall(){
     output ""
@@ -223,6 +225,8 @@ startphpmyadmin(){
     fi
 }
 
+### Finish Panel Installation ###
+
 finish(){
     clear
     output ""
@@ -281,6 +285,8 @@ startwings(){
     fi
 }
 
+### Wings ###
+
 wingsfiles(){
     output "Installing Files..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
@@ -320,6 +326,8 @@ wingsfiles(){
     fi
 }
 
+### Docker ###
+
 wingsdocker(){
     output ""
     output "Installing Docker..."
@@ -338,6 +346,8 @@ wingsdocker(){
         wingsfiles
     fi
 }
+
+### Webserver ###
 
 webserver(){
     if  [ "$SSLSTATUS" =  "true" ]; then
@@ -366,6 +376,8 @@ webserver(){
         fi
 }
 
+### Permissions ###
+
 extra(){
     output "Changing permissions..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
@@ -388,6 +400,8 @@ extra(){
         webserver
     fi
 }
+
+### Confiration of the Panel ###
 
 configuration(){
     output "Setting up the Panel... Can be a long process."
@@ -422,6 +436,8 @@ composer(){
     fi
 }
 
+### Downloading files for Pterodactyl ###
+
 files(){
     output "Downloading required files for Pterodactyl.."
     {
@@ -436,9 +452,13 @@ files(){
     configuration
 }
 
+### haven't changed yet ###
+
 database(){
     firstname
 }
+
+### Installing required Packages for Pterodactyl ###
 
 required(){
     output ""
@@ -509,6 +529,8 @@ begin(){
     composer
 }
 
+### Pterodactyl Admin User ###
+
 password(){
     output ""
     output "Please enter password for Admin Account."
@@ -546,6 +568,8 @@ firstname(){
     lastname
 }
 
+### FQDN ###
+
 fqdn(){
     output ""
     output "* PANEL URL * "
@@ -567,6 +591,8 @@ fqdn(){
     fi
 }
 
+### SSL ###
+
 ssl(){
     output ""
     output "* SSL * "
@@ -587,6 +613,8 @@ ssl(){
     fi
 }
 
+### SSL select yes ##
+
 emailsslyes(){
     output ""
     output "* EMAIL *"
@@ -600,6 +628,8 @@ emailsslyes(){
     fqdn
 }
 
+### SSL select no ###
+
 emailsslno(){
     output ""
     output "* EMAIL *"
@@ -612,6 +642,8 @@ emailsslno(){
     read -r EMAIL
     fqdn
 }
+
+### Webserver selection ###
 
 web(){
     output ""
@@ -632,6 +664,8 @@ web(){
             options
     esac
 }
+
+### Update Panel ###
 
 updatepanel(){
     cd /var/www/pterodactyl || exit || output "Pterodactyl Directory (/var/www/pterodactyl) does not exist." || exit
@@ -654,6 +688,8 @@ updatepanel(){
     output "Pterodactyl Panel has successfully updated."
 }
 
+### Update Wings ###
+
 updatewings(){
     if ! [ -x "$(command -v wings)" ]; then
         echo "Wings is required to update both."
@@ -668,6 +704,8 @@ updatewings(){
     output ""
     output "Wings has successfully updated."
 }
+
+### Update Pterodactyl and Wings ###
 
 updateboth(){
     if ! [ -x "$(command -v wings)" ]; then
@@ -696,6 +734,8 @@ updateboth(){
     output "Pterodactyl Panel and Wings has successfully updated."
 }
 
+### Uninstall Panel ###
+
 uninstallpanel(){
     output ""
     output "Do you really want to delete Pterodactyl Panel? All files & configurations will be deleted. You CANNOT get your files back."
@@ -719,6 +759,8 @@ uninstallpanel(){
     fi
 }
 
+### Uninstall Wings ###
+
 uninstallwings(){
     output ""
     output "Do you really want to delete Pterodactyl Wings? All game servers & configurations will be deleted. You CANNOT get your files back."
@@ -740,6 +782,8 @@ uninstallwings(){
         output ""
     fi
 }
+
+### Firewall ###
 
 http(){
     output ""
@@ -825,6 +869,8 @@ allfirewall(){
     fi
 }
 
+### Switch Domains ###
+
 switch(){
     if  [ "$SSLSWITCH" =  "true" ]; then
         {
@@ -874,7 +920,6 @@ switchssl(){
     esac
 }
 
-
 switchdomains(){
     output ""
     output "* SWITCH DOMAINS * "
@@ -883,6 +928,8 @@ switchdomains(){
     read -r DOMAINSWITCH
     switchssl
 }
+
+### Renews certificates ###
 
 rewnewcertificates(){
     {
@@ -893,6 +940,8 @@ rewnewcertificates(){
     output ""
     output "All Let's Encrypt certificates that were ready to be renewed have been renewed."
 }
+
+### Firewall options ###
 
 options(){
     output ""
@@ -922,6 +971,8 @@ options(){
     esac
 }
 
+### OS Check ###
+
 oscheck(){
     output "* Checking your OS.."
     sleep 1s
@@ -943,6 +994,8 @@ oscheck(){
         exit 1
     fi
 }
+
+### Options ###
 
 options(){
     output "* SELECT OPTION * "
@@ -1002,7 +1055,7 @@ options(){
     esac
 }
 
-### START ###
+### Start ###
 
 clear
 output ""
