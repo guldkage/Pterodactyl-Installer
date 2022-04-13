@@ -39,6 +39,16 @@ output(){
     echo -e '\e[36m'"$1"'\e[0m';
 }
 
+function trap_ctrlc ()
+{
+    echo "Bye!"
+    exit 2
+}
+ 
+# initialise trap to call trap_ctrlc function
+# when signal 2 (SIGINT) is received
+trap "trap_ctrlc" 2
+
 warning(){
     echo -e '\e[31m'"$1"'\e[0m';
 }
