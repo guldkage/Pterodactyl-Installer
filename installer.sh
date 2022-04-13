@@ -821,7 +821,6 @@ options(){
 }
 
 options(){
-    output ""
     output "* SELECT OPTION * "
     output "Operation System: $lsb_dist"
     output ""
