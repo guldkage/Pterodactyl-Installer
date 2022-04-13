@@ -224,6 +224,7 @@ finish(){
         warning "First Name: $FIRSTNAME"
         warning "Last Name: $LASTNAME"
         warning "Password: (Censored)"
+        warning "Database password: $DBPASSWORD"
         output ""
         output "The Panel may not load if port 80 and 433 is not open. Please check your firewall"
         output "or rerun this script and select Firewall Configuration."
