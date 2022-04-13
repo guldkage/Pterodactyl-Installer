@@ -104,115 +104,6 @@ start(){
     fi
 }
 
-phpmyadminweb(){
-    if  [ "$SSLSTATUSPHPMYADMIN" =  "true" ]; then
-        rm -rf /etc/nginx/sites-enabled/default
-        {
-        curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin-ssl.conf
-        sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
-        systemctl stop nginx
-        certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos
-        systemctl start nginx
-        } &> /dev/null
-        clear
-        output ""
-        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
-        output ""
-        output "Thank you for using the script. Remember to give it a star."
-        output "You may still need to create a admin account for PHPMYAdmin."
-        output "URL: https://$FQDNPHPMYADMIN"
-        fi
-    if  [ "$SSLSTATUSPHPMYADMIN" =  "false" ]; then
-        rm -rf /etc/nginx/sites-enabled/default
-        {
-        curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin.conf
-        sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
-        systemctl restart nginx
-        } &> /dev/null
-        clear
-        output ""
-        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
-        output ""
-        output "Thank you for using the script. Remember to give it a star."
-        output "You may still need to create a admin account for PHPMYAdmin."
-        output "URL: http://$FQDNPHPMYADMIN"
-        fi
-}
-
-phpmyadmininstall(){
-    output ""
-    output "Installing PHPMyAdmin..."
-    {
-    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
-    apt install nginx -y
-    wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
-    tar xvzf phpMyAdmin-5.1.3-english.tar.gz
-    mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
-    chown -R www-data:www-data *
-    mkdir config
-    chmod o+rw config
-    cp config.sample.inc.php config/config.inc.php
-    chmod o+w config/config.inc.php
-    } &> /dev/null
-    phpmyadminweb
-}
-
-fqdnphpmyadmin(){
-    output ""
-    output "* PHPMYADMIN URL * "
-    output ""
-    output "Enter your FQDN or IP"
-    output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
-    read -r FQDNPHPMYADMIN
-    phpmyadmininstall
-}
-
-phpmyadminemailsslyes(){
-    output ""
-    output "* EMAIL *"
-    output ""
-    warning "Read:"
-    output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL."
-    output "If you do not agree, stop the script."
-    warning ""
-    output "Please enter your email"
-    read -r PHPMYADMINEMAIL
-    fqdnphpmyadmin
-}
-
-phpmyadminssl(){
-    output ""
-    output "* SSL * "
-    output ""
-    output "Do you want to use SSL for PHPMyAdmin? This requires a domain."
-    output "(Y/N):"
-    read -r SSL_CONFIRM_PHPMYADMIN
-
-    if [[ "$SSL_CONFIRM_PHPMYADMIN" =~ [Yy] ]]; then
-        SSLSTATUSPHPMYADMIN=true
-        phpmyadminemailsslyes
-        fi
-    if [[ "$SSL_CONFIRM_PHPMYADMIN" =~ [Nn] ]]; then
-        fqdnphpmyadmin
-        SSLSTATUSPHPMYADMIN=false
-        fi
-}
-
-
-startphpmyadmin(){
-    output ""
-    output "* AGREEMENT *"
-    output ""
-    output "The script will install PHPMYAdmin with the webserver NGINX."
-    output "Do you want to continue?"
-    output "(Y/N):"
-    read -r AGREEPHPMYADMIN
-
-    if [[ "$AGREEPHPMYADMIN" =~ [Yy] ]]; then
-        phpmyadminssl
-    fi
-}
-
 startwings(){
     output ""
     output "* AGREEMENT *"
@@ -649,7 +540,7 @@ options(){
 
 clear
 output ""
-output "* WELCOME * "
+output "* WELCOME *"
 output ""
 warning "Pterodactyl Installer @ v1.0"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
