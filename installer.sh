@@ -383,7 +383,7 @@ extra(){
 }
 
 configuration(){
-    output "Setting up the Panel..."
+    output "Setting up the Panel... Can be a long process."
     {
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
@@ -402,7 +402,7 @@ composer(){
     output ""
     output "* INSTALLATION * "
     output ""
-    output "Installing composer.."
+    output "Installing Composer.. This is used to operate the Panel."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -414,7 +414,7 @@ composer(){
 }
 
 files(){
-    output "Downloading files... "
+    output "Downloading required files for Pterodactyl.."
     {
     cd /var/www/pterodactyl || exit
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
@@ -442,23 +442,26 @@ required(){
         mkdir /var/www/pterodactyl || exit || output "Panel is already installed!" || exit
         {
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+        output "Installing dependencies"
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         add-apt-repository -y ppa:chris-lea/redis-server
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
         apt update
         apt-add-repository universe
         apt install certbot python3-certbot-nginx -y
+        output "Installing PHP.."
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         } &> /dev/null
         database
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
-
+        output "Installing dependencies"
         yum update -y
         yum install -y MariaDB-common MariaDB-server
         systemctl start mariadb
         systemctl enable mariadb
+        output "Installing PHP.."
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         yum install -y yum-utils
         yum-config-manager --disable remi-php54
@@ -499,7 +502,8 @@ begin(){
 
 password(){
     output ""
-    output "Please enter password for account"
+    output "Please enter password for Admin Account."
+    output "The password is not visible when you type it."
     read -s -p PASSWORD
     begin
 }
@@ -507,7 +511,8 @@ password(){
 
 username(){
     output ""
-    output "Please enter username for account"
+    output "Please enter username for Admin Account."
+    output "You will login with either username or your email."
     read -r USERNAME
     password
 }
@@ -515,7 +520,7 @@ username(){
 
 lastname(){
     output ""
-    output "Please enter last name for account"
+    output "Please enter last name for Admin Account."
     read -r LASTNAME
     username
 }
@@ -527,7 +532,7 @@ firstname(){
     output "In order to create an account on the Panel, we need some more information."
     output "You do not need to type in real first and last name."
     output ""
-    output "Please enter first name for account"
+    output "Please enter first name for Admin Account."
     read -r FIRSTNAME
     lastname
 }
@@ -536,7 +541,7 @@ fqdn(){
     output ""
     output "* PANEL URL * "
     output ""
-    output "Enter your FQDN or IP"
+    output "Enter your FQDN or IP for your Panel. You will access the Panel with this."
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
     read -r FQDN
     [ -z "$FQDN" ] && output "FQDN can't be empty."
@@ -557,7 +562,9 @@ ssl(){
     output ""
     output "* SSL * "
     output ""
-    output "Do you want to use SSL? This requires a domain."
+    output "Do you want to use SSL? It requires a domain."
+    output "SSL encrypts all data compared to HTTP which does not. SSL is always recommended."
+    output "If you do not have a domain and want to use an IP to access, please type N, as you can not have SSL on a IP this easy."
     output "(Y/N):"
     read -r SSL_CONFIRM
 
@@ -992,7 +999,7 @@ clear
 output ""
 output "* WELCOME *"
 output ""
-warning "Pterodactyl Installer @ v1.0"
+warning "Pterodactyl Installer @ v2.0"
 warning "Copyright 2022, guldkage, <guldkaage@gmail.com>"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
 output ""
