@@ -354,7 +354,6 @@ extra(){
         chown -R www-data:www-data /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
         (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
-        sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
         sudo systemctl enable --now redis-server
         sudo systemctl enable --now pteroq.service
         } &> /dev/null
@@ -364,7 +363,6 @@ extra(){
         chown -R nginx:nginx /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq-centos.service
         (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
-        sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
         sudo systemctl enable --now redis-server
         sudo systemctl enable --now pteroq.service
         } &> /dev/null
