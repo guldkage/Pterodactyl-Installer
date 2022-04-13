@@ -27,6 +27,7 @@ FQDNPHPMYADMIN=""
 SSL_CONFIRM_PHPMYADMIN=""
 AGREEPHPMYADMIN=""
 PHPMYADMINEMAIL=""
+lsb_dist="$(. /etc/os-release && echo "$ID")"
 
 
 output(){
