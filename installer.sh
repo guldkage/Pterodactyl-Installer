@@ -46,14 +46,6 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-if [ "$lsb_dist" =  "fedora" ] || [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" = "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
-    output ""
-    output "* ERROR *"
-    output ""
-    output "* Your OS is not supported."
-    exit 1
-fi
-
 if ! [ -x "$(command -v curl)" ]; then
     output ""
     output "* ERROR *"
@@ -292,11 +284,20 @@ wingsfiles(){
 wingsdocker(){
     output ""
     output "Installing Docker..."
-    {
-    curl -sSL https://get.docker.com/ | CHANNEL=stable bash
-    systemctl enable --now docker
-    } &> /dev/null
-    wingsfiles
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        {
+        curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+        systemctl enable --now docker
+        } &> /dev/null
+        wingsfiles
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        dnf -y install docker-ce --allowerasing
+        systemctl enable --now docker
+        } &> /dev/null
+        wingsfiles
+    fi
 }
 
 webserver(){
@@ -821,6 +822,21 @@ options(){
     esac
 }
 
+oscheck(){
+    output "* Checking your OS.."
+    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+        output "* Your OS, $lsb_dist, is fully supported. Continuing.."
+        output ""
+        options
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        output "* Your OS, $lsb_dist, is not fully supported."
+        output "* Installations may work, but there is no gurrantee."
+        output "* Continuing in 5 seconds. CTRL+C to stop."
+        output ""
+        sleep 5s
+        options
+}
+
 options(){
     output "* SELECT OPTION * "
     warning "Operation System: $lsb_dist"
@@ -887,4 +903,4 @@ output "This script is not resposible for any damages. The script has been teste
 output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
 output ""
-options
+oscheck
