@@ -367,6 +367,7 @@ required(){
         apt install certbot python3-certbot-nginx -y
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         } &> /dev/null
+        database
     elif [ "$lsb_dist" =  "fedora" ] || [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
         {
         yum -y install software-properties-common curl apt-transport-https ca-certificates gnupg
@@ -380,7 +381,7 @@ required(){
         yum install certbot python3-certbot-nginx -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache} mariadb-server nginx tar unzip git redis-server
         } &> /dev/null
-    database
+        database
     fi
 }
 
