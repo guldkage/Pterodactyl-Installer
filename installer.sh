@@ -416,9 +416,6 @@ files(){
 }
 
 database(){
-    output ""
-    output "* INSTALLATION * "
-    output ""
     firstname
 }
 
@@ -490,7 +487,7 @@ begin(){
 password(){
     output ""
     output "Please enter password for account"
-    read -s -p -r PASSWORD
+    read -s -p PASSWORD
     begin
 }
 
