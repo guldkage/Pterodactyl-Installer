@@ -551,6 +551,7 @@ fqdn(){
         fqdn
     else
         required
+    fi
 }
 
 ssl(){
