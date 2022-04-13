@@ -101,7 +101,8 @@ phpmyadmininstall(){
     output "Installing PHPMyAdmin..."
     {
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
-    apt install nginx certbot -y
+    apt install nginx -y
+    apt install certbot -y
     wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
     tar xvzf phpMyAdmin-5.1.3-english.tar.gz
     mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
