@@ -896,6 +896,7 @@ oscheck(){
         output ""
         sleep 5s
         options
+    fi
 }
 
 options(){
