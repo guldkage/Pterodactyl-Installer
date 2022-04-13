@@ -27,6 +27,8 @@ FQDNPHPMYADMIN=""
 SSL_CONFIRM_PHPMYADMIN=""
 AGREEPHPMYADMIN=""
 PHPMYADMINEMAIL=""
+DOMAINSWITCH=""
+SSLSWTICH=""
 lsb_dist="$(. /etc/os-release && echo "$ID")"
 
 
@@ -688,7 +690,7 @@ uninstallwings(){
         {
         sudo systemctl stop wings # Stops wings
         sudo rm -rf /var/lib/pterodactyl # Removes game servers and backup files
-        sudo rm -rf /etc/pterodactyl # Removes wings config
+        sudo rm -rf /etc/pterodactyl  || exit || warning "Pterodactyl Wings not installed!"
         sudo rm /usr/local/bin/wings || exit || warning "Wings is not installed!" # Removes wings
         sudo rm /etc/systemd/system/wings.service # Removes wings service file
         } &> /dev/null
@@ -784,6 +786,63 @@ allfirewall(){
     fi
 }
 
+switch(){
+    if  [ "$SSLSWITCH" =  "true" ]; then
+        {
+        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
+        sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        systemctl restart nginx
+        } &> /dev/null
+        output ""
+        output "* SWITCH DOMAINS * "
+        output ""
+        output "Your domain has been switched to $DOMAINSWITCH"
+        fi
+    if  [ "$SSLSWITCH" =  "false" ]; then
+        {
+        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf || exit || warning "Pterodactyl Panel not installed!"
+        sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        systemctl restart nginx
+        } &> /dev/null
+        output ""
+        output "* SWITCH DOMAINS * "
+        output ""
+        output "Your domain has been switched to $DOMAINSWITCH"
+        fi
+}
+
+switchssl(){
+    output ""
+    output "* SWITCH DOMAINS * "
+    output ""
+    output "Select the one that describes your panel:"
+    warning "[1] I have a Panel with SSL"
+    warning "[2] I do not have a Panel with SSL"
+    read -r option
+    case $option in
+        1 ) option=1
+            sslswitch=true
+            switch
+            ;;
+        2 ) option=2
+            sslswitch=false
+            switch
+            ;;
+        * ) output ""
+            output "Please enter a valid option."
+    esac
+}
+
+
+switchdomains(){
+    output ""
+    output "* SWITCH DOMAINS * "
+    output ""
+    output "Please enter the domain (panel.mydomain.ltd) you want to switch to."
+    read -r DOMAINSWITCH
+    switchssl
+}
+
 rewnewcertificates(){
     {
     sudo certbot renew
@@ -824,9 +883,11 @@ options(){
 
 oscheck(){
     output "* Checking your OS.."
+    sleep 1s
     if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
         output "* Your OS, $lsb_dist, is fully supported. Continuing.."
         output ""
+        sleep 1s
         options
     elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
         output "* Your OS, $lsb_dist, is not fully supported."
@@ -855,6 +916,7 @@ options(){
     warning ""
     warning "[9] Renew Certificates | Renews all Lets Encrypt certificates on this machine."
     warning "[10] Configure Firewall | Configure UFW to your liking."
+    warning "[11] Switch Pterodactyl Domain | Changes your Pterodactyl Domain. [BETA]"
     read -r option
     case $option in
         1 ) option=1
@@ -886,6 +948,9 @@ options(){
             ;;
         10 ) option=10
             configureufw
+            ;;
+        11 ) option=11
+            switchdomains
             ;;
         * ) output ""
             output "Please enter a valid option."
