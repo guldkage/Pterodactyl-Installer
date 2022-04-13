@@ -227,7 +227,6 @@ startphpmyadmin(){
     read -r AGREEPHPMYADMIN
 
     if [[ "$AGREEPHPMYADMIN" =~ [Yy] ]]; then
-        AGREEPHPMYADMIN=yes
         phpmyadminssl
     fi
 }
