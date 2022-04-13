@@ -895,11 +895,11 @@ options(){
 
 oscheck(){
     output "* Checking your OS.."
-    sleep 2s
+    sleep 1s
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         output "* Your OS, $dist, is fully supported. Continuing.."
         output ""
-        sleep 2s
+        sleep 1s
         options
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         output "* Your OS, $dist, is not fully supported."
