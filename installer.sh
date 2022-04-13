@@ -490,7 +490,7 @@ begin(){
 password(){
     output ""
     output "Please enter password for account"
-    read -r PASSWORD
+    read -s -p -r PASSWORD
     begin
 }
 
