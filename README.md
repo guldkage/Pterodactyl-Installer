@@ -15,6 +15,7 @@ Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not assoc
 ## Features
 - Install Panel
 - Install Wings
+- Install PHPMyAdmin
 - Update Panel
 - Update Wings
 - Uninstall Panel
