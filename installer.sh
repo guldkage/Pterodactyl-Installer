@@ -188,11 +188,11 @@ phpmyadminssl(){
     if [[ "$SSL_CONFIRM_PHPMYADMIN" =~ [Yy] ]]; then
         SSLSTATUSPHPMYADMIN=true
         phpmyadminemailsslyes
-    fi
+        fi
     if [[ "$SSL_CONFIRM_PHPMYADMIN" =~ [Nn] ]]; then
         fqdnphpmyadmin
         SSLSTATUSPHPMYADMIN=false
-    fi
+        fi
 }
 
 
