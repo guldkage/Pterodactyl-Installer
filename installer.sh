@@ -221,7 +221,7 @@ startphpmyadmin(){
     output ""
     output "* AGREEMENT *"
     output ""
-    output "The script will install PHPMYAdmin, webserver NGINX."
+    output "The script will install PHPMYAdmin with the webserver NGINX."
     output "Do you want to continue?"
     output "(Y/N):"
     read -r AGREEPHPMYADMIN
