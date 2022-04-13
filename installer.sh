@@ -356,17 +356,40 @@ required(){
     output "Installing packages..."
     output "This may take a while."
     output ""
-    {
-    apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
-    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-    add-apt-repository -y ppa:chris-lea/redis-server
-    curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
-    apt update
-    apt-add-repository universe
-    apt install certbot python3-certbot-nginx -y
-    apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-    } &> /dev/null
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        {
+        apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+        LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+        add-apt-repository -y ppa:chris-lea/redis-server
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        apt update
+        apt-add-repository universe
+        apt install certbot python3-certbot-nginx -y
+        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+        } &> /dev/null
+    elif [ "$lsb_dist" =  "fedora" ] || [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        yum -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+        yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+        yum install -y yum-utils
+        yum-config-manager --disable remi-php54
+        yum-config-manager --enable remi-php80
+        yum install -y --enablerepo=remi redis
+        cat <<EOF > /etc/yum.repos.d/mariadb.repo
+        # MariaDB 10.5 CentOS repository list - created 2017-07-14 12:40 UTC
+        # http://downloads.mariadb.org/mariadb/repositories/
+        [mariadb]
+        name = MariaDB
+        baseurl = http://yum.mariadb.org/10.5/centos7-amd64
+        gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+        gpgcheck=1
+        EOF
+        yum update
+        yum install certbot python3-certbot-nginx -y
+        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache} mariadb-server nginx tar unzip git redis-server
+        } &> /dev/null
     database
+    fi
 }
 
 begin(){
@@ -603,6 +626,96 @@ uninstallwings(){
     fi
 }
 
+http(){
+    output ""
+    output "* FIREWALL CONFIGURATION * "
+    output ""
+    output "HTTP & HTTPS firewall rule has been applied."
+    {
+    apt install ufw -Y
+    ufw allow 80
+    ufw alllow 443
+    } &> /dev/null
+}
+
+pterodactylports(){
+    output ""
+    output "* FIREWALL CONFIGURATION * "
+    output ""
+    output "All Pterodactyl Ports firewall rule has been applied."
+    {
+    apt install ufw -Y
+    ufw allow 80
+    ufw alllow 443
+    ufw allow 8080
+    ufw allow 2022
+    } &> /dev/null
+}
+
+mysql(){
+    output ""
+    output "* FIREWALL CONFIGURATION * "
+    output ""
+    output "MySQL firewall rule has been applied."
+    {
+    apt install ufw -Y
+    ufw alllow 3306
+    } &> /dev/null
+}
+
+allfirewall(){
+    output ""
+    output "* FIREWALL CONFIGURATION * "
+    output ""
+    output "All of them firewall rule has been applied."
+    {
+    apt install ufw -Y
+    ufw allow 80
+    ufw alllow 443
+    ufw allow 8080
+    ufw allow 2022
+    ufw alllow 3306
+    } &> /dev/null
+}
+
+rewnewcertificates(){
+    {
+    sudo certbot renew
+    } &> /dev/null
+    output ""
+    output "* RENEW CERTIFICATES * "
+    output ""
+    output "All Let's Encrypt certificates that were ready to be renewed have been renewed."
+}
+
+options(){
+    output ""
+    output "* FIREWALL CONFIGURATION * "
+    output ""
+    output "Available firewall configurations:"
+    warning "[1] HTTP & HTTPS"
+    warning "[2] All Pterodactyl Ports"
+    warning "[3] MySQL"
+    warning "[4] All of them"
+    read -r option
+    case $option in
+        1 ) option=1
+            http
+            ;;
+        2 ) option=2
+            pterodactlports
+            ;;
+        3 ) option=3
+            mysql
+            ;;
+        4 ) option=4
+            allfirewall
+            ;;
+        * ) output ""
+            output "Please enter a valid option."
+    esac
+}
+
 options(){
     output ""
     output "* SELECT OPTION * "
@@ -619,6 +732,8 @@ options(){
     warning "[7] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
     warning "[8] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
     warning ""
+    warning "[9] Renew Certificates | Renews all Lets Encrypt certificates on this machine."
+    warning "[10] Configure Firewall | Configure UFW to your liking."
     read -r option
     case $option in
         1 ) option=1
@@ -644,6 +759,12 @@ options(){
             ;;
         8 ) option=8
             uninstallpanel
+            ;;
+        9 ) option=9
+            renewcertificates
+            ;;
+        10 ) option=10
+            configureufw
             ;;
         * ) output ""
             output "Please enter a valid option."
