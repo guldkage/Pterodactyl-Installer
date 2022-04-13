@@ -11,6 +11,7 @@ Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not assoc
 
 ## Features
 - Install Panel
+- Install Wings
 - Update Panel
 - Update Wings
 - Uninstall Panel
