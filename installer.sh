@@ -53,7 +53,16 @@ if ! [ -x "$(command -v curl)" ]; then
     exit 1
 fi
 
-
+wingsfinish(){
+    clear
+    output ""
+    output "* WINGS SUCCESSFULLY INSTALLED *"
+    output ""
+    output "Thank you for using the script. Remember to give it a star."
+    output "All you need is to set up Wings."
+    output "To do this, create the node on your Panel, then press under Configuration,"
+    output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
+    output ""
 
 finish(){
     if  [ "$SSLSTATUS" =  "true" ]; then
@@ -99,6 +108,43 @@ start(){
         AGREE=yes
         web
     fi
+}
+
+startwings(){
+    output ""
+    output "* AGREEMENT *"
+    output ""
+    output "The script will install Pterodactyl Wings."
+    output "Do you want to continue?"
+    output "(Y/N):"
+    read -r AGREEWINGS
+
+    if [[ "$AGREEWINGS" =~ [Yy] ]]; then
+        AGREEWINGS=yes
+        wingsdocker
+    fi
+}
+
+wingsfiles(){
+    output "Installing Files..."
+    {
+    mkdir -p /etc/pterodactyl
+    curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
+    curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
+    chmod u+x /usr/local/bin/wings
+    } &> /dev/null
+    wingsfinish
+}
+
+
+wingsdocker(){
+    output ""
+    output "Installing Docker..."
+    {
+    curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+    systemctl enable --now docker
+    } &> /dev/null
+    wingsfiles
 }
 
 webserver(){
@@ -457,12 +503,14 @@ options(){
     output ""
     output "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
-    warning "[2] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
-    warning "[3] Update Wings. | Updates your Wings to the latest version."
-    warning "[4] Update Both. | Updates your Panel and Wings to the latest versions."
+    warning "[2] Install Wings. | Installs latest version of Pterodactyl Wings."
     warning ""
-    warning "[5] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
-    warning "[6] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
+    warning "[3] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
+    warning "[4] Update Wings. | Updates your Wings to the latest version."
+    warning "[5] Update Both. | Updates your Panel and Wings to the latest versions."
+    warning ""
+    warning "[6] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
+    warning "[7] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
     warning ""
     read -r option
     case $option in
@@ -470,18 +518,21 @@ options(){
             start
             ;;
         1 ) option=2
+            startwings
+            ;;
+        1 ) option=3
             updatepanel
             ;;
-        2 ) option=3
+        2 ) option=4
             updatewings
             ;;
-        3 ) option=4
+        3 ) option=5
             updateboth
             ;;
-        4 ) option=5
+        4 ) option=6
             uninstallwings
             ;;
-        5 ) option=6
+        5 ) option=7
             uninstallpanel
             ;;
         * ) output ""
