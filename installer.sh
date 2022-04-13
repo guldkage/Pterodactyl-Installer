@@ -79,15 +79,7 @@ finishphpmyadmin(){
         output ""
         output "Thank you for using the script. Remember to give it a star."
         output "You nay still need to create a admin account for PHPMYAdmin."
-        output "URL: https://$FQDNPHPMYADMIN"
-    if  [ "$SSLSTATUS" =  "false" ]; then
-        clear
-        output ""
-        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
-        output ""
-        output "Thank you for using the script. Remember to give it a star."
-        output "You nay still need to create a admin account for PHPMYAdmin."
-        output "URL: http://$FQDNPHPMYADMIN"
+        output "URL: https://$FQDNPHPMYADMIN or http://$FQDNPHPMYADMIN"
 
 finish(){
     if  [ "$SSLSTATUS" =  "true" ]; then
@@ -96,28 +88,13 @@ finish(){
         output "* PANEL SUCCESSFULLY INSTALLED *"
         output ""
         warning "Thank you for using the script. Remember to give it a star."
-        warning "The script has ended. https://$FQDN to go to your Panel."
+        warning "The script has ended. https://$FQDN or http://$FQDN to go to your Panel."
         output ""
         output "Details:"
         warning "Email: $EMAIL"
         warning "First Name: $FIRSTNAME"
         warning "Last Name: $LASTNAME"
         warning "Password: (Censored)"
-        output ""
-    fi
-    if  [ "$SSLSTATUS" =  "false" ]; then
-        clear
-        output ""
-        output "* PANEL SUCCESSFULLY INSTALLED *"
-        output ""
-        output "Thank you for using the script. Remember to give it a star."
-        output "The script has ended. http://$FQDN to go to your Panel."
-        output ""
-        output "Details:"
-        output "Email: $EMAIL"
-        output "First Name: $FIRSTNAME"
-        output "Last Name: $LASTNAME"
-        output "Password: (Censored)"
         output ""
     fi
 }
