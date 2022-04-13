@@ -28,14 +28,18 @@ Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not assoc
 - Nginx webserver
 
 ## Support
-There is no support with this script. The script has been tested multiple times without issues.
+No support is offered for this script.
+The script has been tested many times without any bug fixes, however they can still occur.
+If you find errors, feel free to open an "Issue" on GitHub.
 
 # Run the script
+Nearly all systems supports this
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/installer.sh)
 ```
 
 ### Raspbian
+Only for raspbian users. They might need a extra < in the beginning.
 ```bash
 bash < <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/installer.sh)
 ```
