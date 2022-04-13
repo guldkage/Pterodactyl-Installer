@@ -158,6 +158,7 @@ fqdnphpmyadmin(){
         fqdnphpmyadmin
     else
         phpmyadmininstall
+    fi
 }
 
 phpmyadminemailsslyes(){
