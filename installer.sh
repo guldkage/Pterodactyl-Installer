@@ -917,7 +917,7 @@ options(){
     warning ""
     warning "[9] Renew Certificates | Renews all Lets Encrypt certificates on this machine."
     warning "[10] Configure Firewall | Configure UFW to your liking."
-    warning "[11] Switch Pterodactyl Domain | Changes your Pterodactyl Domain. [BETA]"
+    warning "[11] Switch Pterodactyl Domain | Changes your Pterodactyl Domain."
     read -r option
     case $option in
         1 ) option=1
