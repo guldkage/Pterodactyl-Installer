@@ -11,6 +11,7 @@
 #                                                                      #
 ########################################################################
 
+### VARIABLES ###
 
 SSL_CONFIRM=""
 AGREEWINGS=""
@@ -34,6 +35,7 @@ IP=""
 DOMAIN=""
 dist="$(. /etc/os-release && echo "$ID")"
 
+### GENERAL ###
 
 output(){
     echo -e '\e[36m'"$1"'\e[0m';
@@ -44,14 +46,13 @@ function trap_ctrlc ()
     output "Bye!"
     exit 2
 }
- 
-# initialise trap to call trap_ctrlc function
-# when signal 2 (SIGINT) is received
 trap "trap_ctrlc" 2
 
 warning(){
     echo -e '\e[31m'"$1"'\e[0m';
 }
+
+### CHECKS ###
 
 if [[ $EUID -ne 0 ]]; then
     output ""
@@ -68,6 +69,8 @@ if ! [ -x "$(command -v curl)" ]; then
     output "cURL is required to run this script."
     exit 1
 fi
+
+### BEGINNING OF CODE ###
 
 phpmyadminweb(){
     if  [ "$SSLSTATUSPHPMYADMIN" =  "true" ]; then
@@ -982,6 +985,8 @@ options(){
             output "Please enter a valid option."
     esac
 }
+
+### START ###
 
 clear
 output ""
