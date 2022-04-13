@@ -99,24 +99,49 @@ phpmyadminweb(){
 phpmyadmininstall(){
     output ""
     output "Installing PHPMyAdmin..."
-    {
-    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
-    sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
-    apt install nginx -y
-    apt install certbot -y
-    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-    apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
-    wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
-    tar xvzf phpMyAdmin-5.1.3-english.tar.gz
-    mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
-    chown -R www-data:www-data *
-    mkdir config
-    chmod o+rw config
-    cp config.sample.inc.php config/config.inc.php
-    chmod o+w config/config.inc.php
-    rm -rf /var/www/phpmyadmin/config
-    } &> /dev/null
-    phpmyadminweb
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        {
+        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+        apt install nginx -y
+        apt install certbot -y
+        LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
+        tar xvzf phpMyAdmin-5.1.3-english.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+        chown -R www-data:www-data *
+        mkdir config
+        chmod o+rw config
+        cp config.sample.inc.php config/config.inc.php
+        chmod o+w config/config.inc.php
+        rm -rf /var/www/phpmyadmin/config
+        } &> /dev/null
+        phpmyadminweb
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+        yum install nginx -y
+        yum install certbot -y
+        yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+        yum install -y yum-utils
+        yum-config-manager --disable remi-php54
+        yum-config-manager --enable remi-php80
+        yum update -y
+        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
+        tar xvzf phpMyAdmin-5.1.3-english.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+        chown -R www-data:www-data *
+        mkdir config
+        chmod o+rw config
+        cp config.sample.inc.php config/config.inc.php
+        chmod o+w config/config.inc.php
+        rm -rf /var/www/phpmyadmin/config
+        } &> /dev/null
+        phpmyadminweb
+    fi
 }
 
 fqdnphpmyadmin(){
@@ -226,22 +251,41 @@ startwings(){
 
 wingsfiles(){
     output "Installing Files..."
-    {
-    mkdir -p /etc/pterodactyl
-    apt-get -y install curl tar unzip
-    curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
-    curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
-    chmod u+x /usr/local/bin/wings
-    } &> /dev/null
-    clear
-    output ""
-    output "* WINGS SUCCESSFULLY INSTALLED *"
-    output ""
-    output "Thank you for using the script. Remember to give it a star."
-    output "All you need is to set up Wings."
-    output "To do this, create the node on your Panel, then press under Configuration,"
-    output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
-    output ""
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        {
+        mkdir -p /etc/pterodactyl
+        apt-get -y install curl tar unzip
+        curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
+        curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
+        chmod u+x /usr/local/bin/wings
+        } &> /dev/null
+        clear
+        output ""
+        output "* WINGS SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "All you need is to set up Wings."
+        output "To do this, create the node on your Panel, then press under Configuration,"
+        output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
+        output ""
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        mkdir -p /etc/pterodactyl
+        yum -y install curl tar unzip
+        curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
+        curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
+        chmod u+x /usr/local/bin/wings
+        } &> /dev/null
+        clear
+        output ""
+        output "* WINGS SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "All you need is to set up Wings."
+        output "To do this, create the node on your Panel, then press under Configuration,"
+        output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
+        output ""
+    fi
 }
 
 wingsdocker(){
@@ -283,15 +327,27 @@ webserver(){
 
 extra(){
     output "Changing permissions..."
-    {
-    chown -R www-data:www-data /var/www/pterodactyl/*
-    curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
-    (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
-    sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
-    sudo systemctl enable --now redis-server
-    sudo systemctl enable --now pteroq.service
-    } &> /dev/null
-    webserver
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        {
+        chown -R www-data:www-data /var/www/pterodactyl/*
+        curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
+        (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
+        sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
+        sudo systemctl enable --now redis-server
+        sudo systemctl enable --now pteroq.service
+        } &> /dev/null
+        webserver
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        chown -R nginx:nginx /var/www/pterodactyl/*
+        curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq-centos.service
+        (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
+        sed -i -e "s@<user>@www-data@g" /etc/systemd/system/pteroq.service
+        sudo systemctl enable --now redis-server
+        sudo systemctl enable --now pteroq.service
+        } &> /dev/null
+        webserver
+    fi
 }
 
 configuration(){
@@ -313,10 +369,14 @@ composer(){
     output "* INSTALLATION * "
     output ""
     output "Installing composer.."
-    {
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    } &> /dev/null
-    files
+    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+        {
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+        } &> /dev/null
+        files
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        files
+    fi
 }
 
 files(){
@@ -367,6 +427,46 @@ required(){
         apt-add-repository universe
         apt install certbot python3-certbot-nginx -y
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+        } &> /dev/null
+        database
+    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+        {
+        yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
+
+        cat <<EOF > /etc/yum.repos.d/mariadb.repo
+        [mariadb]
+        name = MariaDB
+        baseurl = http://yum.mariadb.org/10.5/centos7-amd64
+        gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+        gpgcheck=1
+        EOF
+
+        yum update -y
+        yum install -y MariaDB-common MariaDB-server
+        systemctl start mariadb
+        systemctl enable mariadb
+        yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+        yum install -y yum-utils
+        yum-config-manager --disable remi-php54
+        yum-config-manager --enable remi-php80
+        yum update -y
+        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
+        yum install -y zip unzip
+        yum install -y nginx
+        firewall-cmd --add-service=http --permanent
+        firewall-cmd --add-service=https --permanent 
+        firewall-cmd --reload
+        yum install -y --enablerepo=remi redis
+        setsebool -P httpd_can_network_connect 1
+        setsebool -P httpd_execmem 1
+        setsebool -P httpd_unified 1
+        systemctl start redis
+        systemctl enable redis
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+        yum install certbot -y
+        curl -o /etc/php-fpm.d/www-pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/www-pterodactyl.conf
+        systemctl enable php-fpm
+        systemctl start php-fpm
         } &> /dev/null
         database
     fi
