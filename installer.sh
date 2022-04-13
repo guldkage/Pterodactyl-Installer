@@ -31,7 +31,7 @@ DOMAINSWITCH=""
 SSLSWTICH=""
 IP=""
 DOMAIN=""
-lsb_dist="$(. /etc/os-release && echo "$ID")"
+dist="$(. /etc/os-release && echo "$ID")"
 
 
 output(){
@@ -96,7 +96,7 @@ phpmyadminweb(){
 phpmyadmininstall(){
     output ""
     output "Installing PHPMyAdmin..."
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
         sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
@@ -115,7 +115,7 @@ phpmyadmininstall(){
         rm -rf /var/www/phpmyadmin/config
         } &> /dev/null
         phpmyadminweb
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
         sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
@@ -260,7 +260,7 @@ startwings(){
 
 wingsfiles(){
     output "Installing Files..."
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         mkdir -p /etc/pterodactyl
         apt-get -y install curl tar unzip
@@ -277,7 +277,7 @@ wingsfiles(){
         output "To do this, create the node on your Panel, then press under Configuration,"
         output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
         output ""
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         mkdir -p /etc/pterodactyl
         yum -y install curl tar unzip
@@ -300,13 +300,13 @@ wingsfiles(){
 wingsdocker(){
     output ""
     output "Installing Docker..."
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         curl -sSL https://get.docker.com/ | CHANNEL=stable bash
         systemctl enable --now docker
         } &> /dev/null
         wingsfiles
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
         dnf -y install docker-ce --allowerasing
@@ -345,7 +345,7 @@ webserver(){
 
 extra(){
     output "Changing permissions..."
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         chown -R www-data:www-data /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
@@ -355,7 +355,7 @@ extra(){
         sudo systemctl enable --now pteroq.service
         } &> /dev/null
         webserver
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         chown -R nginx:nginx /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq-centos.service
@@ -387,12 +387,12 @@ composer(){
     output "* INSTALLATION * "
     output ""
     output "Installing composer.."
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
         } &> /dev/null
         files
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         files
     fi
 }
@@ -435,7 +435,7 @@ required(){
     output "Installing packages..."
     output "This may take a while."
     output ""
-    if  [ "$lsb_dist" =  "ubuntu" ] || [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
@@ -447,7 +447,7 @@ required(){
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         } &> /dev/null
         database
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
 
@@ -730,13 +730,13 @@ http(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "HTTP & HTTPS firewall rule has been applied."
-    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         {
         apt install ufw -Y
         ufw allow 80
         ufw alllow 443
         } &> /dev/null
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
@@ -749,7 +749,7 @@ pterodactylports(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "All Pterodactyl Ports firewall rule has been applied."
-    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         {
         apt install ufw -Y
         ufw allow 80
@@ -757,7 +757,7 @@ pterodactylports(){
         ufw allow 8080
         ufw allow 2022
         } &> /dev/null
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
@@ -772,12 +772,12 @@ mysql(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "MySQL firewall rule has been applied."
-    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         {
         apt install ufw -Y
         ufw alllow 3306
         } &> /dev/null
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         firewall-cmd --add-service=mysql --permanent
         } &> /dev/null
@@ -789,7 +789,7 @@ allfirewall(){
     output "* FIREWALL CONFIGURATION * "
     output ""
     output "All of them firewall rule has been applied."
-    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         {
         apt install ufw -Y
         ufw allow 80
@@ -798,7 +798,7 @@ allfirewall(){
         ufw allow 2022
         ufw alllow 3306
         } &> /dev/null
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
@@ -907,24 +907,28 @@ options(){
 oscheck(){
     output "* Checking your OS.."
     sleep 2s
-    if  [ "$lsb_dist" =  "ubuntu" ] ||  [ "$lsb_dist" =  "debian" ]; then
-        output "* Your OS, $lsb_dist, is fully supported. Continuing.."
+    if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
+        output "* Your OS, $dist, is fully supported. Continuing.."
         output ""
         sleep 2s
         options
-    elif  [ "$lsb_dist" =  "fedora" ] ||  [ "$lsb_dist" =  "centos" ] || [ "$lsb_dist" =  "rhel" ] || [ "$lsb_dist" =  "rocky" ] || [ "$lsb_dist" = "almalinux" ]; then
-        output "* Your OS, $lsb_dist, is not fully supported."
+    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
+        output "* Your OS, $dist, is not fully supported."
         output "* Installations may work, but there is no gurrantee."
         output "* Continuing in 5 seconds. CTRL+C to stop."
         output ""
         sleep 5s
         options
+    else
+        output "* Your OS, $dist, is not supported!"
+        output "* Exiting..."
+        exit 1
     fi
 }
 
 options(){
     output "* SELECT OPTION * "
-    warning "Operation System: $lsb_dist"
+    warning "Operation System: $dist"
     output ""
     output "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
