@@ -71,15 +71,6 @@ wingsfinish(){
     output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
     output ""
 
-finishphpmyadmin(){
-    clear
-    output ""
-    output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
-    output ""
-    output "Thank you for using the script. Remember to give it a star."
-    output "You nay still need to create a admin account for PHPMYAdmin."
-    output "URL: https://$FQDNPHPMYADMIN or http://$FQDNPHPMYADMIN"
-
 finish(){
     if  [ "$SSLSTATUS" =  "true" ]; then
         clear
@@ -123,7 +114,13 @@ phpmyadminweb(){
         certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos
         systemctl start nginx
         } &> /dev/null
-        finishphpmyadmin
+        clear
+        output ""
+        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "You nay still need to create a admin account for PHPMYAdmin."
+        output "URL: https://$FQDNPHPMYADMIN"
         fi
     if  [ "$SSLSTATUSPHPMYADMIN" =  "false" ]; then
         rm -rf /etc/nginx/sites-enabled/default
@@ -132,7 +129,13 @@ phpmyadminweb(){
         sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
         systemctl restart nginx
         } &> /dev/null
-        finishphpmyadmin
+        clear
+        output ""
+        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "You nay still need to create a admin account for PHPMYAdmin."
+        output "URL: http://$FQDNPHPMYADMIN"
         fi
 }
 
