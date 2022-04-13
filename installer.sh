@@ -41,7 +41,7 @@ output(){
 
 function trap_ctrlc ()
 {
-    echo "Bye!"
+    output "Bye!"
     exit 2
 }
  
