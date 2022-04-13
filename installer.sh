@@ -808,6 +808,7 @@ allfirewall(){
 switch(){
     if  [ "$SSLSWITCH" =  "true" ]; then
         {
+        rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
@@ -819,6 +820,7 @@ switch(){
         fi
     if  [ "$SSLSWITCH" =  "false" ]; then
         {
+        rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
