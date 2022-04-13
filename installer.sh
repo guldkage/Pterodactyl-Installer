@@ -159,6 +159,7 @@ fqdnphpmyadmin(){
         output "Please point your servers IP to your FQDN."
         fqdnphpmyadmin
     else
+        output "Your FQDN is pointed correctly. Continuing."
         phpmyadmininstall
     fi
 }
