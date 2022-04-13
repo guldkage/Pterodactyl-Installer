@@ -224,24 +224,31 @@ startphpmyadmin(){
 }
 
 finish(){
-    if  [ "$SSLSTATUS" =  "true" ]; then
-        clear
-        output ""
-        output "* PANEL SUCCESSFULLY INSTALLED *"
-        output ""
-        warning "Thank you for using the script. Remember to give it a star."
-        warning "The script has ended. https://$FQDN or http://$FQDN to go to your Panel."
-        output ""
-        output "Details:"
-        warning "Email: $EMAIL"
-        warning "First Name: $FIRSTNAME"
-        warning "Last Name: $LASTNAME"
-        warning "Password: (Censored)"
-        warning "Database password: $DBPASSWORD"
-        output ""
-        output "The Panel may not load if port 80 and 433 is not open. Please check your firewall"
-        output "or rerun this script and select Firewall Configuration."
-    fi
+    clear
+    output ""
+    output "* PANEL SUCCESSFULLY INSTALLED *"
+    output ""
+    warning "Thank you for using the script. Remember to give it a star."
+    warning "The script has ended. https://$FQDN or http://$FQDN to go to your Panel."
+    output ""
+    output "Details:"
+    warning "Email: $EMAIL"
+    warning "First Name: $FIRSTNAME"
+    warning "Last Name: $LASTNAME"
+    warning "Password: (Censored)"
+    warning "Database password: $DBPASSWORD"
+    output ""
+    output "Database Host for Nodes (This can be used for servers):"
+    warning "Host: 127.0.0.1"
+    warning "User: pterodactyluser"
+    warning "Password: $DBPASSWORDHOST"
+    output ""
+    output "If you want to create databases on your Panel, you will need to insert this information into"
+    output "Databases -> Create new on the Admin Panel."
+    output ""
+    output "Firewall:"
+    output "The Panel may not load if port 80 and 433 is not open. Please check your firewall"
+    output "or rerun this script and select Firewall Configuration."
 }
 
 start(){
@@ -388,6 +395,8 @@ configuration(){
     [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
     [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
     DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+    DBPASSWORDHOST=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+    mysql -u root -e "CREATE USER 'pterodactyluser'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORDHOST';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'pterodactyluser'@'127.0.0.1' WITH GRANT OPTION;"
     mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';" && mysql -u root -e "CREATE DATABASE panel;" &&mysql -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;" && mysql -u root -e "FLUSH PRIVILEGES;"
     php artisan p:environment:setup --author="$EMAIL" --url="$appurl" --timezone="America/New_York" --cache="redis" --session="redis" --queue="redis" --redis-host="localhost" --redis-pass="null" --redis-port="6379" --settings-ui=true
     php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
