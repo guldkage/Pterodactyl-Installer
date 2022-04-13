@@ -433,14 +433,6 @@ required(){
         {
         yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
 
-        cat <<EOF > /etc/yum.repos.d/mariadb.repo
-        [mariadb]
-        name = MariaDB
-        baseurl = http://yum.mariadb.org/10.5/centos7-amd64
-        gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-        gpgcheck=1
-        EOF
-
         yum update -y
         yum install -y MariaDB-common MariaDB-server
         systemctl start mariadb
