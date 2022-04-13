@@ -10,6 +10,7 @@
 
 
 SSL_CONFIRM=""
+AGREEWINGS=""
 SSLCONFIRM=""
 SSLSTATUS=""
 FQDN=""
@@ -19,7 +20,13 @@ FIRSTNAME=""
 USERNAME=""
 PASSWORD=""
 DBPASSWORD=""
-WEBSERVER="" 
+WEBSERVER=""
+SSLSTATUSPHPMYADMIN=""
+FQDNPHPMYADMIN=""
+SSL_CONFIRM_PHPMYADMIN=""
+AGREEPHPMYADMIN=""
+PHPMYADMINEMAIL=""
+
 
 output(){
     echo -e '\e[36m'"$1"'\e[0m';
@@ -64,6 +71,24 @@ wingsfinish(){
     output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
     output ""
 
+finishphpmyadmin(){
+    if  [ "$SSLSTATUS" =  "true" ]; then
+        clear
+        output ""
+        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "You nay still need to create a admin account for PHPMYAdmin."
+        output "URL: https://$FQDNPHPMYADMIN"
+    if  [ "$SSLSTATUS" =  "false" ]; then
+        clear
+        output ""
+        output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
+        output ""
+        output "Thank you for using the script. Remember to give it a star."
+        output "You nay still need to create a admin account for PHPMYAdmin."
+        output "URL: http://$FQDNPHPMYADMIN"
+
 finish(){
     if  [ "$SSLSTATUS" =  "true" ]; then
         clear
@@ -107,6 +132,103 @@ start(){
     if [[ "$AGREE" =~ [Yy] ]]; then
         AGREE=yes
         web
+    fi
+}
+
+phpmyadminweb(){
+    if  [ "$SSLSTATUSPHPMYADMIN" =  "true" ]; then
+        rm -rf /etc/nginx/sites-enabled/default
+        {
+        curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin-ssl.conf
+        sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
+        systemctl stop nginx
+        certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos
+        systemctl start nginx
+        } &> /dev/null
+        finishphpmyadmin
+        fi
+    if  [ "$SSLSTATUSPHPMYADMIN" =  "false" ]; then
+        rm -rf /etc/nginx/sites-enabled/default
+        {
+        curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin.conf
+        sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
+        systemctl restart nginx
+        } &> /dev/null
+        finishphpmyadmin
+        fi
+}
+
+phpmyadmininstall(){
+    output ""
+    output "Installing PHPMyAdmin..."
+    {
+    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+    wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
+    tar xvzf phpMyAdmin-5.1.3-english.tar.gz
+    mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+    chown -R www-data:www-data *
+    mkdir config
+    chmod o+rw config
+    cp config.sample.inc.php config/config.inc.php
+    chmod o+w config/config.inc.php
+    } &> /dev/null
+    phpmyadminweb
+}
+
+fqdnphpmyadmin(){
+    output ""
+    output "* PHPMYADMIN URL * "
+    output ""
+    output "Enter your FQDN or IP"
+    output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
+    read -r FQDNPHPMYADMIN
+    phpmyadmininstall
+}
+
+phpmyadminemailsslyes(){
+    output ""
+    output "* EMAIL *"
+    output ""
+    warning "Read:"
+    output "The script now asks for your email. It will be shared with Lets Encrypt to complete the SSL. It will also be used to setup PHPMYAdmin."
+    output "If you do not agree, stop the script."
+    warning ""
+    output "Please enter your email"
+    read -r PHPMYADMINEMAIL
+    fqdnphpmyadmin
+}
+
+phpmyadminssl(){
+    output ""
+    output "* SSL * "
+    output ""
+    output "Do you want to use SSL for PHPMyAdmin? This requires a domain."
+    output "(Y/N):"
+    read -r SSL_CONFIRM_PHPMYADMIN
+
+    if [[ "$SSL_CONFIRM_PHPMYADMIN" =~ [Yy] ]]; then
+        SSLSTATUSPHPMYADMIN=true
+        phpmyadminemailsslyes
+    fi
+    if [[ "$SSL_CONFIRM_PHPMYADMIN" =~ [Nn] ]]; then
+        fqdnphpmyadmin
+        SSLSTATUSPHPMYADMIN=false
+    fi
+}
+
+
+startphpmyadmin(){
+    output ""
+    output "* AGREEMENT *"
+    output ""
+    output "The script will install PHPMYAdmin, webserver NGINX."
+    output "Do you want to continue?"
+    output "(Y/N):"
+    read -r AGREEPHPMYADMIN
+
+    if [[ "$AGREEPHPMYADMIN" =~ [Yy] ]]; then
+        AGREEPHPMYADMIN=yes
+        phpmyadminssl
     fi
 }
 
@@ -504,35 +626,39 @@ options(){
     output "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
     warning "[2] Install Wings. | Installs latest version of Pterodactyl Wings."
+    warning "[3] Install PHPMyAdmin. | Installs PHPMyAdmin."
     warning ""
-    warning "[3] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
-    warning "[4] Update Wings. | Updates your Wings to the latest version."
-    warning "[5] Update Both. | Updates your Panel and Wings to the latest versions."
+    warning "[4] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
+    warning "[5] Update Wings. | Updates your Wings to the latest version."
+    warning "[6] Update Both. | Updates your Panel and Wings to the latest versions."
     warning ""
-    warning "[6] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
-    warning "[7] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
+    warning "[7] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
+    warning "[8] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
     warning ""
     read -r option
     case $option in
         1 ) option=1
             start
             ;;
-        1 ) option=2
+        2 ) option=2
             startwings
             ;;
-        1 ) option=3
+        3 ) option=3
+            startphpmyadmin
+            ;;
+        4 ) option=4
             updatepanel
             ;;
-        2 ) option=4
+        5 ) option=5
             updatewings
             ;;
-        3 ) option=5
+        6 ) option=6
             updateboth
             ;;
-        4 ) option=6
+        7 ) option=7
             uninstallwings
             ;;
-        5 ) option=7
+        8 ) option=8
             uninstallpanel
             ;;
         * ) output ""
