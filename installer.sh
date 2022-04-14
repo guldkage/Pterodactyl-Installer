@@ -482,7 +482,6 @@ required(){
     output "This may take a while."
     output ""
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        mkdir /var/www/pterodactyl || exit || output "Panel is already installed!" || exit
         {
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         output "Installing dependencies"
