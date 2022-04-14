@@ -157,6 +157,20 @@ phpmyadmininstall(){
     fi
 }
 
+continueanywayphpmyadmin(){
+    output ""
+    output "Do you want to continue anyway?"
+    output "(Y/N):"
+    read -r CONTINUE_ANYWAY_PHPMYADMIN
+
+    if [[ "$CONTINUE_ANYWAY_PHPMYADMIN" =~ [Yy] ]]; then
+        phpmyadmininstall
+    fi
+    if [[ "$CONTINUE_ANYWAY_PHPMYADMIN" =~ [Nn] ]]; then
+        exit 1
+    fi
+}
+
 fqdnphpmyadmin(){
     output ""
     output "* PHPMYADMIN URL * "
@@ -172,7 +186,7 @@ fqdnphpmyadmin(){
         output ""
         output "Your FQDN does not resolve to the IP of current server."
         output "Please point your servers IP to your FQDN."
-        fqdnphpmyadmin
+        continueanywayphpmyadmin
     else
         output "Your FQDN is pointed correctly. Continuing."
         phpmyadmininstall
@@ -570,6 +584,20 @@ firstname(){
 
 ### FQDN ###
 
+continueanyway(){
+    output ""
+    output "Do you want to continue anyway?"
+    output "(Y/N):"
+    read -r CONTINUE_ANYWAY
+
+    if [[ "$CONTINUE_ANYWAY" =~ [Yy] ]]; then
+        required
+    fi
+    if [[ "$SSL_CONFIRM" =~ [Nn] ]]; then
+        exit 1
+    fi
+}
+
 fqdn(){
     output ""
     output "* PANEL URL * "
@@ -584,7 +612,7 @@ fqdn(){
         output ""
         output "Your FQDN does not resolve to the IP of current server."
         output "Please point your servers IP to your FQDN."
-        fqdn
+        continueanyway
     else
         output "Your FQDN is pointed correctly. Continuing."
         required
