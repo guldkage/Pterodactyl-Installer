@@ -420,8 +420,8 @@ extra(){
 configuration(){
     output "Setting up the Panel... Can be a long process."
     {
-    [ "$SSL_CONFIRM" == true ] && appurl="https://$FQDN"
-    [ "$SSL_CONFIRM" == false ] && appurl="http://$FQDN"
+    [ "$SSLSTATUS" == true ] && appurl="https://$FQDN"
+    [ "$SSLSTATUS" == false ] && appurl="http://$FQDN"
     DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     DBPASSWORDHOST=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     mysql -u root -e "CREATE USER 'pterodactyluser'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORDHOST';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'pterodactyluser'@'127.0.0.1' WITH GRANT OPTION;"
