@@ -253,7 +253,7 @@ finish(){
     warning "Email: $EMAIL"
     warning "First Name: $FIRSTNAME"
     warning "Last Name: $LASTNAME"
-    warning "Password: (Censored)"
+    warning "Password: $USERPASSWORD"
     warning "Database password: $DBPASSWORD"
     output ""
     output "Database Host for Nodes (This can be used for servers):"
@@ -423,6 +423,7 @@ configuration(){
     [ "$SSLSTATUS" == true ] && appurl="https://$FQDN"
     [ "$SSLSTATUS" == false ] && appurl="http://$FQDN"
     DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+    USERPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     DBPASSWORDHOST=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     mysql -u root -e "CREATE USER 'pterodactyluser'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORDHOST';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'pterodactyluser'@'127.0.0.1' WITH GRANT OPTION;"
     mysql -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';" && mysql -u root -e "CREATE DATABASE panel;" &&mysql -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;" && mysql -u root -e "FLUSH PRIVILEGES;"
@@ -430,7 +431,7 @@ configuration(){
     php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
     output "Migrating database.. this may take some time."
     php artisan migrate --seed --force
-    php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1
+    php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$USERPASSWORD" --admin=1
     } &> /dev/null
     extra
 }
@@ -547,9 +548,7 @@ begin(){
 
 password(){
     output ""
-    output "Please enter password for Admin Account."
-    output "The password is not visible when you type it."
-    read -s -p PASSWORD
+    output "Generating password for admin user..."
     begin
 }
 
