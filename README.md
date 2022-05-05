@@ -23,9 +23,9 @@ Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not assoc
 - Uninstall Wings
 
 ## Supported webservers & OS
-- Debian based systems
+- Debian based systems (Disclaimer: Please use Ubuntu system if possible. Debian may have issues with APT repositories.)
 - (You can may use the script with other systems, it is only half supported right now.)
-- Nginx webserver
+- Nginx webserver, please bear with me that Apache is not supported. A decision made by me.
 
 ## Support
 No support is offered for this script.
