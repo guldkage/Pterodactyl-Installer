@@ -592,7 +592,7 @@ continueanyway(){
     if [[ "$CONTINUE_ANYWAY" =~ [Yy] ]]; then
         required
     fi
-    if [[ "$SSL_CONFIRM" =~ [Nn] ]]; then
+    if [[ "$CONTINUE_ANYWAY" =~ [Nn] ]]; then
         exit 1
     fi
 }
