@@ -695,24 +695,10 @@ web(){
 ### Update Panel ###
 
 updatepanel(){
-    cd /var/www/pterodactyl || exit || output "Pterodactyl Directory (/var/www/pterodactyl) does not exist." || exit
-    {
-    php artisan down
-    curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
-    chmod -R 755 storage/* bootstrap/cache
-    composer install --no-dev --optimize-autoloader -n
-    chown -R www-data:www-data /var/www/pterodactyl/*
-    php artisan view:clear
-    php artisan config:clear
-    php artisan migrate --force
-    php artisan db:seed --force
-    php artisan up
-    php artisan queue:restart
-    } &> /dev/null
     output ""
-    output "* SUCCESSFULLY UPDATED *"
-    output ""
-    output "Pterodactyl Panel has successfully updated."
+    output "* WARNING *"
+    output "Please use the install script on the Pterodactyl docs instead."
+    output "cd /var/www/pterodactyl && php artisan p:upgrade"
 }
 
 ### Update Wings ###
@@ -1034,14 +1020,13 @@ options(){
     warning ""
     warning "[4] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
     warning "[5] Update Wings. | Updates your Wings to the latest version."
-    warning "[6] Update Both. | Updates your Panel and Wings to the latest versions."
     warning ""
-    warning "[7] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
-    warning "[8] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
+    warning "[6] Uninstall Wings. | Uninstalls your Wings. This will also remove all of your game servers."
+    warning "[7] Uninstall Panel. | Uninstalls your Panel. You will only be left with your database and web server."
     warning ""
-    warning "[9] Renew Certificates | Renews all Lets Encrypt certificates on this machine."
-    warning "[10] Configure Firewall | Configure UFW to your liking."
-    warning "[11] Switch Pterodactyl Domain | Changes your Pterodactyl Domain."
+    warning "[8] Renew Certificates | Renews all Lets Encrypt certificates on this machine."
+    warning "[9] Configure Firewall | Configure UFW to your liking."
+    warning "[10] Switch Pterodactyl Domain | Changes your Pterodactyl Domain."
     read -r option
     case $option in
         1 ) option=1
@@ -1059,22 +1044,19 @@ options(){
         5 ) option=5
             updatewings
             ;;
-        6 ) option=6
-            updateboth
-            ;;
-        7 ) option=7
+        7 ) option=6
             uninstallwings
             ;;
-        8 ) option=8
+        8 ) option=7
             uninstallpanel
             ;;
-        9 ) option=9
+        9 ) option=8
             renewcertificates
             ;;
-        10 ) option=10
+        10 ) option=9
             configureufw
             ;;
-        11 ) option=11
+        11 ) option=10
             switchdomains
             ;;
         * ) output ""
