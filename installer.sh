@@ -890,6 +890,8 @@ allfirewall(){
 switch(){
     if  [ "$SSLSWITCH" =  "true" ]; then
         output ""
+        output "* SWITCH DOMAINS * "
+        output ""
         output "Switching your domain.. This wont take long!"
         {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
@@ -899,11 +901,14 @@ switch(){
         systemctl restart nginx
         } &> /dev/null
         output ""
+        output ""
         output "* SWITCH DOMAINS * "
         output ""
         output "Your domain has been switched to $DOMAINSWITCH"
         fi
     if  [ "$SSLSWITCH" =  "false" ]; then
+        output ""
+        output "* SWITCH DOMAINS * "
         output ""
         output "Switching your domain.. This wont take long!"
         {
@@ -912,6 +917,7 @@ switch(){
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
         } &> /dev/null
+        output ""
         output ""
         output "* SWITCH DOMAINS * "
         output ""
