@@ -922,11 +922,11 @@ switchssl(){
     read -r option
     case $option in
         1 ) option=1
-            sslswitch=true
+            SSLSWITCH=true
             switch
             ;;
         2 ) option=2
-            sslswitch=false
+            SSLSWITCH=false
             switch
             ;;
         * ) output ""
