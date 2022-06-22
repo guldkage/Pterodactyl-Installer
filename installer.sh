@@ -18,6 +18,7 @@ AGREEWINGS=""
 SSLCONFIRM=""
 SSLSTATUS=""
 SSLSWITCH=""
+EMAILSWITCHDOMAINS=""
 FQDN=""
 AGREE=""
 LASTNAME=""
@@ -892,6 +893,7 @@ switch(){
         rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        certbot certonly --standalone -d $DOMAINSWITCH --staple-ocsp --no-eff-email -m $EMAILSWITCHDOMAINS --agree-tos || exit || warning "Errors accured."
         systemctl restart nginx
         } &> /dev/null
         output ""
@@ -913,6 +915,23 @@ switch(){
         fi
 }
 
+switchemail(){
+    output ""
+    output "* EMAIL *"
+    output ""
+    warning "Read:"
+    output "To install your new domain certificate to your Panel, your email address must be shared with Let's Encrypt."
+    output "They will send you an email when your certificate is about to expire. A certificate lasts 90 days at a time and you can renew your certificates for free and easily, even with this script."
+    output ""
+    output "When you created your certificate for your panel before, they also asked you for your email address. It's the exact same thing here, with your new domain."
+    output "Therefore, enter your email. If you do not feel like giving your email, then the script can not continue. Press CTRL + C to exit."
+    output ""
+    warning "Please enter your email"
+
+    read -r EMAILSWITCHDOMAINS
+    switch
+}
+
 switchssl(){
     output ""
     output "* SWITCH DOMAINS * "
@@ -924,7 +943,7 @@ switchssl(){
     case $option in
         1 ) option=1
             SSLSWITCH=true
-            switch
+            switchemail
             ;;
         2 ) option=2
             SSLSWITCH=false
