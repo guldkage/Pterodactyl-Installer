@@ -889,6 +889,7 @@ allfirewall(){
 
 switch(){
     if  [ "$SSLSWITCH" =  "true" ]; then
+        output ""
         output "Switching your domain.. This wont take long!"
         {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
@@ -903,6 +904,7 @@ switch(){
         output "Your domain has been switched to $DOMAINSWITCH"
         fi
     if  [ "$SSLSWITCH" =  "false" ]; then
+        output ""
         output "Switching your domain.. This wont take long!"
         {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
