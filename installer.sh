@@ -249,14 +249,16 @@ finish(){
     warning "Thank you for using the script. Remember to give it a star."
     warning "The script has ended. https://$FQDN or http://$FQDN to go to your Panel."
     output ""
-    output "Details:"
+    output "I hope you enjoy your new panel!"
+    output "Your login information for your new Panel:"
     warning "Email: $EMAIL"
+    warning "Username: $USERNAME"
     warning "First Name: $FIRSTNAME"
     warning "Last Name: $LASTNAME"
     warning "Password: $USERPASSWORD"
     warning "Database password: $DBPASSWORD"
     output ""
-    output "Database Host for Nodes (This can be used for servers):"
+    output "Database Host for Nodes (Eg. if a server on your panel needs a database, it can be easily created through a database host):"
     warning "Host: 127.0.0.1"
     warning "User: pterodactyluser"
     warning "Password: $DBPASSWORDHOST"
@@ -280,7 +282,7 @@ start(){
 
     if [[ "$AGREE" =~ [Yy] ]]; then
         AGREE=yes
-        web
+        firstname
     fi
 }
 
@@ -535,10 +537,9 @@ required(){
 
 begin(){
     output ""
-    output "* INSTALLATION * "
+    output "* INSTALLING YOUR PANEL * "
     output ""
-    output "Let's begin the installation!"
-    output "Continuing in 3 seconds.."
+    output "Continuing in 3 seconds.. CTRL+C if you want to stop."
     output 
     sleep 3s
     composer
