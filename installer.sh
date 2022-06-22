@@ -889,6 +889,7 @@ allfirewall(){
 
 switch(){
     if  [ "$SSLSWITCH" =  "true" ]; then
+        output "Switching your domain.. This wont take long!"
         {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
@@ -902,6 +903,7 @@ switch(){
         output "Your domain has been switched to $DOMAINSWITCH"
         fi
     if  [ "$SSLSWITCH" =  "false" ]; then
+        output "Switching your domain.. This wont take long!"
         {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf || exit || warning "Pterodactyl Panel not installed!"
