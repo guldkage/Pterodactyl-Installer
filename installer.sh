@@ -490,14 +490,18 @@ required(){
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
+        } &> /dev/null
         output "Installing dependencies"
+        {
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         add-apt-repository -y ppa:chris-lea/redis-server
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
         apt update
         apt-add-repository universe
         apt install certbot python3-certbot-nginx -y
-        output "Installing PHP.."
+        } &> /dev/null
+        output "Installing PHP, MariaDB and NGINX"
+        {
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         } &> /dev/null
         database
