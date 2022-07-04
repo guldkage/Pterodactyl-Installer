@@ -1093,19 +1093,19 @@ options(){
         5 ) option=5
             updatewings
             ;;
-        7 ) option=6
+        6 ) option=6
             uninstallwings
             ;;
-        8 ) option=7
+        7 ) option=7
             uninstallpanel
             ;;
-        9 ) option=8
+        8 ) option=8
             renewcertificates
             ;;
-        10 ) option=9
+        9 ) option=9
             configureufw
             ;;
-        11 ) option=10
+        10 ) option=10
             switchdomains
             ;;
         * ) output ""
