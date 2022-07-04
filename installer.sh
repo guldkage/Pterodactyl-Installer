@@ -284,7 +284,7 @@ start(){
 
     if [[ "$AGREE" =~ [Yy] ]]; then
         AGREE=yes
-        firstname
+        required
     fi
 }
 
