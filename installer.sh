@@ -20,6 +20,7 @@ SSLSTATUS=""
 SSLSWITCH=""
 EMAILSWITCHDOMAINS=""
 FQDN=""
+UFW=""
 AGREE=""
 LASTNAME=""
 FIRSTNAME=""
@@ -1005,7 +1006,7 @@ rewnewcertificates(){
 
 ### Firewall options ###
 
-options(){
+configureufw(){
     output ""
     output "* FIREWALL CONFIGURATION * "
     output ""
@@ -1014,18 +1015,18 @@ options(){
     warning "[2] All Pterodactyl Ports"
     warning "[3] MySQL"
     warning "[4] All of them"
-    read -r option
-    case $option in
-        1 ) option=1
+    read -r ufw
+    case $ufw in
+        1 ) ufw=1
             http
             ;;
-        2 ) option=2
+        2 ) ufw=2
             pterodactlports
             ;;
-        3 ) option=3
+        3 ) ufw=3
             mainmysql
             ;;
-        4 ) option=4
+        4 ) ufw=4
             allfirewall
             ;;
         * ) output ""
