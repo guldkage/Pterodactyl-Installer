@@ -3,7 +3,7 @@
 
 # Pterodactyl Installer
 
-With this script you can easily install, update and delete Pterodactyl Panel. Everything is gathered in one script.
+With this script you can easily install, update or delete Pterodactyl Panel. Everything is gathered in one script.
 Use this script if you want to install, update or delete your services quickly. The things that are being done are already listed on [Pterodactyl](https://pterodactyl.io/), but this clearly makes it faster since it is automatic.
 
 Please note that this script is made to work on a fresh installation. There is a good chance that it will fail if it is not a fresh installation.
