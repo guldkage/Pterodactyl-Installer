@@ -1110,7 +1110,7 @@ options(){
             switchdomains
             ;;
         * ) output ""
-            output "Please enter a valid option."
+            output "Please enter a valid option from 1-10"
     esac
 }
 
