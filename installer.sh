@@ -912,13 +912,11 @@ switch(){
         output "* SWITCH DOMAINS * "
         output ""
         output "Switching your domain.. This wont take long!"
-        {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         certbot certonly --standalone -d $DOMAINSWITCH --staple-ocsp --no-eff-email -m $EMAILSWITCHDOMAINS --agree-tos || exit || warning "Errors accured."
         systemctl restart nginx
-        } &> /dev/null
         output ""
         output ""
         output "* SWITCH DOMAINS * "
