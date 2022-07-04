@@ -284,7 +284,7 @@ start(){
 
     if [[ "$AGREE" =~ [Yy] ]]; then
         AGREE=yes
-        required
+        web
     fi
 }
 
@@ -539,9 +539,10 @@ required(){
 
 begin(){
     output ""
-    output "* INSTALLING YOUR PANEL * "
+    output "* INSTALLATION * "
     output ""
-    output "Continuing in 3 seconds.. CTRL+C if you want to stop."
+    output "Let's begin the installation!"
+    output "Continuing in 3 seconds.."
     output 
     sleep 3s
     composer
@@ -1075,19 +1076,19 @@ options(){
         5 ) option=5
             updatewings
             ;;
-        6 ) option=6
+        7 ) option=6
             uninstallwings
             ;;
-        7 ) option=7
+        8 ) option=7
             uninstallpanel
             ;;
-        8 ) option=8
+        9 ) option=8
             renewcertificates
             ;;
-        9 ) option=9
+        10 ) option=9
             configureufw
             ;;
-        10 ) option=10
+        11 ) option=10
             switchdomains
             ;;
         * ) output ""
@@ -1105,7 +1106,7 @@ warning "Pterodactyl Installer @ v2.0"
 warning "Copyright 2022, Malthe K, <me@malthe.cc>"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
 output ""
-output "This script is not resposible for any damages. The script has been tested several times without issues."
+output "This script is not responsible for any damages. The script has been tested several times without issues."
 output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
 output ""
