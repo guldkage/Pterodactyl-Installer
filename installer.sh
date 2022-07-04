@@ -489,6 +489,7 @@ required(){
     output ""
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
+        apt-get update
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         } &> /dev/null
         output "Installing dependencies"
