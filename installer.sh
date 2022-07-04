@@ -400,6 +400,10 @@ extra(){
     output "Changing permissions..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         {
+        apt install nginx
+        mkdir /var
+        mkdir /var/www
+        mkdir /var/www/pterodactyl
         chown -R www-data:www-data /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
         (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
