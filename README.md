@@ -27,6 +27,9 @@ Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not assoc
 - (You can may use the script with other systems, it is only half supported right now.)
 - Nginx webserver, please bear with me that Apache is not supported. A decision made by me.
 
+## Copyright
+You have no right to say that you created this script. You may create a fork for this script, but this github must always be linked to.
+
 ## Support
 No support is offered for this script.
 The script has been tested many times without any bug fixes, however they can still occur.
