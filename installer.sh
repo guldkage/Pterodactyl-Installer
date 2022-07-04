@@ -925,6 +925,8 @@ switch(){
         output "* SWITCH DOMAINS * "
         output ""
         output "Your domain has been switched to $DOMAINSWITCH"
+        output "This script does not update your APP URL, you can"
+        output "update it in /var/www/pterodactyl/.env"
         fi
     if  [ "$SSLSWITCH" =  "false" ]; then
         output ""
@@ -942,6 +944,8 @@ switch(){
         output "* SWITCH DOMAINS * "
         output ""
         output "Your domain has been switched to $DOMAINSWITCH"
+        output "This script does not update your APP URL, you can"
+        output "update it in /var/www/pterodactyl/.env"
         fi
 }
 
