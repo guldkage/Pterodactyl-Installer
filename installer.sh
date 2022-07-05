@@ -70,6 +70,7 @@ if ! [ -x "$(command -v curl)" ]; then
     output "* ERROR *"
     output ""
     output "cURL is required to run this script."
+    output "To proceed, please install cURL on your machine."
     exit 1
 fi
 
@@ -569,8 +570,6 @@ begin(){
 ### Pterodactyl Admin User ###
 
 password(){
-    output ""
-    output "Generating password for admin user..."
     begin
 }
 
@@ -607,6 +606,7 @@ firstname(){
 
 continueanyway(){
     output ""
+    output "This error can sometimes be false positive."
     output "Do you want to continue anyway?"
     output "(Y/N):"
     read -r CONTINUE_ANYWAY
@@ -718,9 +718,44 @@ web(){
 
 updatepanel(){
     output ""
-    output "* WARNING *"
-    output "Please use the install script on the Pterodactyl docs instead."
-    output "cd /var/www/pterodactyl && php artisan p:upgrade"
+    output "* UPDATE PANEL *"
+    output ""
+    output "Your Panel will be updated to the latest version."
+    output "For security, the script will exit if any error occur."
+    output "This script is NOT responsible for any damage."
+    output ""
+    output "Do you want to continue with updating your Panel?"
+    output "(Y/N):"
+    read -r PANELUPDATE
+
+    if [[ "$PANELUPDATE" =~ [Yy] ]]; then
+        PANELUPDATE=true
+        confirmupdatepanel
+    fi
+    if [[ "$PANELUPDATE" =~ [Nn] ]]; then
+        PANELUPDATE=false
+        output "The script will stop now."
+    fi
+}
+
+confirmupdatepanel(){
+    cd /var/www/pterodactyl || exit || output "Pterodactyl Directory (/var/www/pterodactyl) does not exist." || exit
+    {
+    php artisan down || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    chmod -R 755 storage/* bootstrap/cache || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    composer install --no-dev --optimize-autoloader -n || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    php artisan view:clear || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    php artisan config:clear || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    php artisan migrate --force || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    chown -R www-data:www-data /var/www/pterodactyl/* || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    php artisan queue:restart || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    php artisan up || exit || output "WARNING! The script ran into an error and stopped the script for security. The script is not responsible for any damage." || exit
+    } &> /dev/null
+    output ""
+    output "* SUCCESSFULLY UPDATED *"
+    output ""
+    output "Pterodactyl Panel has successfully updated."
 }
 
 ### Update Wings ###
