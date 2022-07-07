@@ -721,22 +721,7 @@ updatepanel(){
     output ""
     output "* UPDATE PANEL *"
     output ""
-    output "Your Panel will be updated to the latest version."
-    output "For security, the script will exit if any error occur."
-    output "This script is NOT responsible for any damage."
-    output ""
-    output "Do you want to continue with updating your Panel?"
-    output "(Y/N):"
-    read -r PANELUPDATE
-
-    if [[ "$PANELUPDATE" =~ [Yy] ]]; then
-        PANELUPDATE=true
-        confirmupdatepanel
-    fi
-    if [[ "$PANELUPDATE" =~ [Nn] ]]; then
-        PANELUPDATE=false
-        output "The script will stop now."
-    fi
+    output "Please use the official Docs instead"
 }
 
 confirmupdatepanel(){
