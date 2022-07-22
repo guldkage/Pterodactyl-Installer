@@ -122,7 +122,6 @@ phpmyadmininstall(){
     sleep 1s
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
-        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
         apt install nginx -y
         apt install certbot -y
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
