@@ -180,7 +180,6 @@ fqdnphpmyadmin(){
     output ""
     output "Enter your FQDN or IP"
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
-    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
     read -r FQDNPHPMYADMIN
     [ -z "$FQDNPHPMYADMIN" ] && output "FQDN can't be empty."
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
