@@ -364,12 +364,11 @@ wingsdocker(){
         systemctl enable --now docker
         wingsfiles
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
         dnf -y install docker-ce --allowerasing
         systemctl enable --now docker
         wingsfiles
-    fi
+        fi
 }
 
 ### Webserver ###
