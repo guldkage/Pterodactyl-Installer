@@ -771,6 +771,7 @@ uninstallpanel(){
         sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
         sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
         sudo rm -rf /var/www/pterodactyl # Removing panel files
+        systemctl restart nginx && systemctl restart apache2
         output ""
         output "* PANEL SUCCESSFULLY UNINSTALLED *"
         output ""
