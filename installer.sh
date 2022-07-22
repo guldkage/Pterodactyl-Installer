@@ -8,6 +8,7 @@
 # https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE  #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
+#  You may not remove thihs line                                       #
 #                                                                      #
 ########################################################################
 
@@ -63,6 +64,7 @@ if [[ $EUID -ne 0 ]]; then
     output "* ERROR *"
     output ""
     output "* Sorry, but you need to be root to run this script."
+    output "* Most of the time this can be done by typing sudo su in your terminal"
     exit 1
 fi
 
@@ -72,6 +74,9 @@ if ! [ -x "$(command -v curl)" ]; then
     output ""
     output "cURL is required to run this script."
     output "To proceed, please install cURL on your machine."
+    output ""
+    output "Debian based systems: apt install curl"
+    output "CentOS: yum install curl"
     exit 1
 fi
 
@@ -80,13 +85,11 @@ fi
 phpmyadminweb(){
     if  [ "$SSLSTATUSPHPMYADMIN" =  "true" ]; then
         rm -rf /etc/nginx/sites-enabled/default
-        {
         curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin-ssl.conf
         sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
-        systemctl stop nginx
-        certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos
-        systemctl start nginx
-        } &> /dev/null
+        systemctl stop nginx || exit || output "An error occurred. NGINX is not installed." || exit
+        certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos || exit || output "An error occurred. Certbot not installed." || exit
+        systemctl start nginx || exit || output "An error occurred. NGINX is not installed." || exit
         clear
         output ""
         output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
@@ -96,12 +99,10 @@ phpmyadminweb(){
         output "URL: https://$FQDNPHPMYADMIN"
         fi
     if  [ "$SSLSTATUSPHPMYADMIN" =  "false" ]; then
-        rm -rf /etc/nginx/sites-enabled/default
-        {
-        curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin.conf
-        sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf
-        systemctl restart nginx
-        } &> /dev/null
+        rm -rf /etc/nginx/sites-enabled/default || exit || output "An error occurred. NGINX is not installed." || exit
+        curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin.conf || exit || output "An error occurred. cURL is not installed." || exit
+        sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf || exit || output "An error occurred. NGINX is not installed." || exit
+        systemctl restart nginx || exit || output "An error occurred. NGINX is not installed." || exit
         clear
         output ""
         output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
@@ -117,10 +118,11 @@ phpmyadminweb(){
 phpmyadmininstall(){
     output ""
     output "Installing PHPMyAdmin..."
+    output "This wont take long"
+    sleep 1s
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        {
-        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
-        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
+        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
         apt install nginx -y
         apt install certbot -y
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
@@ -134,12 +136,10 @@ phpmyadmininstall(){
         cp config.sample.inc.php config/config.inc.php
         chmod o+w config/config.inc.php
         rm -rf /var/www/phpmyadmin/config
-        } &> /dev/null
         phpmyadminweb
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
-        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
-        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
+        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
         yum install nginx -y
         yum install certbot -y
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
@@ -157,7 +157,6 @@ phpmyadmininstall(){
         cp config.sample.inc.php config/config.inc.php
         chmod o+w config/config.inc.php
         rm -rf /var/www/phpmyadmin/config
-        } &> /dev/null
         phpmyadminweb
     fi
 }
@@ -182,7 +181,7 @@ fqdnphpmyadmin(){
     output ""
     output "Enter your FQDN or IP"
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the webpage."
-    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin
+    mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
     read -r FQDNPHPMYADMIN
     [ -z "$FQDNPHPMYADMIN" ] && output "FQDN can't be empty."
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
@@ -323,13 +322,11 @@ startwings(){
 wingsfiles(){
     output "Installing Files..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        {
-        mkdir -p /etc/pterodactyl
+        mkdir -p /etc/pterodactyl || exit || output "An error occurred. Could not create directory." || exit
         apt-get -y install curl tar unzip
         curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
         curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
         chmod u+x /usr/local/bin/wings
-        } &> /dev/null
         clear
         output ""
         output "* WINGS SUCCESSFULLY INSTALLED *"
@@ -340,13 +337,11 @@ wingsfiles(){
         output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
         output ""
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         mkdir -p /etc/pterodactyl
         yum -y install curl tar unzip
         curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
         curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
         chmod u+x /usr/local/bin/wings
-        } &> /dev/null
         clear
         output ""
         output "* WINGS SUCCESSFULLY INSTALLED *"
@@ -365,17 +360,14 @@ wingsdocker(){
     output ""
     output "Installing Docker..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        {
         curl -sSL https://get.docker.com/ | CHANNEL=stable bash
         systemctl enable --now docker
-        } &> /dev/null
         wingsfiles
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         {
         dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
         dnf -y install docker-ce --allowerasing
         systemctl enable --now docker
-        } &> /dev/null
         wingsfiles
     fi
 }
@@ -387,24 +379,20 @@ webserver(){
         command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
         output "Configuring webserver..."
-        {
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
         certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
         systemctl start nginx
-        } &> /dev/null
         finish
         fi
     if  [ "$SSLSTATUS" =  "false" ]; then
         command 1> /dev/null
         rm -rf /etc/nginx/sites-enabled/default
         output "Configuring webserver..."
-        {
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
-        } &> /dev/null
         finish
         fi
 }
@@ -414,22 +402,18 @@ webserver(){
 extra(){
     output "Changing permissions..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        {
         chown -R www-data:www-data /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
         (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
         sudo systemctl enable --now redis-server
         sudo systemctl enable --now pteroq.service
-        } &> /dev/null
         webserver
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         chown -R nginx:nginx /var/www/pterodactyl/*
         curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq-centos.service
         (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
         sudo systemctl enable --now redis-server
         sudo systemctl enable --now pteroq.service
-        } &> /dev/null
         webserver
     fi
 }
@@ -438,7 +422,7 @@ extra(){
 
 configuration(){
     output "Setting up the Panel... Can be a long process."
-    {
+    sleep 1s
     [ "$SSLSTATUS" == true ] && appurl="https://$FQDN"
     [ "$SSLSTATUS" == false ] && appurl="http://$FQDN"
     DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
@@ -451,7 +435,6 @@ configuration(){
     output "Migrating database.. this may take some time."
     php artisan migrate --seed --force
     php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$USERPASSWORD" --admin=1
-    } &> /dev/null
     extra
 }
 
@@ -461,9 +444,7 @@ composer(){
     output ""
     output "Installing Composer.. This is used to operate the Panel."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        {
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-        } &> /dev/null
         files
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         files
@@ -474,7 +455,7 @@ composer(){
 
 files(){
     output "Downloading required files for Pterodactyl.."
-    {
+    sleep 1s
     mkdir /var/www/pterodactyl
     cd /var/www/pterodactyl
     curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
@@ -483,7 +464,6 @@ files(){
     cp .env.example .env
     command composer install --no-dev --optimize-autoloader --no-interaction
     php artisan key:generate --force
-    } &> /dev/null
     configuration
 }
 
@@ -503,26 +483,21 @@ required(){
     output "This may take a while."
     output ""
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        {
         apt-get update
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
-        } &> /dev/null
         output "Installing dependencies"
-        {
+        sleep 1s
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         add-apt-repository -y ppa:chris-lea/redis-server
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
         apt update
         apt-add-repository universe
         apt install certbot python3-certbot-nginx -y
-        } &> /dev/null
         output "Installing PHP, MariaDB and NGINX"
-        {
+        sleep 1s
         apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-        } &> /dev/null
         database
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
         output "Installing dependencies"
         yum update -y
@@ -552,7 +527,6 @@ required(){
         curl -o /etc/php-fpm.d/www-pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/www-pterodactyl.conf
         systemctl enable php-fpm
         systemctl start php-fpm
-        } &> /dev/null
         database
     fi
 }
@@ -748,11 +722,9 @@ updatewings(){
     if ! [ -x "$(command -v wings)" ]; then
         echo "Wings is required to update both."
     fi
-    {
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
-    } &> /dev/null
     output ""
     output "* SUCCESSFULLY UPDATED *"
     output ""
@@ -766,7 +738,6 @@ updateboth(){
         echo "Wings is required to update both."
     fi
     cd /var/www/pterodactyl || exit || warning "Pterodactyl Directory (/var/www/pterodactyl) does not exist!"
-    {
     php artisan down
     curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
     chmod -R 755 storage/* bootstrap/cache
@@ -781,7 +752,6 @@ updateboth(){
     curl -L -o /usr/local/bin/wings https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_amd64
     chmod u+x /usr/local/bin/wings
     systemctl restart wings
-    } &> /dev/null
     output ""
     output "* SUCCESSFULLY UPDATED *"
     output ""
@@ -797,13 +767,11 @@ uninstallpanel(){
     read -r UNINSTALLPANEL
 
     if [[ "$UNINSTALLPANEL" =~ [Yy] ]]; then
-        {
         sudo rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
         sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
         sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
         sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
         sudo rm -rf /var/www/pterodactyl # Removing panel files
-        } &> /dev/null
         output ""
         output "* PANEL SUCCESSFULLY UNINSTALLED *"
         output ""
@@ -845,16 +813,12 @@ http(){
     output ""
     output "HTTP & HTTPS firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        {
         apt install ufw -Y
         ufw allow 80
         ufw alllow 443
-        } &> /dev/null
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
-        } &> /dev/null
     fi
 }
 
@@ -864,20 +828,16 @@ pterodactylports(){
     output ""
     output "All Pterodactyl Ports firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        {
         apt install ufw -Y
         ufw allow 80
         ufw alllow 443
         ufw allow 8080
         ufw allow 2022
-        } &> /dev/null
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
         firewall-cmd --permanent --add-port=8080/tcp
         firewall-cmd --permanent --add-port=2022/tcp
-        } &> /dev/null
     fi
 }
 
@@ -887,14 +847,10 @@ mainmysql(){
     output ""
     output "MySQL firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        {
         apt install ufw -Y
         ufw alllow 3306
-        } &> /dev/null
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         firewall-cmd --add-service=mysql --permanent
-        } &> /dev/null
     fi
 }
 
@@ -904,22 +860,18 @@ allfirewall(){
     output ""
     output "All of them firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        {
         apt install ufw -Y
         ufw allow 80
         ufw alllow 443
         ufw allow 8080
         ufw allow 2022
         ufw alllow 3306
-        } &> /dev/null
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        {
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
         firewall-cmd --permanent --add-port=8080/tcp
         firewall-cmd --permanent --add-port=2022/tcp
         firewall-cmd --add-service=mysql --permanent
-        } &> /dev/null
     fi
 }
 
@@ -931,14 +883,12 @@ switch(){
         output "* SWITCH DOMAINS * "
         output ""
         output "Switching your domain.. This wont take long!"
-        {
         rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl stop nginx
         certbot certonly --standalone -d $DOMAINSWITCH --staple-ocsp --no-eff-email -m $EMAILSWITCHDOMAINS --agree-tos || exit || warning "Errors accured."
         systemctl start nginx
-        } &> /dev/null
         output ""
         output ""
         output "* SWITCH DOMAINS * "
@@ -952,12 +902,10 @@ switch(){
         output "* SWITCH DOMAINS * "
         output ""
         output "Switching your domain.. This wont take long!"
-        {
-        rm /etc/nginx/sites-enabled/pterodactyl.conf
+        rm /etc/nginx/sites-enabled/pterodactyl.conf || exit || output "An error occurred. Could not delete file." || exit
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
-        } &> /dev/null
         output ""
         output ""
         output "* SWITCH DOMAINS * "
