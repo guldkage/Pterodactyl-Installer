@@ -811,7 +811,7 @@ http(){
     output ""
     output "HTTP & HTTPS firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        apt install ufw -Y
+        apt install ufw -y
         ufw allow 80
         ufw alllow 443
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
@@ -826,7 +826,7 @@ pterodactylports(){
     output ""
     output "All Pterodactyl Ports firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        apt install ufw -Y
+        apt install ufw -y
         ufw allow 80
         ufw alllow 443
         ufw allow 8080
@@ -845,7 +845,7 @@ mainmysql(){
     output ""
     output "MySQL firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        apt install ufw -Y
+        apt install ufw -y
         ufw alllow 3306
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         firewall-cmd --add-service=mysql --permanent
@@ -858,7 +858,7 @@ allfirewall(){
     output ""
     output "All of them firewall rule has been applied."
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
-        apt install ufw -Y
+        apt install ufw -y
         ufw allow 80
         ufw alllow 443
         ufw allow 8080
