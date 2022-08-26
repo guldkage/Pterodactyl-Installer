@@ -1099,11 +1099,7 @@ output "This script is not responsible for any damages. The script has been test
 output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
 output ""
-<<<<<<< HEAD
 output "You are very welcome to report errors or bugs about this script. These can be reported on GitHub."
 output "Thanks in advance!"
 output ""
 oscheck
-=======
-oscheck
->>>>>>> 60165798bbecc5252cf869e3318c75a691c742f9
