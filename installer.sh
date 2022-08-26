@@ -40,7 +40,7 @@ IP=""
 DOMAIN=""
 dist="$(. /etc/os-release && echo "$ID")"
 
-### GENERAL ###
+### OUTPUTS ###
 
 output(){
     echo -e '\e[36m'"$1"'\e[0m';
@@ -117,8 +117,9 @@ phpmyadminweb(){
 
 phpmyadmininstall(){
     output ""
-    output "Installing PHPMyAdmin..."
-    output "This wont take long"
+    output "Starting the installation of PHPMyAdmin"
+    output "While the script is doing its work, please do not abort the installation. This can lead to issues on your machine."
+    output "Instead, let the script install PHPMyAdmin. Then uninstall it after if you have changed your mind."
     sleep 1s
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
         mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
@@ -880,7 +881,7 @@ switch(){
         output ""
         output "* SWITCH DOMAINS * "
         output ""
-        output "Switching your domain.. This wont take long!"
+        output "The script is now changing your Pterodactyl Domain. This may take a couple seconds for the SSL part, as SSL certificates are being generated."
         rm /etc/nginx/sites-enabled/pterodactyl.conf
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
         sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
@@ -894,6 +895,12 @@ switch(){
         output "Your domain has been switched to $DOMAINSWITCH"
         output "This script does not update your APP URL, you can"
         output "update it in /var/www/pterodactyl/.env"
+        output ""
+        output "If using Cloudflare certifiates for your Panel, please read this:"
+        output "The script uses Lets Encrypt to complete the change of your domain,"
+        output "if you normally use Cloudflare Certificates,"
+        output "you can change it manually in its config which is in the same place as before."
+        output ""
         fi
     if  [ "$SSLSWITCH" =  "false" ]; then
         output ""
@@ -1029,12 +1036,10 @@ oscheck(){
 ### Options ###
 
 options(){
-    output "* SELECT OPTION * "
-    output ""
     output "Please select your installation option:"
     warning "[1] Install Panel. | Installs latest version of Pterodactyl Panel"
     warning "[2] Install Wings. | Installs latest version of Pterodactyl Wings."
-    warning "[3] Install PHPMyAdmin. | Installs PHPMyAdmin."
+    warning "[3] Install PHPMyAdmin. | Installs PHPMyAdmin. (Installs using NGINX)"
     warning ""
     warning "[4] Update Panel. | Updates your Panel to the latest version. May remove addons and themes."
     warning "[5] Update Wings. | Updates your Wings to the latest version."
@@ -1086,8 +1091,6 @@ options(){
 
 clear
 output ""
-output "* WELCOME *"
-output ""
 warning "Pterodactyl Installer @ v2.0"
 warning "Copyright 2022, Malthe K, <me@malthe.cc>"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
@@ -1095,5 +1098,8 @@ output ""
 output "This script is not responsible for any damages. The script has been tested several times without issues."
 output "Support is not given."
 output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
+output ""
+output "You are very welcome to report errors or bugs about this script. These can be reported on GitHub."
+output "Thanks in advance!"
 output ""
 oscheck
