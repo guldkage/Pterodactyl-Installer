@@ -8,7 +8,7 @@
 # https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE  #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
-#  You may not remove thihs line                                       #
+#  You may not remove this line                                       #
 #                                                                      #
 ########################################################################
 
