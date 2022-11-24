@@ -145,7 +145,7 @@ phpmyadmininstall(){
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         yum install -y yum-utils
         yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php80
+        yum-config-manager --enable remi-php81
         yum update -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
         wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
