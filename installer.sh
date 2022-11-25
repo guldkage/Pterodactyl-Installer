@@ -1019,13 +1019,6 @@ oscheck(){
         output "* Your OS, $dist, is fully supported. Continuing.."
         output ""
         options
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        output "* Your OS, $dist, is not fully supported."
-        output "* Installations may work, but there is no gurrantee."
-        output "* Continuing in 5 seconds. CTRL+C to stop."
-        output ""
-        sleep 5s
-        options
     else
         output "* Your OS, $dist, is not supported!"
         output "* Exiting..."
