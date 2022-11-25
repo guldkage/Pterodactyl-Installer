@@ -8,7 +8,7 @@
 # https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE  #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
-#  You may not remove this line                                       #
+#  You may not remove this line                                        #
 #                                                                      #
 ########################################################################
 
@@ -126,10 +126,10 @@ phpmyadmininstall(){
         apt install nginx -y
         apt install certbot -y
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
-        tar xvzf phpMyAdmin-5.1.3-english.tar.gz
-        mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
+        tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
         chown -R www-data:www-data *
         mkdir config
         chmod o+rw config
@@ -145,12 +145,12 @@ phpmyadmininstall(){
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         yum install -y yum-utils
         yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php80
+        yum-config-manager --enable remi-php81
         yum update -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
-        tar xvzf phpMyAdmin-5.1.3-english.tar.gz
-        mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
+        tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
         chown -R www-data:www-data *
         mkdir config
         chmod o+rw config
@@ -493,7 +493,7 @@ required(){
         apt install certbot python3-certbot-nginx -y
         output "Installing PHP, MariaDB and NGINX"
         sleep 1s
-        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         database
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
@@ -506,7 +506,7 @@ required(){
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         yum install -y yum-utils
         yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php80
+        yum-config-manager --enable remi-php81
         yum update -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
         yum install -y zip unzip
