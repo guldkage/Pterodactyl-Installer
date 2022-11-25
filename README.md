@@ -32,8 +32,8 @@ Supported operating systems.
 - Nginx webserver, please bear with me that Apache is not supported. A decision made by me.
 
 ## Copyright
-You have no right to say that you created this script. You may create a fork for this Pterodactyl-Installer, but this github must always be linked to.
-Also, do not remove my copyright at the top of the Pterodactyl-Installer script.
+Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
+Also, please not remove my copyright at the top of the Pterodactyl-Installer script.
 
 ## Support
 No support is offered for this script.
