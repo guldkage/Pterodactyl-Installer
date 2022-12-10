@@ -382,12 +382,18 @@ wingsfqdn-ask(){
         output "Please point your servers IP to your FQDN."
         output ""
         output "This error can be false positive. The script is continuing in 10 seconds.."
-        systemctl stop nginx && certbot certonly --standalone -d $WINGS-FQDN --staple-ocsp --no-eff-email -m $WINGSEMAILFQDN --agree-tos && systemctl start nginx || exit || output "An error occurred. Certbot not installed." || exit
+        apt install certbot
+        systemctl stop nginx
+        certbot certonly --standalone -d FQDNwingsurl --staple-ocsp --no-eff-email -m WINGSEMAILFQDN --agree-tos
+        systemctl start nginx
         sleep 10s
         wingsinstall
     else
         output "Your FQDN is pointed correctly. Continuing."
-        systemctl stop nginx && certbot certonly --standalone -d $WINGS-FQDN --staple-ocsp --no-eff-email -m $WINGSEMAILFQDN --agree-tos && systemctl start nginx || exit || output "An error occurred. Certbot not installed." || exit
+        apt install certbot
+        systemctl stop nginx
+        certbot certonly --standalone -d FQDNwingsurl --staple-ocsp --no-eff-email -m $WINGSEMAILFQDN --agree-tos
+        systemctl start nginx
         wingsinstall
     fi
 }
