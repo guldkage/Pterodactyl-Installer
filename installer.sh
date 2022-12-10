@@ -94,6 +94,7 @@ phpmyadminweb(){
         certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos || exit || output "An error occurred. Certbot not installed." || exit
         systemctl start nginx || exit || output "An error occurred. NGINX is not installed." || exit
 
+        apt install mariadb-server
         PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
         mysql -u root -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
 
@@ -114,6 +115,7 @@ phpmyadminweb(){
         sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf || exit || output "An error occurred. NGINX is not installed." || exit
         systemctl restart nginx || exit || output "An error occurred. NGINX is not installed." || exit
 
+        apt install mariadb-server
         PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
         mysql -u root -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
 
