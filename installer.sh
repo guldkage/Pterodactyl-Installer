@@ -41,7 +41,7 @@ DOMAIN=""
 dist="$(. /etc/os-release && echo "$ID")"
 
 WINGSFQDN=""
-WINGSEMAILFQDN=""
+WINGSEMAIL=""
 
 ### OUTPUTS ###
 
@@ -362,7 +362,7 @@ wingsemail(){
     output "They will send you an email when your certificate is about to expire. A certificate lasts 90 days at a time and you can renew your certificates for free and easily, even with this script."
     output ""
     output "Therefore, enter your email. If you do not feel like giving your email, then the script can not continue. Press CTRL + C to exit."
-    read -r WINGSEMAILFQDN
+    read -r WINGSEMAIL
     wingsfqdn-ask
 }
 
@@ -382,17 +382,17 @@ wingsfqdn-ask(){
         output "Please point your servers IP to your FQDN."
         output ""
         output "This error can be false positive. The script is continuing in 10 seconds.."
+        sleep 10s
         apt install certbot
         systemctl stop nginx
-        certbot certonly --standalone -d FQDNwingsurl --staple-ocsp --no-eff-email -m WINGSEMAILFQDN --agree-tos
+        certbot certonly --standalone -d $FQDNwingsurl --staple-ocsp --no-eff-email -m $WINGSEMAIL --agree-tos
         systemctl start nginx
-        sleep 10s
         wingsinstall
     else
         output "Your FQDN is pointed correctly. Continuing."
         apt install certbot
         systemctl stop nginx
-        certbot certonly --standalone -d FQDNwingsurl --staple-ocsp --no-eff-email -m $WINGSEMAILFQDN --agree-tos
+        certbot certonly --standalone -d $FQDNwingsurl --staple-ocsp --no-eff-email -m $WINGSEMAIL --agree-tos
         systemctl start nginx
         wingsinstall
     fi
