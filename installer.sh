@@ -40,6 +40,12 @@ IP=""
 DOMAIN=""
 dist="$(. /etc/os-release && echo "$ID")"
 
+WINGSFQDN=""
+WINGSEMAIL-FQDN=""
+WINGS-IP=""
+WINGS-DOMAIN=""
+WINGS-FQDN=""
+
 ### OUTPUTS ###
 
 output(){
@@ -90,26 +96,40 @@ phpmyadminweb(){
         systemctl stop nginx || exit || output "An error occurred. NGINX is not installed." || exit
         certbot certonly --standalone -d $FQDNPHPMYADMIN --staple-ocsp --no-eff-email -m $PHPMYADMINEMAIL --agree-tos || exit || output "An error occurred. Certbot not installed." || exit
         systemctl start nginx || exit || output "An error occurred. NGINX is not installed." || exit
+
+        PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+        mysql -u root -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
+
         clear
         output ""
         output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
         output ""
         output "Thank you for using the script. Remember to give it a star."
-        output "You may still need to create a admin account for PHPMYAdmin."
         output "URL: https://$FQDNPHPMYADMIN"
+        output ""
+        output "Details for admin account:"
+        output "Username: admin"
+        output "Password: $PHPMYADMIN_USER"
         fi
     if  [ "$SSLSTATUSPHPMYADMIN" =  "false" ]; then
         rm -rf /etc/nginx/sites-enabled/default || exit || output "An error occurred. NGINX is not installed." || exit
         curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin.conf || exit || output "An error occurred. cURL is not installed." || exit
         sed -i -e "s@<domain>@${FQDNPHPMYADMIN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf || exit || output "An error occurred. NGINX is not installed." || exit
         systemctl restart nginx || exit || output "An error occurred. NGINX is not installed." || exit
+
+        PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+        mysql -u root -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mysql -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
+
         clear
         output ""
         output "* PHPMYADMIN SUCCESSFULLY INSTALLED *"
         output ""
         output "Thank you for using the script. Remember to give it a star."
-        output "You may still need to create a admin account for PHPMYAdmin."
         output "URL: http://$FQDNPHPMYADMIN"
+        output ""
+        output "Details for admin account:"
+        output "Username: admin"
+        output "Password: $PHPMYADMIN_USER"
         fi
 }
 
@@ -301,6 +321,8 @@ start(){
     fi
 }
 
+### WINGS ###
+
 startwings(){
     output ""
     output "* AGREEMENT *"
@@ -312,15 +334,72 @@ startwings(){
 
     if [[ "$AGREEWINGS" =~ [Yy] ]]; then
         AGREEWINGS=yes
-        wingsdocker
+        wingsfqdn
     fi
 }
 
-### Wings ###
+wingsfqdn(){
+    output ""
+    output "* FQDN *"
+    output ""
+    output "Would you like to install a SSL certificate for a FQDN?"
+    output "(Y/N):"
+    read -r WINGSFQDN
 
-wingsfiles(){
-    output "Installing Files..."
+    if [[ "$WINGSFQDN" =~ [Yy] ]]; then
+        WINGSFQDN=yes
+        wingsemail
+    fi
+    if [[ "$WINGSFQDN" =~ [Nn] ]]; then
+        WINGSFQDN=no
+        wingsinstall
+    fi
+}
+
+wingsemail(){
+    output ""
+    output "* EMAIL *"
+    output ""
+    warning "Read:"
+    output "To generate your new FQDN certificate for Wings, your email address must be shared with Let's Encrypt."
+    output "They will send you an email when your certificate is about to expire. A certificate lasts 90 days at a time and you can renew your certificates for free and easily, even with this script."
+    output ""
+    output "Therefore, enter your email. If you do not feel like giving your email, then the script can not continue. Press CTRL + C to exit."
+    read -r WINGSEMAILFQDN
+    wingsfqdn-ask
+}
+
+wingsfqdn-ask(){
+    output ""
+    output "* Wings FQDN * "
+    output ""
+    output "Enter FQDN for Wings."
+    output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the service."
+    read -r FQDN
+    [ -z "$FQDN" ] && output "FQDN can't be empty."
+    IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
+    DOMAIN=$(dig +short ${FQDN})
+    if [ "${IP}" != "${DOMAIN}" ]; then
+        output ""
+        output "Your FQDN does not resolve to the IP of current server."
+        output "Please point your servers IP to your FQDN."
+        output ""
+        output "The script will NOT generate a certificate for you. Continuing in 10 seconds.."
+        sleep 10s
+        wingsinstall
+    else
+        output "Your FQDN is pointed correctly. Continuing."
+        systemctl stop nginx && certbot certonly --standalone -d $WINGS-FQDN --staple-ocsp --no-eff-email -m $WINGSEMAILFQDN --agree-tos && systemctl start nginx || exit || output "An error occurred. Certbot not installed." || exit
+        wingsinstall
+    fi
+}
+
+wingsinstall(){
+    output "Installing..."
     if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
+        curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+        systemctl enable --now docker
+
         mkdir -p /etc/pterodactyl || exit || output "An error occurred. Could not create directory." || exit
         apt-get -y install curl tar unzip
         curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
@@ -336,6 +415,10 @@ wingsfiles(){
         output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
         output ""
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
+        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        dnf -y install docker-ce --allowerasing
+        systemctl enable --now docker
+
         mkdir -p /etc/pterodactyl
         yum -y install curl tar unzip
         curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
@@ -351,23 +434,6 @@ wingsfiles(){
         output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
         output ""
     fi
-}
-
-### Docker ###
-
-wingsdocker(){
-    output ""
-    output "Installing Docker..."
-    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
-        curl -sSL https://get.docker.com/ | CHANNEL=stable bash
-        systemctl enable --now docker
-        wingsfiles
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-        dnf -y install docker-ce --allowerasing
-        systemctl enable --now docker
-        wingsfiles
-        fi
 }
 
 ### Webserver ###
