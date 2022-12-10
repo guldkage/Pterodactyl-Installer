@@ -41,10 +41,7 @@ DOMAIN=""
 dist="$(. /etc/os-release && echo "$ID")"
 
 WINGSFQDN=""
-WINGSEMAIL-FQDN=""
-WINGS-IP=""
-WINGS-DOMAIN=""
-WINGS-FQDN=""
+WINGSEMAILFQDN=""
 
 ### OUTPUTS ###
 
