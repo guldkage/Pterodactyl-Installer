@@ -372,10 +372,10 @@ wingsfqdn-ask(){
     output ""
     output "Enter FQDN for Wings."
     output "Make sure that your FQDN is pointed to your IP with an A record. If not the script will not be able to provide the service."
-    read -r FQDN
-    [ -z "$FQDN" ] && output "FQDN can't be empty."
+    read -r FQDNwingsurl
+    [ -z "$FQDNwingsurl" ] && output "FQDN can't be empty."
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
-    DOMAIN=$(dig +short ${FQDN})
+    DOMAIN=$(dig +short ${FQDNwingsurl})
     if [ "${IP}" != "${DOMAIN}" ]; then
         output ""
         output "Your FQDN does not resolve to the IP of current server."
