@@ -381,7 +381,8 @@ wingsfqdn-ask(){
         output "Your FQDN does not resolve to the IP of current server."
         output "Please point your servers IP to your FQDN."
         output ""
-        output "The script will NOT generate a certificate for you. Continuing in 10 seconds.."
+        output "This error can be false positive. The script is continuing in 10 seconds.."
+        systemctl stop nginx && certbot certonly --standalone -d $WINGS-FQDN --staple-ocsp --no-eff-email -m $WINGSEMAILFQDN --agree-tos && systemctl start nginx || exit || output "An error occurred. Certbot not installed." || exit
         sleep 10s
         wingsinstall
     else
