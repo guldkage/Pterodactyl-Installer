@@ -28,12 +28,11 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 Supported operating systems.
 
 - Debian based systems (Disclaimer: Please use Ubuntu system if possible. Debian may have issues with APT repositories.)
-- (You can may use the script with other systems, it is only half supported right now.)
-- Nginx webserver, please bear with me that Apache is not supported. A decision made by me.
+- Nginx webserver. Apache is outdated and is not supported.
 
 ## Copyright
-You have no right to say that you created this script. You may create a fork for this Pterodactyl-Installer, but this github must always be linked to.
-Also, do not remove my copyright at the top of the Pterodactyl-Installer script.
+Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
+Also, please not remove my copyright at the top of the Pterodactyl-Installer script.
 
 ## Support
 No support is offered for this script.
@@ -41,7 +40,7 @@ The script has been tested many times without any bug fixes, however they can st
 If you find errors, feel free to open an "Issue" on GitHub.
 
 # Run the script
-Nearly all systems supports this
+Debian based systems only.
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/installer.sh)
 ```

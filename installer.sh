@@ -8,7 +8,7 @@
 # https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE  #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
-#  You may not remove thihs line                                       #
+#  You may not remove this line                                        #
 #                                                                      #
 ########################################################################
 
@@ -146,10 +146,10 @@ phpmyadmininstall(){
         apt install nginx -y
         apt install certbot -y
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
-        tar xvzf phpMyAdmin-5.1.3-english.tar.gz
-        mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
+        tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
         chown -R www-data:www-data *
         mkdir config
         chmod o+rw config
@@ -165,12 +165,12 @@ phpmyadmininstall(){
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         yum install -y yum-utils
         yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php80
+        yum-config-manager --enable remi-php81
         yum update -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.1.3/phpMyAdmin-5.1.3-english.tar.gz
-        tar xvzf phpMyAdmin-5.1.3-english.tar.gz
-        mv /var/www/phpmyadmin/phpMyAdmin-5.1.3-english/* /var/www/phpmyadmin
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
+        tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
         chown -R www-data:www-data *
         mkdir config
         chmod o+rw config
@@ -266,44 +266,44 @@ startphpmyadmin(){
 
 finish(){
     clear
-    output ""
-    output "* PANEL SUCCESSFULLY INSTALLED *"
-    output ""
-    output "Thank you for using the script. Remember to give it a star."
-    output "The script has ended."
-    output "https://$FQDN or http://$FQDN to go to your Panel."
-    output ""
-    output "I hope you enjoy your new panel!"
-    output "Your login information for your new Panel:"
-    output ""
-    output "Email: $EMAIL"
-    output "Username: $USERNAME"
-    output "First Name: $FIRSTNAME"
-    output "Last Name: $LASTNAME"
-    output "Password: $USERPASSWORD"
-    output ""
-    output "You do not need to copy the password under here."
-    output "This password can also be seen in /var/www/pterodactyl/.env"
-    output "You will not use this password in your daily use,"
-    output "this script already configured it for you."
-    output ""
-    output "Database password: $DBPASSWORD"
-    output ""
-    output "Database Host for Nodes. If a server on your panel needs a database,"
-    output "it can be easily created through a database host"
-    output ""
-    output "Host: 127.0.0.1"
-    output "User: pterodactyluser"
-    output "Password: $DBPASSWORDHOST"
-    output ""
-    output "If you want to create databases on your Panel,"
-    output "you will need to insert this information into"
-    output "Your Admin Panel then Databases -> Create new"
-    output ""
-    output "Firewall:"
-    output "The Panel may not load if port 80 and 433 is not open."
-    output "Please check your firewall or rerun this script"
-    output "and select Firewall Configuration."
+    warning ""
+    warning "* PANEL SUCCESSFULLY INSTALLED *"
+    warning ""
+    warning "Thank you for using the script. Remember to give it a star."
+    warning "The script has ended."
+    warning "https://$FQDN or http://$FQDN to go to your Panel."
+    warning ""
+    warning "I hope you enjoy your new panel!"
+    warning "Your login information for your new Panel:"
+    warning ""
+    warning "Email: $EMAIL"
+    warning "Username: $USERNAME"
+    warning "First Name: $FIRSTNAME"
+    warning "Last Name: $LASTNAME"
+    warning "Password: $USERPASSWORD"
+    warning ""
+    warning "You do not need to copy the password under here."
+    warning "This password can also be seen in /var/www/pterodactyl/.env"
+    warning "You will not use this password in your daily use,"
+    warning "this script already configured it for you."
+    warning ""
+    warning "Database password: $DBPASSWORD"
+    warning ""
+    warning "Database Host for Nodes. If a server on your panel needs a database,"
+    warning "it can be easily created through a database host"
+    warning ""
+    warning "Host: 127.0.0.1"
+    warning "User: pterodactyluser"
+    warning "Password: $DBPASSWORDHOST"
+    warning ""
+    warning "If you want to create databases on your Panel,"
+    warning "you will need to insert this information into"
+    warning "Your Admin Panel then Databases -> Create new"
+    warning ""
+    warning "Firewall:"
+    warning "The Panel may not load if port 80 and 433 is not open."
+    warning "Please check your firewall or rerun this script"
+    warning "and select Firewall Configuration."
 }
 
 start(){
@@ -559,7 +559,7 @@ required(){
         apt install certbot python3-certbot-nginx -y
         output "Installing PHP, MariaDB and NGINX"
         sleep 1s
-        apt -y install php8.0 php8.0-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
         database
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
@@ -572,7 +572,7 @@ required(){
         yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         yum install -y yum-utils
         yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php80
+        yum-config-manager --enable remi-php81
         yum update -y
         yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
         yum install -y zip unzip
@@ -1085,13 +1085,6 @@ oscheck(){
         output "* Your OS, $dist, is fully supported. Continuing.."
         output ""
         options
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        output "* Your OS, $dist, is not fully supported."
-        output "* Installations may work, but there is no gurrantee."
-        output "* Continuing in 5 seconds. CTRL+C to stop."
-        output ""
-        sleep 5s
-        options
     else
         output "* Your OS, $dist, is not supported!"
         output "* Exiting..."
@@ -1160,12 +1153,12 @@ output ""
 warning "Pterodactyl Installer @ v2.0"
 warning "Copyright 2022, Malthe K, <me@malthe.cc>"
 warning "https://github.com/guldkage/Pterodactyl-Installer"
-output ""
-output "This script is not responsible for any damages. The script has been tested several times without issues."
-output "Support is not given."
-output "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
-output ""
-output "You are very welcome to report errors or bugs about this script. These can be reported on GitHub."
-output "Thanks in advance!"
-output ""
+warning ""
+warning "This script is not responsible for any damages. The script has been tested several times without issues."
+warning "Support is not given."
+warning "This script will only work on a fresh installation. Proceed with caution if not having a fresh installation"
+warning ""
+warning "You are very welcome to report errors or bugs about this script. These can be reported on GitHub."
+warning "Thanks in advance!"
+warning ""
 oscheck
