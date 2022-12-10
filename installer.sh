@@ -877,7 +877,7 @@ http(){
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         apt install ufw -Y
         ufw allow 80
-        ufw alllow 443
+        ufw allow 443
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
@@ -892,7 +892,7 @@ pterodactylports(){
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         apt install ufw -y
         ufw allow 80
-        ufw alllow 443
+        ufw allow 443
         ufw allow 8080
         ufw allow 2022
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
@@ -924,10 +924,10 @@ allfirewall(){
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         apt install ufw -y
         ufw allow 80
-        ufw alllow 443
+        ufw allow 443
         ufw allow 8080
         ufw allow 2022
-        ufw alllow 3306
+        ufw allow 3306
     elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
         firewall-cmd --add-service=http --permanent
         firewall-cmd --add-service=https --permanent
