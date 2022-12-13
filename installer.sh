@@ -156,27 +156,6 @@ phpmyadmininstall(){
         chmod o+w config/config.inc.php
         rm -rf /var/www/phpmyadmin/config
         phpmyadminweb
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
-        sudo mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
-        yum install nginx -y
-        yum install certbot -y
-        yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        yum install -y yum-utils
-        yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php81
-        yum update -y
-        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
-        tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
-        mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
-        chown -R www-data:www-data *
-        mkdir config
-        chmod o+rw config
-        cp config.sample.inc.php config/config.inc.php
-        chmod o+w config/config.inc.php
-        rm -rf /var/www/phpmyadmin/config
-        phpmyadminweb
     fi
 }
 
@@ -420,25 +399,6 @@ wingsinstall(){
         output "To do this, create the node on your Panel, then press under Configuration,"
         output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
         output ""
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-        dnf -y install docker-ce --allowerasing
-        systemctl enable --now docker
-
-        mkdir -p /etc/pterodactyl
-        yum -y install curl tar unzip
-        curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
-        curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
-        chmod u+x /usr/local/bin/wings
-        clear
-        output ""
-        output "* WINGS SUCCESSFULLY INSTALLED *"
-        output ""
-        output "Thank you for using the script. Remember to give it a star."
-        output "All you need is to set up Wings."
-        output "To do this, create the node on your Panel, then press under Configuration,"
-        output "press Generate Token, paste it on your server and then type systemctl enable wings --now"
-        output ""
     fi
 }
 
@@ -566,37 +526,6 @@ required(){
         output "Installing PHP, MariaDB and NGINX"
         sleep 1s
         apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-        database
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
-        output "Installing dependencies"
-        yum update -y
-        yum install -y MariaDB-common MariaDB-server
-        systemctl start mariadb
-        systemctl enable mariadb
-        output "Installing PHP.."
-        yum install -y epel-release http://rpms.remirepo.net/enterprise/remi-release-8.rpm
-        yum install -y yum-utils
-        yum-config-manager --disable remi-php54
-        yum-config-manager --enable remi-php81
-        yum update -y
-        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
-        yum install -y zip unzip
-        yum install -y nginx
-        firewall-cmd --add-service=http --permanent
-        firewall-cmd --add-service=https --permanent 
-        firewall-cmd --reload
-        yum install -y --enablerepo=remi redis
-        setsebool -P httpd_can_network_connect 1
-        setsebool -P httpd_execmem 1
-        setsebool -P httpd_unified 1
-        systemctl start redis
-        systemctl enable redis
-        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-        yum install certbot -y
-        curl -o /etc/php-fpm.d/www-pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/www-pterodactyl.conf
-        systemctl enable php-fpm
-        systemctl start php-fpm
         database
     fi
 }
@@ -887,9 +816,6 @@ http(){
         apt install ufw -Y
         ufw allow 80
         ufw allow 443
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        firewall-cmd --add-service=http --permanent
-        firewall-cmd --add-service=https --permanent
     fi
 }
 
@@ -904,11 +830,6 @@ pterodactylports(){
         ufw allow 443
         ufw allow 8080
         ufw allow 2022
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        firewall-cmd --add-service=http --permanent
-        firewall-cmd --add-service=https --permanent
-        firewall-cmd --permanent --add-port=8080/tcp
-        firewall-cmd --permanent --add-port=2022/tcp
     fi
 }
 
@@ -920,8 +841,6 @@ mainmysql(){
     if  [ "$dist" =  "ubuntu" ] ||  [ "$dist" =  "debian" ]; then
         apt install ufw -y
         ufw alllow 3306
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        firewall-cmd --add-service=mysql --permanent
     fi
 }
 
@@ -937,12 +856,6 @@ allfirewall(){
         ufw allow 8080
         ufw allow 2022
         ufw allow 3306
-    elif  [ "$dist" =  "fedora" ] ||  [ "$dist" =  "centos" ] || [ "$dist" =  "rhel" ] || [ "$dist" =  "rocky" ] || [ "$dist" = "almalinux" ]; then
-        firewall-cmd --add-service=http --permanent
-        firewall-cmd --add-service=https --permanent
-        firewall-cmd --permanent --add-port=8080/tcp
-        firewall-cmd --permanent --add-port=2022/tcp
-        firewall-cmd --add-service=mysql --permanent
     fi
 }
 
