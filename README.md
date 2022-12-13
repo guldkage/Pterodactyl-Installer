@@ -27,15 +27,15 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 ## Supported OS & Webserver
 Supported operating systems.
 
-| Operating System | Version               | Supported          |
-| ---------------- | ----------------------| ------------------ |
-| Ubuntu           | from 18.04 to 22.04   | :white_check_mark: |
-| Debian           | from 10 to 11         | :white_check_mark: |
-| CentOS           | no supported versions | :x:                |
-| Rocky Linux      | no supported versions | :x:                |
+| Operating System | Version               | Supported                          |
+| ---------------- | ----------------------| ---------------------------------- |
+| Ubuntu           | from 18.04 to 22.04   | :white_check_mark:                 |
+| Debian           | from 10 to 11         | :white_check_mark:                 |
+| CentOS           | no supported versions | :x:                                |
+| Rocky Linux      | no supported versions | :x:                                |
 
-| Webserver        | Supported             | Reason             |
-| ---------------- | ----------------------| ------------------ |
+| Webserver        | Supported             | Reason                             |
+| ---------------- | ----------------------| ---------------------------------- |
 | NGINX            | :white_check_mark:    |                                    |
 | Apache           | :x:                   | Too many modules                   |
 | LiteSpeed        | :x:                   | Not fully supported by Pterodactyl |
