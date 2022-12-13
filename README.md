@@ -34,12 +34,12 @@ Supported operating systems.
 | CentOS           | no supported versions | :x:            |
 | Rocky Linux      | no supported versions | :x:       |
 
-| Webserver | Supported          |
-| --------- | ------------------ |
-| NGINX     | :white_check_mark: |
-| Apache    | :x:                |
-| LiteSpeed | :x:                |
-| Caddy     | :x:                |
+| Webserver                     | Supported                     |
+| ----------------------------- | ----------------------------- |
+| NGINX                         | :white_check_mark: |
+| Apache                        | :x:                |
+| LiteSpeed                     | :x:                |
+| Caddy                         | :x:                |
 
 ## Copyright
 Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
