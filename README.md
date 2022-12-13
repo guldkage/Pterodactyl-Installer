@@ -24,7 +24,7 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 - Uninstall Panel
 - Uninstall Wings
 
-## Supported OS
+## Supported OS & Webserver
 Supported operating systems.
 
 | Operating System | Version               | Supported          |
@@ -33,6 +33,10 @@ Supported operating systems.
 | Debian           | from 10 to 11         | :white_check_mark: |
 | CentOS           | no supported versions | :x:       |
 | Rocky Linux      | no supported versions | :x:       |
+
+| Webserver | Version           |
+| --------- | ------------------|
+| NGINX     | :white_check_mark:|
 
 ## Copyright
 Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
