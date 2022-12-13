@@ -34,12 +34,12 @@ Supported operating systems.
 | CentOS           | no supported versions | :x:                                |
 | Rocky Linux      | no supported versions | :x:                                |
 
-| Webserver        | Supported             | Reason                             |
-| ---------------- | ----------------------| ---------------------------------- |
-| NGINX            | :white_check_mark:    |                                    |
-| Apache           | :x:                   | Too many modules                   |
-| LiteSpeed        | :x:                   | Not fully supported by Pterodactylㅤㅤ |
-| Caddy            | :x:                   | Not fully supported by Pterodactyl |
+| Webserver        | Supported           | Reason                             |
+| ---------------- | --------------------| ---------------------------------- |
+| NGINX            | :white_check_mark:  |                                    |
+| Apache           | :x:                 | Too many modules                   |
+| LiteSpeed        | :x:                 | Not fully supported by Pterodactyl |
+| Caddy            | :x:                 | Not fully supported by Pterodactyl |
 
 ## Copyright
 Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
