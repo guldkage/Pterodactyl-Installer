@@ -31,10 +31,8 @@ Supported operating systems.
 | ---------------- | ----------------------| ------------------ |
 | Ubuntu           | from 18.04 to 22.04   | :white_check_mark: |
 |                  | any other version     | :red_circle:       |
-|                  |                       |                    |
 | Debian           | from 10 to 11         | :white_check_mark: |
 |                  | any other version     | :red_circle:       |
-|                  |                       |                    |
 | CentOS           | no supported versions | :red_circle:       |
 
 ## Copyright
