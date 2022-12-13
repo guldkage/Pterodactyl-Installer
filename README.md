@@ -32,13 +32,13 @@ Supported operating systems.
 | Ubuntu           | from 18.04 to 22.04   | :white_check_mark:                 |
 | Debian           | from 10 to 11         | :white_check_mark:                 |
 | CentOS           | no supported versions | :x:                                |
-| Rocky Linux      | no supported versions | :x:ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ |
+| Rocky Linux      | no supported versions | :x:                                |
 
 | Webserver        | Supported             | Reason                             |
 | ---------------- | ----------------------| ---------------------------------- |
 | NGINX            | :white_check_mark:    |                                    |
 | Apache           | :x:                   | Too many modules                   |
-| LiteSpeed        | :x:                   | Not fully supported by Pterodactyl |
+| LiteSpeed        | :x:                   | Not fully supported by Pterodactylㅤㅤ |
 | Caddy            | :x:                   | Not fully supported by Pterodactyl |
 
 ## Copyright
