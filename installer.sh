@@ -140,12 +140,33 @@ phpmyadmininstall(){
     output "While the script is doing its work, please do not abort the installation. This can lead to issues on your machine."
     output "Instead, let the script install PHPMyAdmin. Then uninstall it after if you have changed your mind."
     sleep 1s
-    if  [ "$dist" =  "ubuntu" ] || [ "$dist" =  "debian" ]; then
+    if  [ "$dist" =  "ubuntu" ]; then
+        apt install nginx certbot -y
         mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
-        apt install nginx -y
-        apt install certbot -y
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
+        tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
+        mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
+        chown -R www-data:www-data *
+        mkdir config
+        chmod o+rw config
+        cp config.sample.inc.php config/config.inc.php
+        chmod o+w config/config.inc.php
+        rm -rf /var/www/phpmyadmin/config
+        phpmyadminweb
+    if  [ "$dist" =  "debian" ]; then
+        apt install nginx certbot -y
+        mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || output "An error occurred. Could not create directory." || exit
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+        curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+        apt update -y
+
+        apt-get update
+        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
+        apt-add-repository universe
+        apt install -y php8.1 php8.1-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,zip}
+
         wget https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.tar.gz
         tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
         mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
