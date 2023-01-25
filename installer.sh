@@ -177,7 +177,7 @@ phpmyadmininstall(){
         chmod o+w config/config.inc.php
         rm -rf /var/www/phpmyadmin/config
         phpmyadminweb
-    fi
+        fi
 }
 
 continueanywayphpmyadmin(){
