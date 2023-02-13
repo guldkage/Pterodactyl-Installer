@@ -301,7 +301,7 @@ finish(){
     warning "Your Admin Panel then Databases -> Create new"
     warning ""
     warning "Firewall:"
-    warning "The Panel may not load if port 80 and 433 is not open."
+    warning "The Panel may not load if port 80 and 443 is not open."
     warning "Please check your firewall or rerun this script"
     warning "and select Firewall Configuration."
 }
