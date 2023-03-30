@@ -73,7 +73,7 @@ No support is offered for this script.
 The script has been tested many times without any bug fixes, however they can still occur.
 If you find errors, feel free to open an "Issue" on GitHub.
 
-# Run the script
+# Interactive/Normal installation
 Debian based systems only.
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/installer.sh)
