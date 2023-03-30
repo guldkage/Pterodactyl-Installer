@@ -29,6 +29,7 @@ You can now install Pterodactyl using 1 command without having to manually type 
 ## How do I use it?
 You use it like this:
 
+```
 <fqdn> = What you want to access your panel with. Eg. panel.domain.ltd
 <ssl> = Whether to use SSL. Options are true or false.
 <email> = Your email. If you choose SSL, it will be shared with Lets Encrypt.
@@ -37,6 +38,7 @@ You use it like this:
 <lastname> = Lastname for admin account on Pterodactyl
 <password> = The password for the admin account on Pterodactyl
 <wings> = Whether you want to have Wings installed automatically as well. Options are true or false.
+```
 
 You must be precise when using this script. 1 typo and everything can go wrong.
 It also needs to be run on a fresh version of Ubuntu or Debian.
