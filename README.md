@@ -62,7 +62,7 @@ Only for raspbian users. They might need a extra < in the beginning.
 bash < <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/installer.sh)
 ```
 
-# Autoinstall
+# Autoinstall / Developer Installation
 Only use this if you know what you are doing!
 You can now install Pterodactyl using 1 command without having to manually type anything after running the command.
 
