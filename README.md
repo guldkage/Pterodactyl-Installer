@@ -12,7 +12,7 @@ The script must be run as root.
 If you find any errors, things you would like changed or queries for things in the future for this script, please write an "Issue".
 Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not associated with the official Pterodactyl Project.
 
-## Features
+# Features
 This script is one of the only ones that has a well-functioning Switch Domains feature.
 
 - Install Panel
@@ -23,10 +23,10 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 - Uninstall Panel
 - Uninstall Wings
 
-## Autoinstall
+# Autoinstall
 You can now install Pterodactyl using 1 command without having to manually type anything after running the command.
 
-# How do I use it?
+## How do I use it?
 You use it like this:
 
 <fqdn> = What you want to access your panel with. Eg. panel.domain.ltd
@@ -43,7 +43,7 @@ It also needs to be run on a fresh version of Ubuntu or Debian.
 
 ```bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/interactive_install.sh <fqdn <ssl> <email> <username> <firstname <lastname> <password> <wings>)```
 
-## Supported OS & Webserver
+# Supported OS & Webserver
 Supported operating systems.
 
 | Operating System | Version               | Supported                          |
@@ -60,11 +60,11 @@ Supported operating systems.
 | LiteSpeed        | :x:                 |
 | Caddy            | :x:                 |
 
-## Copyright
+# Copyright
 Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
 Also, please not remove my copyright at the top of the Pterodactyl-Installer script.
 
-## Support
+# Support
 No support is offered for this script.
 The script has been tested many times without any bug fixes, however they can still occur.
 If you find errors, feel free to open an "Issue" on GitHub.
