@@ -117,7 +117,7 @@ LASTNAME=`echo $6`
 PASSWORD=`echo $7`
 WINGS=`echo $8`
 
-echo "Welcome to Interactive Install of Pterodactyl Panel"
+echo "Welcome to Autoinstall of Pterodactyl Panel"
 echo "Quick summary before the install begins:"
 echo ""
 echo "FQDN (URL): $FQDN"
