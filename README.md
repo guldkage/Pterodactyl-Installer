@@ -66,9 +66,6 @@ bash < <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installe
 Only use this if you know what you are doing!
 You can now install Pterodactyl using 1 command without having to manually type anything after running the command.
 
-## How do I use it?
-You use it like this:
-
 ```
 <fqdn> = What you want to access your panel with. Eg. panel.domain.ltd
 <ssl> = Whether to use SSL. Options are true or false.
