@@ -20,7 +20,7 @@ dist="$(. /etc/os-release && echo "$ID")"
 
 function trap_ctrlc ()
 {
-    output "Bye!"
+    echo "Bye!"
     exit 2
 }
 trap "trap_ctrlc" 2
@@ -104,7 +104,7 @@ finish(){
     echo "    Database password: $DBPASSWORD"
     echo "    Password for Database Host: $DBPASSWORDHOST"
     echo "" 
-    echo "    These credentials will has been saved in a file called" 
+    echo "    These credentials has been saved in a file called" 
     echo "    panel_credentials.txt in your current directory"
     echo ""
     echo "    Would you like to install Wings too? (Y/N)"
