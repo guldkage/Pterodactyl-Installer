@@ -1,6 +1,3 @@
-![Logo Image](https://github.com/guldkage/Pterodactyl-Installer/blob/main/configs/installer.png?raw=true)
-
-
 # Pterodactyl Installer
 
 With this script you can easily install, update or delete Pterodactyl Panel. Everything is gathered in one script.
