@@ -323,7 +323,7 @@ wings_fqdnask(){
 wings_full(){
     if  [ "$WINGS_FQDN_STATUS" =  "true" ]; then
         systemctl stop nginx
-        apt install certbot && certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email --agree-tos
+        apt install certbot && certbot certonly --standalone -d $WINGS_FQDN --staple-ocsp --no-eff-email --agree-tos
 
         curl -sSL https://get.docker.com/ | CHANNEL=stable bash
         systemctl enable --now docker
@@ -359,7 +359,7 @@ wings_full(){
 }
 
 wings_fqdn(){
-    echo "[!] Do you want to install a SSL certificate on a FQDN? If not, press enter and leave this blank."
+    echo "[!] Please enter your FQDN if you want to install a SSL certificate. If not, press enter and leave this blank."
     read -r WINGS_FQDN
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
     DOMAIN=$(dig +short ${WINGS_FQDN})
