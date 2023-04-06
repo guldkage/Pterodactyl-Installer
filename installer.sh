@@ -53,14 +53,15 @@ fi
 
 send_summary(){
     clear
-    if [ -d "/path/to/dir" ] 
+    if [ -d "/var/www/pterodactyl" ] 
     then
         echo ""
         warning "[!] WARNING: There seems to already be a installation of Pterodactyl installed! This script will fail!"
         echo ""
         echo "[!] Summary:"
         echo "    Panel URL: $FQDN"
-        echo "    Preselected webserver: NGINX"
+        echo "    Webserver: $WEBSERVER"
+        echo "    SSL: $SSLSTATUS"
         echo "    Username: $USERNAME"
         echo "    First name: $FIRSTNAME"
         echo "    Last name: $LASTNAME"
@@ -70,7 +71,8 @@ send_summary(){
         echo ""
         echo "[!] Summary:"
         echo "    Panel URL: $FQDN"
-        echo "    Preselected webserver: NGINX"
+        echo "    Webserver: $WEBSERVER"
+        echo "    SSL: $SSLSTATUS"
         echo "    Username: $USERNAME"
         echo "    First name: $FIRSTNAME"
         echo "    Last name: $LASTNAME"
@@ -83,11 +85,11 @@ panel(){
     echo ""
     echo "[!] Before installation, we need some information."
     echo ""
-    panel_fqdn
+    panel_webserver
 }
 
 finish(){
-
+    clear
     cd
     echo -e "Summary of the installation\n\nPanel URL: $FQDN\nPreselected webserver: NGINX\nUsername: $USERNAME\nFirst name: $FIRSTNAME\nLast name: $LASTNAME\nPassword: $USERPASSWORD\nDatabase password: $DBPASSWORD\nPassword for Database Host: $DBPASSWORDHOST" >> panel_credentials.txt
 
@@ -95,7 +97,8 @@ finish(){
     echo ""
     echo "    Summary of the installation" 
     echo "    Panel URL: $FQDN"
-    echo "    Preselected webserver: NGINX"
+    echo "    Webserver: $WEBSERVER"
+    echo "    SSL: $SSLSTATUS"
     echo "    Username: $USERNAME"
     echo "    First name: $FIRSTNAME"
     echo "    Last name: $LASTNAME"
@@ -119,6 +122,27 @@ finish(){
     fi
 }
 
+panel_webserver(){
+    send_summary
+    echo "[!] Select Webserver"
+    echo "    (1) NGINX"
+    echo "    (2) Apache"
+    echo "    Input 1-2"
+    read -r option
+    case $option in
+        1 ) option=1
+            WEBSERVER="NGINX"
+            panel_fqdn
+            ;;
+        2 ) option=2
+            WEBSERVER="Apache"
+            panel_fqdn
+            ;;
+        * ) echo ""
+            echo "Please enter a valid option from 1-2"
+    esac
+}
+
 panel_conf(){
     [ "$SSLSTATUS" == true ] && appurl="https://$FQDN"
     [ "$SSLSTATUS" == false ] && appurl="http://$FQDN"
@@ -133,20 +157,42 @@ panel_conf(){
     (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
     sudo systemctl enable --now redis-server
     sudo systemctl enable --now pteroq.service
-    if  [ "$SSLSTATUS" =  "true" ]; then
+    if [ "$SSLSTATUS" = "true" ] && [ "$WEBSERVER" = "NGINX" ]; then
         rm -rf /etc/nginx/sites-enabled/default
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+
         systemctl stop nginx
         certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
         systemctl start nginx
         finish
         fi
-    if  [ "$SSLSTATUS" =  "false" ]; then
+    if [ "$SSLSTATUS" = "true" ] && [ "$WEBSERVER" = "Apache" ]; then
+        a2dissite 000-default.conf && systemctl reload apache2
+        curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache-ssl.conf
+        sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
+        apt install libapache2-mod-php
+        sudo a2enmod rewrite
+        sudo a2enmod ssl
+        systemctl stop apache2
+        certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
+        systemctl start apache2
+        finish
+        fi
+    if [ "$SSLSTATUS" = "false" ] && [ "$WEBSERVER" = "NGINX" ]; then
         rm -rf /etc/nginx/sites-enabled/default
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
         systemctl restart nginx
+        finish
+        fi
+    if [ "$SSLSTATUS" = "false" ] && [ "$WEBSERVER" = "Apache" ]; then
+        a2dissite 000-default.conf && systemctl reload apache2
+        curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache.conf
+        sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
+        sudo a2enmod rewrite
+        systemctl stop apache2
+        systemctl start apache2
         finish
         fi
 }
@@ -156,17 +202,19 @@ panel_install(){
     if  [ "$dist" =  "ubuntu" ]; then
         apt-get update
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
-        sleep 1s
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
         apt update
-        apt-add-repository universe
-        apt install certbot python3-certbot-nginx -y
-        sleep 1s
-        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+        apt install certbot -y
+
+        apt -y install mariadb-server tar unzip git redis-server
+        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+        mkdir /var
+        mkdir /var/www
         mkdir /var/www/pterodactyl
         cd /var/www/pterodactyl
         curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
@@ -175,8 +223,16 @@ panel_install(){
         cp .env.example .env
         command composer install --no-dev --optimize-autoloader --no-interaction
         php artisan key:generate --force
-        panel_conf
-    elif  [ "$dist" =  "debian" ]; then
+
+        if  [ "$WEBSERVER" =  "NGINX" ]; then
+            apt install nginx -y
+            panel_conf
+            fi
+        elif  [ "$WEBSERVER" =  "Apache" ]; then
+            apt install apache2 libapache2-mod-php -y
+            panel_conf
+            fi
+    if  [ "$dist" =  "debian" ]; then
         apt-get update
         apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
@@ -184,12 +240,16 @@ panel_install(){
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
         apt update -y
-        apt-add-repository universe
-        apt install certbot python3-certbot-nginx -y
-        sleep 1s
+        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+        apt install certbot -y
+
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bas
-        apt install -y php8.1 php8.1-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
+        apt install -y mariadb-server tar unzip git redis-server
+        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
         curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+        pause 0.5s
+        mkdir /var
+        mkdir /var/www
         mkdir /var/www/pterodactyl
         cd /var/www/pterodactyl
         curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
@@ -198,8 +258,14 @@ panel_install(){
         cp .env.example .env
         command composer install --no-dev --optimize-autoloader --no-interaction
         php artisan key:generate --force
-        panel_conf
-    fi
+        if  [ "$WEBSERVER" =  "NGINX" ]; then
+            apt install nginx -y
+            panel_conf
+            fi
+        elif  [ "$WEBSERVER" =  "Apache" ]; then
+            sudo apt install apache2 libapache2-mod-php8.1 -y
+            panel_conf
+            fi
 }
 
 panel_summary(){
@@ -210,7 +276,8 @@ panel_summary(){
     echo ""
     echo "[!] Summary:"
     echo "    Panel URL: $FQDN"
-    echo "    Preselected webserver: NGINX"
+    echo "    Webserver: $WEBSERVER"
+    echo "    SSL: $SSLSTATUS"
     echo "    Username: $USERNAME"
     echo "    First name: $FIRSTNAME"
     echo "    Last name: $LASTNAME"
