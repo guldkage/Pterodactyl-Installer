@@ -16,7 +16,6 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 - Install Wings
 - Install PHPMyAdmin
 - Switch Pterodactyl Domains
-- Update Wings
 - Uninstall Panel
 - Uninstall Wings
 
