@@ -32,7 +32,7 @@ Supported operating systems.
 | Webserver        | Supported           |
 | ---------------- | --------------------| 
 | NGINX            | :white_check_mark:  |
-| Apache           | :x:                 |
+| Apache           | :white_check_mark:  |
 | LiteSpeed        | :x:                 |
 | Caddy            | :x:                 |
 
