@@ -91,7 +91,7 @@ panel(){
 finish(){
     clear
     cd
-    echo -e "Summary of the installation\n\nPanel URL: $FQDN\nPreselected webserver: NGINX\nUsername: $USERNAME\nFirst name: $FIRSTNAME\nLast name: $LASTNAME\nPassword: $USERPASSWORD\nDatabase password: $DBPASSWORD\nPassword for Database Host: $DBPASSWORDHOST" >> panel_credentials.txt
+    echo -e "Summary of the installation\n\nPanel URL: $FQDN\nWebserver: $WEBSERVER\nUsername: $USERNAME\nFirst name: $FIRSTNAME\nLast name: $LASTNAME\nPassword: $USERPASSWORD\nDatabase password: $DBPASSWORD\nPassword for Database Host: $DBPASSWORDHOST" >> panel_credentials.txt
 
     echo "[!] Installation of Pterodactyl Panel done"
     echo ""
