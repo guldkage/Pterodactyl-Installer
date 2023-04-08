@@ -240,7 +240,6 @@ panel_install(){
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
         apt update -y
-        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
         apt install certbot -y
 
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bas
