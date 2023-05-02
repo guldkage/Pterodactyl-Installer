@@ -365,6 +365,7 @@ panel_lastname(){
 
 wings(){
     clear
+    apt install dnsutils -y
     echo ""
     echo "[!] Before installation, we need some information."
     echo ""
@@ -389,7 +390,7 @@ wings_fqdnask(){
 wings_full(){
     if  [ "$WINGS_FQDN_STATUS" =  "true" ]; then
         systemctl stop nginx
-        apt install certbot && certbot certonly --standalone -d $WINGS_FQDN --staple-ocsp --no-eff-email --agree-tos
+        apt install -y certbot && certbot certonly --standalone -d $WINGS_FQDN --staple-ocsp --no-eff-email --agree-tos
 
         curl -sSL https://get.docker.com/ | CHANNEL=stable bash
         systemctl enable --now docker
@@ -443,6 +444,7 @@ wings_fqdn(){
 ### PHPMyAdmin Installation ###
 
 phpmyadmin(){
+    apt install dnsutils -y
     echo ""
     echo "[!] Before installation, we need some information."
     echo ""
