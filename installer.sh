@@ -452,6 +452,7 @@ phpmyadmin(){
 }
 
 phpmyadmin_finish(){
+    cd
     echo -e "PHPMyAdmin Installation\n\nSummary of the installation\n\nPHPMyAdmin URL: $PHPMYADMIN_FQDN\nPreselected webserver: NGINX\nSSL: $PHPMYADMIN_SSLSTATUS\nUser: $PHPMYADMIN_USER_LOCAL\nEmail: $PHPMYADMIN_EMAIL" > phpmyadmin_credentials.txt
     clear
     echo "[!] Installation of PHPMyAdmin done"
