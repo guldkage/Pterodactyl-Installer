@@ -464,7 +464,7 @@ phpmyadminweb(){
         certbot certonly --standalone -d $PHPMYADMIN_FQDN --staple-ocsp --no-eff-email -m $PHPMYADMIN_EMAIL --agree-tos || exit || echo "An error occurred. Certbot not installed." || exit
         systemctl start nginx || exit || echo "An error occurred. NGINX is not installed." || exit
 
-        apt install mariadb-server
+        apt install mariadb-server -y
         PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
         mariadb -u root -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mariadb -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
         phpmyadmin_finish
@@ -475,7 +475,7 @@ phpmyadminweb(){
         sed -i -e "s@<domain>@${PHPMYADMIN_FQDN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf || exit || echo "An error occurred. NGINX is not installed." || exit
         systemctl restart nginx || exit || echo "An error occurred. NGINX is not installed." || exit
 
-        apt install mariadb-server
+        apt install mariadb-server -y
         PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
         mariadb -u root -e "CREATE USER '$PHPMYADMIN_USER_LOCAL'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mariadb -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
         phpmyadmin_finish
