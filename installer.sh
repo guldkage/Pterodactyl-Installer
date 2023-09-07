@@ -501,6 +501,7 @@ phpmyadmin_fqdn(){
 }
 
 phpmyadmininstall(){
+    apt update
     apt install nginx certbot -y
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || echo "An error occurred. Could not create directory." || exit
     cd /var/www/phpmyadmin
@@ -535,7 +536,6 @@ phpmyadmininstall(){
     chmod o+w config/config.inc.php
     rm -rf /var/www/phpmyadmin/config
     phpmyadminweb
-    fi
 }
 
 
