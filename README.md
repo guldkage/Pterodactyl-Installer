@@ -18,6 +18,7 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 - Switch Pterodactyl Domains
 - Uninstall Panel
 - Uninstall Wings
+- Autoinstall [BETA, should work fine though.]
 
 # Supported OS & Webserver
 Supported operating systems.
@@ -25,7 +26,7 @@ Supported operating systems.
 | Operating System | Version               | Supported                          |
 | ---------------- | ----------------------| ---------------------------------- |
 | Ubuntu           | from 18.04 to 22.04   | :white_check_mark:                 |
-| Debian           | from 10 to 11         | :white_check_mark:                 |
+| Debian           | from 10 to 12         | :white_check_mark:                 |
 | CentOS           | no supported versions | :x:                                |
 | Rocky Linux      | no supported versions | :x:                                |
 
