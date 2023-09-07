@@ -220,6 +220,15 @@ panel_install(){
         apt update -y
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     fi
+    if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
+        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
+        sudo apt install -y apt-transport-https lsb-release ca-certificates wget
+        wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        apt update -y
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+    fi
     apt install -y mariadb-server tar unzip git redis-server
     apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -793,9 +802,9 @@ switchdomains(){
 
 oscheck(){
     echo "Checking your OS.."
-    if [ "$dist" = "ubuntu" ] && [ "$version" = "20.04" ]; then
+    if [ "$dist" = "ubuntu" ] && { [ "$version" = "18.04" ] || [ "$version" = "20.04" ] || [ "$version" = "22.04" ]; }; then
         options
-    elif [ "$dist" = "debian" ] && { [ "$version" = "11" ] || [ "$version" = "10" ]; }; then
+    elif [ "$dist" = "debian" ] && { [ "$version" = "11" ] || [ "$version" = "12" ]; }; then
         options
     else
         echo "Your OS, $dist $version, is not supported"
