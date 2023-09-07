@@ -60,50 +60,51 @@ panel_conf(){
 
 panel_install(){
     echo "" 
-    if  [ "$dist" =  "ubuntu" ]; then
-        apt-get update
+    apt update
+    apt install certbot -y
+    if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
         apt update
-        apt-add-repository universe
-        apt install certbot python3-certbot-nginx -y
-        apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-        mkdir /var/www/pterodactyl
-        cd /var/www/pterodactyl
-        curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
-        tar -xzvf panel.tar.gz
-        chmod -R 755 storage/* bootstrap/cache/
-        cp .env.example .env
-        command composer install --no-dev --optimize-autoloader --no-interaction
-        php artisan key:generate --force
-        panel_conf
-    elif  [ "$dist" =  "debian" ]; then
-        apt-get update
+        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+    fi
+    if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
         apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
         curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
         apt update -y
-        apt-add-repository universe
-        apt install certbot python3-certbot-nginx -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bas
-        apt install -y php8.1 php8.1-{common,cli,gd,mysql,mbstring,bcmath,xml,fpm,curl,zip} mariadb-server nginx tar unzip git redis-server
-        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-        mkdir /var/www/pterodactyl
-        cd /var/www/pterodactyl
-        curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
-        tar -xzvf panel.tar.gz
-        chmod -R 755 storage/* bootstrap/cache/
-        cp .env.example .env
-        command composer install --no-dev --optimize-autoloader --no-interaction
-        php artisan key:generate --force
-        panel_conf
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     fi
+    if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
+        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
+        sudo apt install -y apt-transport-https lsb-release ca-certificates wget
+        wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        apt update -y
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+    fi
+    apt install -y mariadb-server tar unzip git redis-server
+    apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    pause 0.5s
+    mkdir /var
+    mkdir /var/www
+    mkdir /var/www/pterodactyl
+    cd /var/www/pterodactyl
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+    tar -xzvf panel.tar.gz
+    chmod -R 755 storage/* bootstrap/cache/
+    cp .env.example .env
+    command composer install --no-dev --optimize-autoloader --no-interaction
+    php artisan key:generate --force
+    apt install nginx -y
+    panel_conf
 }
 
 #! /bin/sh -
