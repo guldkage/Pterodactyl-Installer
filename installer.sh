@@ -527,8 +527,10 @@ phpmyadmininstall(){
         apt update -y
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     fi
-    tar xzf phpMyAdmin-5.2.0-all-languages.tar.gz
-    mv /var/www/phpmyadmin/phpMyAdmin-5.2.0-all-languages/* /var/www/phpmyadmin
+    
+    wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
+    tar xzf phpMyAdmin-5.2.1-all-languages.tar.gz
+    mv /var/www/phpmyadmin/phpMyAdmin-5.2.1-all-languages/* /var/www/phpmyadmin
     chown -R www-data:www-data *
     mkdir config
     chmod o+rw config
