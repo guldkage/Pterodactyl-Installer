@@ -18,7 +18,7 @@ This script is one of the only ones that has a well-functioning Switch Domains f
 - Switch Pterodactyl Domains
 - Uninstall Panel
 - Uninstall Wings
-- Autoinstall [BETA, should work fine though.]
+- Autoinstall [ONLY NGINX & BETA]
 
 # Supported OS & Webserver
 Supported operating systems.
