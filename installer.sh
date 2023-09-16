@@ -51,6 +51,30 @@ if ! [ -x "$(command -v curl)" ]; then
     exit 1
 fi
 
+### Privacy ####
+
+numbercounter(){
+    echo ""
+    echo "[!] Hello there!"
+    echo "Thank you very much for using this script."
+    echo "This script is free to use, and therefore would like to collect a personal number of how many installations happen with this script. No personal information about your machine or your installation is shared."
+    echo "A request will be sent to a web server which adds 1 to the total number, therefore this server IP address will be sent to the web server."
+    echo "You of course have the option to decline, and that will be respected. The request only happens if you accept."
+    echo ""
+    echo "(Y/N)"
+    read -r PRIVACY
+
+    if [[ "$PRIVACY" =~ [Yy] ]]; then
+        curl -X POST https://malthe.cc/api/pterodactyl_installer_number.php
+        echo "Thank you very much for participating! One has been added to the total number."
+    fi
+    if [[ "$PRIVACY" =~ [Nn] ]]; then
+        echo "That's totally okay! Thank you again for using this script."
+        exit 1
+    fi
+}
+
+
 ### Pterodactyl Panel Installation ###
 
 send_summary(){
@@ -120,11 +144,11 @@ finish(){
     read -r WINGS_ON_PANEL
 
     if [[ "$WINGS_ON_PANEL" =~ [Yy] ]]; then
-
+        numbercounter
         wings
     fi
     if [[ "$WINGS_ON_PANEL" =~ [Nn] ]]; then
-        exit 1
+        numbercounter
     fi
 }
 
@@ -544,6 +568,8 @@ phpmyadmin_finish(){
     echo ""
     echo "    These credentials will has been saved in a file called" 
     echo "    phpmyadmin_credentials.txt in your current directory"
+    echo ""
+    numbercounter
 }
 
 
