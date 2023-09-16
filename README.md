@@ -28,7 +28,7 @@ Supported operating systems.
 | Ubuntu           | from 18.04 to 22.04   | :white_check_mark:                 | 8.1   |
 | Debian           | from 10 to 12         | :white_check_mark:                 | 8.1   |
 | CentOS           |       centos 7        | :white_check_mark:                 | 8.1   |
-| Rocky Linux      | no supported versions | :x:                                |       |
+| Rocky Linux      | no supported versions | :x:                                | :x:   |
 
 | Webserver        | Supported           |
 | ---------------- | --------------------| 
