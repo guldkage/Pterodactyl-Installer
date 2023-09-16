@@ -51,16 +51,6 @@ if ! [ -x "$(command -v curl)" ]; then
     exit 1
 fi
 
-if ! [ -x "$(command -v dig)" ]; then
-    echo ""
-    echo "[!] dig is required to run this script."
-    echo "To proceed, please install dig on your machine."
-    echo ""
-    echo "Debian based systems: apt install dnsutils"
-    echo "CentOS: yum install bind-utils"
-    exit 1
-fi
-
 ### Privacy ####
 
 numbercounter(){
