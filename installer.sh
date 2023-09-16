@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #!/usr/bin/env bash
 
@@ -80,6 +81,10 @@ send_summary(){
         echo "    Password: $USERPASSWORD"
         echo ""
     fi
+    if [ "$dist" = "centos" ] && [ "$version" = "7" ]; then
+        echo "    You are running CentOS 7. NGINX will be selected as webserver."
+        echo ""
+    fi
 }
 
 panel(){
@@ -154,10 +159,33 @@ panel_conf(){
     php artisan migrate --seed --force
     php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$USERPASSWORD" --admin=1
     chown -R www-data:www-data /var/www/pterodactyl/*
+    if [ "$dist" = "centos" ]; then
+        chown -R nginx:nginx /var/www/pterodactyl/*
+        sudo systemctl enable --now redis
+        fi
     curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
     (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
     sudo systemctl enable --now redis-server
     sudo systemctl enable --now pteroq.service
+
+    if [ "$dist" = "centos" ] && { [ "$version" = "7" ] || [ "$SSLSTATUS" = "true" ]; }; then
+        sudo yum install epel-release -y
+        sudo yum install certbot -y
+        curl -o /etc/nginx/conf.d/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
+        sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/conf.d/pterodactyl.conf
+        sed -i -e "s@/run/php/php8.1-fpm.sock@/var/run/php-fpm/pterodactyl.sock@g" /etc/nginx/conf.d/pterodactyl.conf
+        systemctl stop nginx
+        certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
+        systemctl start nginx
+        finish
+        fi
+    if [ "$dist" = "centos" ] && { [ "$version" = "7" ] || [ "$SSLSTATUS" = "false" ]; }; then
+        curl -o /etc/nginx/conf.d/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
+        sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/conf.d/pterodactyl.conf
+        sed -i -e "s@/run/php/php8.1-fpm.sock@/var/run/php-fpm/pterodactyl.sock@g" /etc/nginx/conf.d/pterodactyl.conf
+        systemctl restart nginx
+        finish
+        fi
     if [ "$SSLSTATUS" = "true" ] && [ "$WEBSERVER" = "NGINX" ]; then
         rm -rf /etc/nginx/sites-enabled/default
         curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
@@ -200,8 +228,6 @@ panel_conf(){
 
 panel_install(){
     echo "" 
-    apt update
-    apt install certbot -y
     if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
@@ -230,6 +256,61 @@ panel_install(){
         apt update -y
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     fi
+    if [ "$dist" = "centos" ] && [ "$version" = "7" ]; then
+        yum update -y
+        yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans -y
+
+        curl -o /etc/yum.repos.d/mariadb.repo https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/mariadb.repo
+
+        yum update -y
+        yum install -y mariadb-server
+        systemctl start mariadb
+        systemctl enable mariadb
+
+        yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+        yum install -y yum-utils
+        yum-config-manager --disable 'remi-php*'
+        yum-config-manager --enable remi-php81
+
+        yum update -y
+        yum install -y php php-{common,fpm,cli,json,mysqlnd,mcrypt,gd,mbstring,pdo,zip,bcmath,dom,opcache}
+
+        yum install -y zip unzip
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+        yum install -y nginx
+
+        yum install -y --enablerepo=remi redis
+        systemctl start redis
+        systemctl enable redis
+
+        setsebool -P httpd_can_network_connect 1
+        setsebool -P httpd_execmem 1
+        setsebool -P httpd_unified 1
+
+        curl -o /etc/php-fpm.d/www-pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/www-pterodactyl.conf
+        systemctl enable php-fpm
+        systemctl start php-fpm
+
+        pause 0.5s
+        mkdir /var
+        mkdir /var/www
+        mkdir /var/www/pterodactyl
+        cd /var/www/pterodactyl
+        curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+        tar -xzvf panel.tar.gz
+        chmod -R 755 storage/* bootstrap/cache/
+        cp .env.example .env
+        command composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-reqs
+        php artisan key:generate --force
+
+        WEBSERVER=NGINX
+        panel_conf
+        fi
+
+    apt update
+    apt install certbot -y
+
     apt install -y mariadb-server tar unzip git redis-server
     apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -351,8 +432,16 @@ panel_lastname(){
 ### Pterodactyl Wings Installation ###
 
 wings(){
+    if [ "$dist" = "debian" ] || [ "$dist" = "ubuntu" ]; then
+        apt install dnsutils certbot -y
+        apt-get -y install curl tar unzip
+        fi
+    if [ "$dist" = "centos" ]; then
+        sudo yum install bind-utils certbot -y
+        yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans -y
+        yum install tar unzip zip
+        fi
     clear
-    apt install dnsutils -y
     echo ""
     echo "[!] Before installation, we need some information."
     echo ""
@@ -376,7 +465,7 @@ wings_fqdnask(){
 
 wings_full(){
     if  [ "$WINGS_FQDN_STATUS" =  "true" ]; then
-        systemctl stop nginx
+        systemctl stop nginx apache2
         apt install -y certbot && certbot certonly --standalone -d $WINGS_FQDN --staple-ocsp --no-eff-email --agree-tos
 
         curl -sSL https://get.docker.com/ | CHANNEL=stable bash
@@ -399,7 +488,6 @@ wings_full(){
         systemctl enable --now docker
 
         mkdir -p /etc/pterodactyl || exit || echo "An error occurred. Could not create directory." || exit
-        apt-get -y install curl tar unzip
         curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
         curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
         chmod u+x /usr/local/bin/wings
@@ -796,9 +884,7 @@ switchdomains(){
 
 oscheck(){
     echo "Checking your OS.."
-    if [ "$dist" = "ubuntu" ] && { [ "$version" = "18.04" ] || [ "$version" = "20.04" ] || [ "$version" = "22.04" ]; }; then
-        options
-    elif [ "$dist" = "debian" ] && { [ "$version" = "11" ] || [ "$version" = "12" ]; }; then
+    if { [ "$dist" = "ubuntu" ] && [ "$version" = "18.04" ] || [ "$version" = "20.04" ] || [ "$version" = "22.04" ]; } || { [ "$dist" = "centos" ] && [ "$version" = "7" ]; } || { [ "$dist" = "debian" ] && [ "$version" = "11" ] || [ "$version" = "12" ]; }; then
         options
     else
         echo "Your OS, $dist $version, is not supported"
@@ -809,37 +895,65 @@ oscheck(){
 ### Options ###
 
 options(){
-    echo "What would you like to do?"
-    echo "[1] Install Panel."
-    echo "[2] Install Wings."
-    echo "[3] Install PHPMyAdmin."
-    echo "[4] Remove Wings"
-    echo "[5] Remove Panel"
-    echo "[6] Switch Pterodactyl Domain"
-    echo "Input 0-6"
-    read -r option
-    case $option in
-        1 ) option=1
-            panel
-            ;;
-        2 ) option=2
-            wings
-            ;;
-        3 ) option=3
-            phpmyadmin
-            ;;
-        4 ) option=6
-            wings_remove
-            ;;
-        5 ) option=7
-            uninstallpanel
-            ;;
-        6 ) option=10
-            switchdomains
-            ;;
-        * ) echo ""
-            echo "Please enter a valid option from 1-6"
-    esac
+    if [ "$dist" = "centos" ] && { [ "$version" = "7" ]; }; then
+        echo "Your opportunities has been limited due to CentOS 7."
+        echo ""
+        echo "What would you like to do?"
+        echo "[1] Install Panel."
+        echo "[2] Install Wings."
+        echo "[3] Remove Panel."
+        echo "[4] Remove Wings."
+        echo "Input 1-4"
+        read -r option
+        case $option in
+            1 ) option=1
+                panel
+                ;;
+            2 ) option=2
+                wings
+                ;;
+            2 ) option=3
+                uninstallpanel
+                ;;
+            2 ) option=4
+                wings_remove
+                ;;
+            * ) echo ""
+                echo "Please enter a valid option from 1-4"
+        esac
+    else
+        echo "What would you like to do?"
+        echo "[1] Install Panel."
+        echo "[2] Install Wings."
+        echo "[3] Install PHPMyAdmin."
+        echo "[4] Remove Wings"
+        echo "[5] Remove Panel"
+        echo "[6] Switch Pterodactyl Domain"
+        echo "Input 1-6"
+        read -r option
+        case $option in
+            1 ) option=1
+                panel
+                ;;
+            2 ) option=2
+                wings
+                ;;
+            3 ) option=3
+                phpmyadmin
+                ;;
+            4 ) option=4
+                wings_remove
+                ;;
+            5 ) option=5
+                uninstallpanel
+                ;;
+            6 ) option=6
+                switchdomains
+                ;;
+            * ) echo ""
+                echo "Please enter a valid option from 1-6"
+        esac
+    fi
 }
 
 ### Start ###
@@ -847,7 +961,7 @@ options(){
 clear
 echo ""
 echo "Pterodactyl Installer @ v2.0"
-echo "Copyright 2022, Malthe K, <me@malthe.cc>"
+echo "Copyright 2023, Malthe K, <me@malthe.cc>"
 echo "https://github.com/guldkage/Pterodactyl-Installer"
 echo ""
 echo "This script is not associated with the official Pterodactyl Panel."
