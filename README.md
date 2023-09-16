@@ -10,7 +10,7 @@ If you find any errors, things you would like changed or queries for things in t
 Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not associated with the official Pterodactyl Project.
 
 # Features
-This script is one of the only ones that has a well-functioning Switch Domains feature.
+Supports newest version of Pterodactyl! This script is one of the only ones that has a well-functioning Switch Domains feature.
 
 - Install Panel
 - Install Wings
