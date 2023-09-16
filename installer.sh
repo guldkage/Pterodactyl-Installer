@@ -229,6 +229,7 @@ panel_conf(){
 panel_install(){
     echo "" 
     if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
+        apt update
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg
@@ -238,6 +239,7 @@ panel_install(){
         sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
+        apt update
         apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
         curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
@@ -247,6 +249,7 @@ panel_install(){
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
+        apt update
         apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
         sudo apt install -y apt-transport-https lsb-release ca-certificates wget
         wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
