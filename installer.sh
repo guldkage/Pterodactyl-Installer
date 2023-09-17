@@ -65,7 +65,7 @@ numbercounter(){
     read -r PRIVACY
 
     if [[ "$PRIVACY" =~ [Yy] ]]; then
-        curl -X POST https://malthe.cc/api/pterodactyl_installer_number.php
+        curl -X POST https://malthe.cc/api/numbercounter/pterodactyl_installer_number.php
         echo "Thank you very much for participating! One has been added to the total number."
     fi
     if [[ "$PRIVACY" =~ [Nn] ]]; then
