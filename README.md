@@ -30,6 +30,10 @@ Supported operating systems.
 | CentOS           |       centos 7        | :white_check_mark:                 | 8.1   |
 | Rocky Linux      | no supported versions | :x:                                | :x:   |
 
+```diff
+- Please do not use CentOS 7. It is EOL and there will not be added support for any newer CentOS version. Please switch to a new ditro, such as Debian or Ubuntu.
+```
+
 | Webserver        | Supported           |
 | ---------------- | --------------------| 
 | NGINX            | :white_check_mark:  |
