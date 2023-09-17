@@ -35,6 +35,8 @@ Supported operating systems.
   If you are running CentOS and you want to use this script, you should switch to a new ditro, such as Debian or Ubuntu.
 </a>
 
+$${\color{red}Red}$$
+
 | Webserver        | Supported           |
 | ---------------- | --------------------| 
 | NGINX            | :white_check_mark:  |
