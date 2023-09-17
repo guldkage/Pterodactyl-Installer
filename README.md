@@ -41,7 +41,6 @@ Supported operating systems.
 
 # Copyright
 Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
-Also, please not remove my copyright at the top of the Pterodactyl-Installer script.
 
 # Support
 No support is offered for this script.
