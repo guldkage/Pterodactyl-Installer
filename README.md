@@ -30,7 +30,7 @@ Supported operating systems.
 | CentOS           |       centos 7        | :white_check_mark:                 | 8.1   |
 | Rocky Linux      | no supported versions | :x:                                | :x:   |
 
-:warning: Please do not use CentOS 7. It is EOL and there will not be added support in this script for any newer CentOS version. If you are running CentOS and you want to use this script, you should switch to a new ditro, such as Debian or Ubuntu.
+:warning: Please do not use CentOS 7. It is EOL and there will not be added support in this script for any newer CentOS version. If you are running CentOS and you want to use this script, you should switch to a new distro, such as Debian or Ubuntu.
 
 | Webserver        | Supported           |
 | ---------------- | --------------------| 
