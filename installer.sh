@@ -370,6 +370,7 @@ panel_summary(){
 panel_fqdn(){
     send_summary
     echo "[!] Please enter FQDN. You will access Panel with this."
+    echo "[!] Example: panel.yourdomain.dk."
     read -r FQDN
     [ -z "$FQDN" ] && echo "FQDN can't be empty."
     IP=$(dig +short myip.opendns.com @resolver2.opendns.com -4)
@@ -388,6 +389,7 @@ panel_fqdn(){
 panel_ssl(){
     send_summary
     echo "[!] Do you want to use SSL for your Panel? This is recommended. (Y/N)"
+    echo "[!] SSL is recommended for every panel."
     read -r SSL_CONFIRM
 
     if [[ "$SSL_CONFIRM" =~ [Yy] ]]; then
@@ -414,7 +416,7 @@ panel_email(){
 
 panel_username(){
     send_summary
-    echo "[!] Please enter username for admin account."
+    echo "[!] Please enter username for admin account. You can use your username to login to your Pterodactyl Account."
     read -r USERNAME
     panel_firstname
 }
