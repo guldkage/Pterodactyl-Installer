@@ -146,6 +146,5 @@ if { [ "$dist" = "ubuntu" ] && [ "$version" = "20.04" ]; } || { [ "$dist" = "deb
 else
     echo "Your OS, $dist $version, is not supported"
     exit 1
-    fi
-}
+fi
 
