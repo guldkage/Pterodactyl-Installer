@@ -1,9 +1,9 @@
 <h1 align="center"><strong>Pterodactyl Installer</strong></h1>
 
 With this script you can easily install, update or delete Pterodactyl Panel. Everything is gathered in one script.
-Use this script if you want to install, update or delete your services quickly. The things that are being done are already listed on [Pterodactyl](https://pterodactyl.io/), but this clearly makes it faster since it is automatic.
 
-Please note that this script is made to work on a fresh installation. There is a good chance that it will fail if it is not a fresh installation.
+Please note that this script is made to work on a fresh installation.
+There is a good chance that it will fail if it is not a fresh installation.
 The script must be run as root.
 
 If you find any errors, things you would like changed or queries for things in the future for this script, please write an "Issue".
@@ -39,8 +39,10 @@ Supported operating systems.
 | LiteSpeed        | :x:                 |
 | Caddy            | :x:                 |
 
-# Copyright
-Please do not say you created this script. You may create a fork for this Pterodactyl-Installer, but I would appreciate this github being linked to.
+# Contributors
+Copyright 2022-2023, [Malthe K](https://github.com/guldkage), me@malthe.cc
+<br>
+Created and maintained by [Malthe K.](https://github.com/guldkage)
 
 # Support
 No support is offered for this script.
@@ -64,6 +66,10 @@ bash < <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installe
 Only use this if you know what you are doing!
 You can now install Pterodactyl using 1 command without having to manually type anything after running the command.
 
+### [BETA] Generate Autoinstall Command
+You can use my [autoinstall command generator](https://malthe.cc/api/autoinstall/) to install Pterodactyl and Wings with 1 command.
+
+### Required fields
 ```
 <fqdn> = What you want to access your panel with. Eg. panel.domain.ltd
 <ssl> = Whether to use SSL. Options are true or false.
