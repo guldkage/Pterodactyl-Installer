@@ -6,7 +6,6 @@ Please note that this script is made to work on a fresh installation.
 There is a good chance that it will fail if it is not a fresh installation.
 The script must be run as root.
 
-If you find any errors, things you would like changed or queries for things in the future for this script, please write an "Issue".
 Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not associated with the official Pterodactyl Project.
 
 # Features
@@ -45,7 +44,6 @@ Copyright 2022-2023, [Malthe K](https://github.com/guldkage), me@malthe.cc
 Created and maintained by [Malthe K.](https://github.com/guldkage)
 
 # Support
-No support is offered for this script.
 The script has been tested many times without any bug fixes, however they can still occur.
 If you find errors, feel free to open an "Issue" on GitHub.
 
