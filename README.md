@@ -45,6 +45,7 @@ Created and maintained by [Malthe K.](https://github.com/guldkage)
 
 # Support
 The script has been tested many times without any bug fixes, however they can still occur.
+<br>
 If you find errors, feel free to open an "Issue" on GitHub.
 
 # Interactive/Normal installation
