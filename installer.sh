@@ -53,38 +53,30 @@ fi
 
 ### Pterodactyl Panel Installation ###
 
-send_summary(){
+send_summary() {
     clear
-    if [ -d "/var/www/pterodactyl" ] 
-    then
-        echo ""
-        warning "[!] WARNING: There seems to already be a installation of Pterodactyl installed! This script will fail!"
-        echo ""
-        echo "[!] Summary:"
-        echo "    Panel URL: $FQDN"
-        echo "    Webserver: $WEBSERVER"
-        echo "    SSL: $SSLSTATUS"
-        echo "    Username: $USERNAME"
-        echo "    First name: $FIRSTNAME"
-        echo "    Last name: $LASTNAME"
-        echo "    Password: $USERPASSWORD"
-        echo ""
-    else
-        echo ""
-        echo "[!] Summary:"
-        echo "    Panel URL: $FQDN"
-        echo "    Webserver: $WEBSERVER"
-        echo "    SSL: $SSLSTATUS"
-        echo "    Username: $USERNAME"
-        echo "    First name: $FIRSTNAME"
-        echo "    Last name: $LASTNAME"
-        echo "    Password: $USERPASSWORD"
-        echo ""
+    echo ""
+    
+    if [ -d "/var/www/pterodactyl" ]; then
+        warning "[!] WARNING: Pterodactyl is already installed. This script will fail!"
     fi
+
+    echo ""
+    echo "[!] Summary:"
+    echo "    Panel URL: $FQDN"
+    echo "    Webserver: $WEBSERVER"
+    echo "    SSL: $SSLSTATUS"
+    echo "    Username: $USERNAME"
+    echo "    First name: $FIRSTNAME"
+    echo "    Last name: $LASTNAME"
+    echo "    Password: $USERPASSWORD"
+    echo ""
+    
     if [ "$dist" = "centos" ] && [ "$version" = "7" ]; then
-        echo "    You are running CentOS 7. NGINX will be selected as webserver."
-        echo ""
+        echo "    You are running CentOS 7. NGINX will be selected as the webserver."
     fi
+    
+    echo ""
 }
 
 panel(){
