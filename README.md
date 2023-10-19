@@ -50,7 +50,6 @@ If you find errors, feel free to open an "Issue" on GitHub.
 
 # Interactive/Normal installation
 The recommended way to use this script.
-Debian based systems only.
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/installer.sh)
 ```
