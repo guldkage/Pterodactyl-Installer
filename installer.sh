@@ -1,4 +1,5 @@
 
+
 #!/bin/bash
 #!/usr/bin/env bash
 
@@ -17,11 +18,13 @@
 
 dist="$(. /etc/os-release && echo "$ID")"
 version="$(. /etc/os-release && echo "$VERSION_ID")"
+USERPASSWORD=""
 
 ### OUTPUTS ###
 
 function trap_ctrlc ()
 {
+    echo ""
     echo "Bye!"
     exit 2
 }
@@ -65,11 +68,16 @@ send_summary() {
     echo "[!] Summary:"
     echo "    Panel URL: $FQDN"
     echo "    Webserver: $WEBSERVER"
+    echo "    Email: $EMAIL"
     echo "    SSL: $SSLSTATUS"
     echo "    Username: $USERNAME"
     echo "    First name: $FIRSTNAME"
     echo "    Last name: $LASTNAME"
-    echo "    Password: $USERPASSWORD"
+    if [ -n "$USERPASSWORD" ]; then
+    echo "    Password: $(printf "%0.s*" $(seq 1 ${#USERPASSWORD}))"
+    else
+        echo "    Password:"
+    fi
     echo ""
     
     if [ "$dist" = "centos" ] && [ "$version" = "7" ]; then
@@ -89,18 +97,19 @@ panel(){
 finish(){
     clear
     cd
-    echo -e "Summary of the installation\n\nPanel URL: $FQDN\nWebserver: $WEBSERVER\nUsername: $USERNAME\nFirst name: $FIRSTNAME\nLast name: $LASTNAME\nPassword: $USERPASSWORD\nDatabase password: $DBPASSWORD\nPassword for Database Host: $DBPASSWORDHOST" >> panel_credentials.txt
+    echo -e "Summary of the installation\n\nPanel URL: $FQDN\nWebserver: $WEBSERVER\nUsername: $USERNAME\nEmail: $EMAIL\nFirst name: $FIRSTNAME\nLast name: $LASTNAME\nPassword: $(printf "%0.s*" $(seq 1 ${#USERPASSWORD}))\nDatabase password: $DBPASSWORD\nPassword for Database Host: $DBPASSWORDHOST" >> panel_credentials.txt
 
     echo "[!] Installation of Pterodactyl Panel done"
     echo ""
     echo "    Summary of the installation" 
     echo "    Panel URL: $FQDN"
     echo "    Webserver: $WEBSERVER"
+    echo "    Email: $EMAIL"
     echo "    SSL: $SSLSTATUS"
     echo "    Username: $USERNAME"
     echo "    First name: $FIRSTNAME"
     echo "    Last name: $LASTNAME"
-    echo "    Password: $USERPASSWORD"
+    echo "    Password: $(printf "%0.s*" $(seq 1 ${#USERPASSWORD}))"
     echo "" 
     echo "    Database password: $DBPASSWORD"
     echo "    Password for Database Host: $DBPASSWORDHOST"
@@ -108,14 +117,25 @@ finish(){
     echo "    These credentials has been saved in a file called" 
     echo "    panel_credentials.txt in your current directory"
     echo ""
-    echo "    Would you like to install Wings too? (Y/N)"
-    read -r WINGS_ON_PANEL
 
-    if [[ "$WINGS_ON_PANEL" =~ [Yy] ]]; then
+    if [ "$INSTALLBOTH" = "true" ]; then
+        WINGSNOQUESTIONS=true
         wings
     fi
-    if [[ "$WINGS_ON_PANEL" =~ [Nn] ]]; then
-        exit 0
+
+    if [ "$INSTALLBOTH" = "false" ]; then
+        WINGSNOQUESTIONS=false
+        echo "    Would you like to install Wings too? (Y/N)"
+        read -r -p "Do you want to install Wings? [Y/n]: " WINGS_ON_PANEL
+
+        if [[ "$WINGS_ON_PANEL" =~ [Yy] ]]; then
+            wings
+        fi
+        
+        if [[ "$WINGS_ON_PANEL" =~ [Nn] ]]; then
+            echo "Bye!"
+            exit 0
+        fi
     fi
 }
 
@@ -152,16 +172,16 @@ panel_conf(){
     chown -R www-data:www-data /var/www/pterodactyl/*
     if [ "$dist" = "centos" ]; then
         chown -R nginx:nginx /var/www/pterodactyl/*
-        sudo systemctl enable --now redis
+         systemctl enable --now redis
         fi
     curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
     (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
-    sudo systemctl enable --now redis-server
-    sudo systemctl enable --now pteroq.service
+     systemctl enable --now redis-server
+     systemctl enable --now pteroq.service
 
     if [ "$dist" = "centos" ] && { [ "$version" = "7" ] || [ "$SSLSTATUS" = "true" ]; }; then
-        sudo yum install epel-release -y
-        sudo yum install certbot -y
+         yum install epel-release -y
+         yum install certbot -y
         curl -o /etc/nginx/conf.d/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/conf.d/pterodactyl.conf
         sed -i -e "s@/run/php/php8.1-fpm.sock@/var/run/php-fpm/pterodactyl.sock@g" /etc/nginx/conf.d/pterodactyl.conf
@@ -192,8 +212,8 @@ panel_conf(){
         curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache-ssl.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
         apt install libapache2-mod-php
-        sudo a2enmod rewrite
-        sudo a2enmod ssl
+         a2enmod rewrite
+         a2enmod ssl
         systemctl stop apache2
         certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
         systemctl start apache2
@@ -210,7 +230,7 @@ panel_conf(){
         a2dissite 000-default.conf && systemctl reload apache2
         curl -o /etc/apache2/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-apache.conf
         sed -i -e "s@<domain>@${FQDN}@g" /etc/apache2/sites-enabled/pterodactyl.conf
-        sudo a2enmod rewrite
+         a2enmod rewrite
         systemctl stop apache2
         systemctl start apache2
         finish
@@ -223,32 +243,32 @@ panel_install(){
         apt update
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        curl -fsSL https://packages.redis.io/gpg |  gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" |  tee /etc/apt/sources.list.d/redis.list
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
         apt update
-        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+         add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
         apt update
-        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
-        curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
-        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        apt -y install software-properties-common curl ca-certificates gnupg2  lsb-release
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" |  tee /etc/apt/sources.list.d/sury-php.list
+        curl -fsSL  https://packages.sury.org/php/apt.gpg |  gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+        curl -fsSL https://packages.redis.io/gpg |  gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" |  tee /etc/apt/sources.list.d/redis.list
         apt update -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
         apt update
-        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-        sudo apt install -y apt-transport-https lsb-release ca-certificates wget
+        apt -y install software-properties-common curl ca-certificates gnupg2  lsb-release
+         apt install -y apt-transport-https lsb-release ca-certificates wget
         wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
-        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" |  tee /etc/apt/sources.list.d/php.list
+        curl -fsSL https://packages.redis.io/gpg |  gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" |  tee /etc/apt/sources.list.d/redis.list
         apt update -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
     fi
     if [ "$dist" = "centos" ] && [ "$version" = "7" ]; then
         yum update -y
@@ -258,8 +278,10 @@ panel_install(){
 
         yum update -y
         yum install -y mariadb-server
+        sed -i 's/character-set-collations = utf8mb4=uca1400_ai_ci/character-set-collations = utf8mb4=utf8mb4_general_ci/' /etc/mysql/mariadb.conf.d/50-server.cnf
         systemctl start mariadb
         systemctl enable mariadb
+        systemctl restart mariadb
 
         yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
         yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm
@@ -306,6 +328,8 @@ panel_install(){
     apt install certbot -y
 
     apt install -y mariadb-server tar unzip git redis-server
+    sed -i 's/character-set-collations = utf8mb4=uca1400_ai_ci/character-set-collations = utf8mb4=utf8mb4_general_ci/' /etc/mysql/mariadb.conf.d/50-server.cnf
+    systemctl restart mariadb
     apt -y install php8.1 php8.1-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     pause 0.5s
@@ -324,7 +348,7 @@ panel_install(){
         panel_conf
     fi
     if  [ "$WEBSERVER" =  "Apache" ]; then
-        sudo apt install apache2 libapache2-mod-php8.1 -y
+        apt install apache2 libapache2-mod-php8.1 -y
         panel_conf
     fi
 }
@@ -332,7 +356,6 @@ panel_install(){
 panel_summary(){
     clear
     DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
-    USERPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     DBPASSWORDHOST=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
     echo ""
     echo "[!] Summary:"
@@ -342,7 +365,7 @@ panel_summary(){
     echo "    Username: $USERNAME"
     echo "    First name: $FIRSTNAME"
     echo "    Last name: $LASTNAME"
-    echo "    Password: $USERPASSWORD"
+    echo "    Password: $(printf "%0.s*" $(seq 1 ${#USERPASSWORD}))"
     echo ""
     echo "    These credentials will be saved in a file called" 
     echo "    panel_credentials.txt in your current directory"
@@ -418,31 +441,59 @@ panel_firstname(){
     read -r FIRSTNAME
     panel_lastname
 }
+
 panel_lastname(){
     send_summary
     echo "[!] Please enter last name for admin account."
     read -r LASTNAME
+    panel_password
+}
+
+panel_password(){
+    send_summary
+    echo "[!] Please enter password for admin account."
+    local USERPASSWORD=""
+    while IFS= read -r -s -n 1 char; do
+        if [[ $char == $'\0' ]]; then
+            break
+        elif [[ $char == $'\177' ]]; then
+            if [ -n "$USERPASSWORD" ]; then
+                USERPASSWORD="${USERPASSWORD%?}"
+                echo -en "\b \b"
+            fi
+        else
+            echo -n '*'
+            USERPASSWORD+="$char"
+        fi
+    done
+    echo
     panel_summary
 }
+
+
+
 
 ### Pterodactyl Wings Installation ###
 
 wings(){
     if [ "$dist" = "debian" ] || [ "$dist" = "ubuntu" ]; then
-        apt install dnsutils certbot -y
-        apt-get -y install curl tar unzip
-        fi
-    if [ "$dist" = "centos" ]; then
-        sudo yum install bind-utils certbot -y
-        yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans -y
-        yum install tar unzip zip
-        fi
-    clear
-    echo ""
-    echo "[!] Before installation, we need some information."
-    echo ""
-    wings_fqdn
+         apt install dnsutils certbot curl tar unzip -y
+    elif [ "$dist" = "centos" ]; then
+         yum install bind-utils certbot policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans tar unzip zip -y
+    fi
+    
+    if [ "$WINGSNOQUESTIONS" = "true" ]; then
+        WINGS_FQDN_STATUS=false
+        wings_full
+    elif [ "$WINGSNOQUESTIONS" = "false" ]; then
+        clear
+        echo ""
+        echo "[!] Before installation, we need some information."
+        echo ""
+        wings_fqdn
+    fi
 }
+
 
 wings_fqdnask(){
     echo "[!] Do you want to install a SSL certificate? (Y/N)"
@@ -450,25 +501,36 @@ wings_fqdnask(){
     echo "    The email will be shared with Lets Encrypt."
     read -r WINGS_SSL
 
-    if [[ "WINGS_SSL" =~ [Yy] ]]; then
+    if [[ "$WINGS_SSL" =~ [Yy] ]]; then
         panel_fqdn
     fi
-    if [[ "$SSL_CONFIRM" =~ [Nn] ]]; then
+    if [[ "$WINGS_SSL" =~ [Nn] ]]; then
         WINGS_FQDN_STATUS=false
         wings_full
     fi
 }
 
 wings_full(){
-    if  [ "$WINGS_FQDN_STATUS" =  "true" ]; then
-        systemctl stop nginx apache2
-        apt install -y certbot && certbot certonly --standalone -d $WINGS_FQDN --staple-ocsp --no-eff-email --agree-tos
+    if [ "$dist" = "debian" ] || [ "$dist" = "ubuntu" ]; then
+        apt-get update && apt-get -y install curl tar unzip
 
-        curl -sSL https://get.docker.com/ | CHANNEL=stable bash
-        systemctl enable --now docker
+        if ! command -v docker &> /dev/null; then
+            curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+             systemctl enable --now docker
+        else
+            echo "[!] Docker is already installed."
+        fi
 
-        mkdir -p /etc/pterodactyl || exit || echo "An error occurred. Could not create directory." || exit
-        apt-get -y install curl tar unzip
+        if ! mkdir -p /etc/pterodactyl; then
+            echo "[!] An error occurred. Could not create directory." >&2
+            exit 1
+        fi
+
+        if  [ "$WINGS_FQDN_STATUS" =  "true" ]; then
+            systemctl stop nginx apache2
+            apt install -y certbot && certbot certonly --standalone -d $WINGS_FQDN --staple-ocsp --no-eff-email --agree-tos
+            fi
+
         curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
         curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
         chmod u+x /usr/local/bin/wings
@@ -478,22 +540,14 @@ wings_full(){
         echo "    You still need to setup the Node"
         echo "    on the Panel and restart Wings after."
         echo ""
-        fi
-    if  [ "$WINGS_FQDN_STATUS" =  "false" ]; then
-        curl -sSL https://get.docker.com/ | CHANNEL=stable bash
-        systemctl enable --now docker
 
-        mkdir -p /etc/pterodactyl || exit || echo "An error occurred. Could not create directory." || exit
-        curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
-        curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
-        chmod u+x /usr/local/bin/wings
-        clear
-        echo ""
-        echo "[!] Pterodactyl Wings successfully installed."
-        echo "    You still need to setup the Node"
-        echo "    on the Panel and restart Wings after."
-        echo ""
-        fi
+        if [ "$INSTALLBOTH" = "true" ]; then
+            INSTALLBOTH="0"
+            finish
+            fi
+    else
+        echo "[!] Your OS is not supported for installing Wings with this installer"
+    fi
 }
 
 wings_fqdn(){
@@ -503,7 +557,7 @@ wings_fqdn(){
     DOMAIN=$(dig +short ${WINGS_FQDN})
     if [ "${IP}" != "${DOMAIN}" ]; then
         echo ""
-        echo "FQDN cancelled. Either FQDN is incorrect or you left this blank."
+        echo "FQDN canceled. Either FQDN is incorrect or you left this blank."
         WINGS_FQDN_STATUS=false
         wings_full
     else
@@ -594,24 +648,24 @@ phpmyadmininstall(){
     if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
         apt update
-        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+         add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
-        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
-        curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+        apt -y install software-properties-common curl ca-certificates gnupg2  lsb-release
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" |  tee /etc/apt/sources.list.d/sury-php.list
+        curl -fsSL  https://packages.sury.org/php/apt.gpg |  gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
         apt update -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
-        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-        sudo apt install -y apt-transport-https lsb-release ca-certificates wget
+        apt -y install software-properties-common curl ca-certificates gnupg2  lsb-release
+         apt install -y apt-transport-https lsb-release ca-certificates wget
         wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" |  tee /etc/apt/sources.list.d/php.list
         apt update -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
     fi
     
     wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
@@ -654,28 +708,18 @@ phpmyadmin_summary(){
 
 send_phpmyadmin_summary(){
     clear
-    if [ -d "/var/www/phpymyadmin" ] 
-    then
-        echo ""
-        warning "[!] WARNING: There seems to already be a installation of PHPMyAdmin installed! This script will fail!"
-        echo ""
-        echo "[!] Summary:"
-        echo "    PHPMyAdmin URL: $PHPMYADMIN_FQDN"
-        echo "    Preselected webserver: NGINX"
-        echo "    SSL: $PHPMYADMIN_SSLSTATUS"
-        echo "    User: $PHPMYADMIN_USER_LOCAL"
-        echo "    Email: $PHPMYADMIN_EMAIL"
-        echo ""
-    else
-        echo ""
-        echo "[!] Summary:"
-        echo "    PHPMyAdmin URL: $PHPMYADMIN_FQDN"
-        echo "    Preselected webserver: NGINX"
-        echo "    SSL: $PHPMYADMIN_SSLSTATUS"
-        echo "    User: $PHPMYADMIN_USER_LOCAL"
-        echo "    Email: $PHPMYADMIN_EMAIL"
-        echo ""
+    echo ""
+    if [ -d "/var/www/phpymyadmin" ]; then
+        warning "[!] WARNING: There seems to already be an installation of PHPMyAdmin installed! This script will fail!"
     fi
+    echo ""
+    echo "[!] Summary:"
+    echo "    PHPMyAdmin URL: $PHPMYADMIN_FQDN"
+    echo "    Preselected webserver: NGINX"
+    echo "    SSL: $PHPMYADMIN_SSLSTATUS"
+    echo "    User: $PHPMYADMIN_USER_LOCAL"
+    echo "    Email: $PHPMYADMIN_EMAIL"
+    echo ""
 }
 
 phpmyadmin_ssl(){
@@ -721,14 +765,30 @@ wings_remove(){
     read -r UNINSTALLWINGS
 
     if [[ "$UNINSTALLWINGS" =~ [Yy] ]]; then
-        sudo systemctl stop wings # Stops wings
-        sudo rm -rf /var/lib/pterodactyl # Removes game servers and backup files
-        sudo rm -rf /etc/pterodactyl  || exit || warning "Pterodactyl Wings not installed!"
-        sudo rm /usr/local/bin/wings || exit || warning "Wings is not installed!" # Removes wings
-        sudo rm /etc/systemd/system/wings.service # Removes wings service file
+         systemctl stop wings # Stops wings
+         rm -rf /var/lib/pterodactyl # Removes game servers and backup files
+         rm -rf /etc/pterodactyl  || exit || warning "Pterodactyl Wings not installed!"
+         rm /usr/local/bin/wings || exit || warning "Wings is not installed!" # Removes wings
+         rm /etc/systemd/system/wings.service # Removes wings service file
         echo ""
         echo "[!] Pterodactyl Wings has been uninstalled."
         echo ""
+    fi
+}
+
+## PHPMyAdmin Removal ###
+
+removephpmyadmin(){
+    echo ""
+    echo "[!] Do you really want to delete PHPMyAdmin? /var/www/phpmyadmin will be deleted, and cannot be recovered. (Y/N)"
+    read -r UNINSTALLPHPMYADMIN
+
+    if [[ "$UNINSTALLPHPMYADMIN" =~ [Yy] ]]; then
+         rm -rf /var/www/phpmyadmin || exit || warning "PHPMyAdmin is not installed!" # Removes PHPMyAdmin files
+         echo "[!] PHPMyAdmin has been removed."
+    fi
+    if [[ "$UNINSTALLPHPMYADMIN" =~ [Nn] ]]; then
+        echo "[!] Removal aborted."
     fi
 }
 
@@ -741,6 +801,9 @@ uninstallpanel(){
 
     if [[ "$UNINSTALLPANEL" =~ [Yy] ]]; then
         uninstallpanel_backup
+    fi
+    if [[ "$UNINSTALLPANEL" =~ [Nn] ]]; then
+        echo "[!] Removal aborted."
     fi
 }
 
@@ -762,11 +825,11 @@ uninstallpanel_backup(){
 uninstallpanel_confirm(){
     if  [ "$BACKUPPANEL" =  "true" ]; then
         mv /var/www/pterodactyl/.env .
-        sudo rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
-        sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
-        sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
-        sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
-        sudo rm -rf /var/www/pterodactyl # Removing panel files
+         rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
+         rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
+         unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
+         unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
+         rm -rf /var/www/pterodactyl # Removing panel files
         systemctl restart nginx
         clear
         echo ""
@@ -776,11 +839,11 @@ uninstallpanel_confirm(){
         echo ""
         fi
     if  [ "$BACKUPPANEL" =  "false" ]; then
-        sudo rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
-        sudo rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
-        sudo unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
-        sudo unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
-        sudo rm -rf /var/www/pterodactyl # Removing panel files
+         rm -rf /var/www/pterodactyl || exit || warning "Panel is not installed!" # Removes panel files
+         rm /etc/systemd/system/pteroq.service # Removes pteroq service worker
+         unlink /etc/nginx/sites-enabled/pterodactyl.conf # Removes nginx config (if using nginx)
+         unlink /etc/apache2/sites-enabled/pterodactyl.conf # Removes Apache config (if using apache)
+         rm -rf /var/www/pterodactyl # Removing panel files
         mariadb -u root -e "DROP DATABASE panel;" # Remove panel database
         mysql -u root -e "DROP DATABASE panel;" # Remove panel database
         systemctl restart nginx
@@ -904,9 +967,11 @@ options(){
         read -r option
         case $option in
             1 ) option=1
+                INSTALLBOTH=false
                 panel
                 ;;
             2 ) option=2
+                INSTALLBOTH=false
                 wings
                 ;;
             2 ) option=3
@@ -920,35 +985,46 @@ options(){
         esac
     else
         echo "What would you like to do?"
-        echo "[1] Install Panel."
-        echo "[2] Install Wings."
-        echo "[3] Install PHPMyAdmin."
-        echo "[4] Remove Wings"
-        echo "[5] Remove Panel"
-        echo "[6] Switch Pterodactyl Domain"
-        echo "Input 1-6"
+        echo "[1] Install Panel"
+        echo "[2] Install Wings"
+        echo "[3] Panel & Wings"
+        echo "[4] Install PHPMyAdmin"
+        echo "[5] Remove PHPMyAdmin"
+        echo "[6] Remove Wings"
+        echo "[7] Remove Panel"
+        echo "[8] Switch Pterodactyl Domain"
+        echo "Input 1-8"
         read -r option
         case $option in
             1 ) option=1
+                INSTALLBOTH=false
                 panel
                 ;;
             2 ) option=2
+                INSTALLBOTH=false
                 wings
                 ;;
             3 ) option=3
-                phpmyadmin
+                INSTALLBOTH=true
+                panel
                 ;;
             4 ) option=4
-                wings_remove
+                phpmyadmin
                 ;;
             5 ) option=5
-                uninstallpanel
+                removephpmyadmin
                 ;;
             6 ) option=6
+                wings_remove
+                ;;
+            7 ) option=7
+                uninstallpanel
+                ;;
+            8 ) option=8
                 switchdomains
                 ;;
             * ) echo ""
-                echo "Please enter a valid option from 1-6"
+                echo "Please enter a valid option from 1-8"
         esac
     fi
 }
@@ -957,8 +1033,8 @@ options(){
 
 clear
 echo ""
-echo "Pterodactyl Installer @ v2.0"
-echo "Copyright 2023, Malthe K, <me@malthe.cc>"
+echo "Pterodactyl Installer @ v2.1"
+echo "Copyright 2024, Malthe K, <me@malthe.cc>"
 echo "https://github.com/guldkage/Pterodactyl-Installer"
 echo ""
 echo "This script is not associated with the official Pterodactyl Panel."
