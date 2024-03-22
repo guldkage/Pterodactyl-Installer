@@ -13,7 +13,9 @@ Supports newest version of Pterodactyl! This script is one of the only ones that
 
 - Install Panel
 - Install Wings
+- Install Panel & Wings
 - Install PHPMyAdmin
+- Uninstall PHPMyAdmin
 - Switch Pterodactyl Domains
 - Uninstall Panel
 - Uninstall Wings
