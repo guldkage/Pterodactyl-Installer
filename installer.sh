@@ -19,6 +19,7 @@
 dist="$(. /etc/os-release && echo "$ID")"
 version="$(. /etc/os-release && echo "$VERSION_ID")"
 USERPASSWORD=""
+WINGSNOQUESTIONS=false
 
 ### OUTPUTS ###
 
@@ -972,7 +973,6 @@ options(){
                 ;;
             2 ) option=2
                 INSTALLBOTH=false
-                WINGSNOQUESTIONS=false
                 wings
                 ;;
             2 ) option=3
