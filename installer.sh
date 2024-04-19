@@ -972,6 +972,7 @@ options(){
                 ;;
             2 ) option=2
                 INSTALLBOTH=false
+                WINGSNOQUESTIONS=false
                 wings
                 ;;
             2 ) option=3
