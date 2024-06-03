@@ -579,7 +579,7 @@ phpmyadmin(){
 
 phpmyadmin_finish(){
     cd
-    echo -e "PHPMyAdmin Installation\n\nSummary of the installation\n\nPHPMyAdmin URL: $PHPMYADMIN_FQDN\nPreselected webserver: NGINX\nSSL: $PHPMYADMIN_SSLSTATUS\nUser: $PHPMYADMIN_USER_LOCAL\nEmail: $PHPMYADMIN_EMAIL" > phpmyadmin_credentials.txt
+    echo -e "PHPMyAdmin Installation\n\nSummary of the installation\n\nPHPMyAdmin URL: $PHPMYADMIN_FQDN\nPreselected webserver: NGINX\nSSL: $PHPMYADMIN_SSLSTATUS\nUser: $PHPMYADMIN_USER_LOCAL\nPassword: $PHPMYADMIN_PASSWORD\nEmail: $PHPMYADMIN_EMAIL" > phpmyadmin_credentials.txt
     clear
     echo "[!] Installation of PHPMyAdmin done"
     echo ""
@@ -588,6 +588,7 @@ phpmyadmin_finish(){
     echo "    Preselected webserver: NGINX"
     echo "    SSL: $PHPMYADMIN_SSLSTATUS"
     echo "    User: $PHPMYADMIN_USER_LOCAL"
+    echo "    Password: $PHPMYADMIN_PASSWORD"
     echo "    Email: $PHPMYADMIN_EMAIL"
     echo ""
     echo "    These credentials will has been saved in a file called" 
@@ -597,6 +598,11 @@ phpmyadmin_finish(){
 
 
 phpmyadminweb(){
+    rm -rf /etc/nginx/sites-enabled/default || exit || echo "An error occurred. NGINX is not installed." || exit
+    apt install mariadb-server -y
+    PHPMYADMIN_PASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
+    mariadb -u root -e "CREATE USER '$PHPMYADMIN_USER_LOCAL'@'localhost' IDENTIFIED BY '$PHPMYADMIN_PASSWORD';" && mariadb -u root -e "GRANT ALL PRIVILEGES ON *.* TO '$PHPMYADMIN_USER_LOCAL'@'localhost' WITH GRANT OPTION;"
+    
     if  [ "$PHPMYADMIN_SSLSTATUS" =  "true" ]; then
         rm -rf /etc/nginx/sites-enabled/default
         curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin-ssl.conf
@@ -604,21 +610,12 @@ phpmyadminweb(){
         systemctl stop nginx || exit || echo "An error occurred. NGINX is not installed." || exit
         certbot certonly --standalone -d $PHPMYADMIN_FQDN --staple-ocsp --no-eff-email -m $PHPMYADMIN_EMAIL --agree-tos || exit || echo "An error occurred. Certbot not installed." || exit
         systemctl start nginx || exit || echo "An error occurred. NGINX is not installed." || exit
-
-        apt install mariadb-server -y
-        PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
-        mariadb -u root -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mariadb -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
         phpmyadmin_finish
         fi
     if  [ "$PHPMYADMIN_SSLSTATUS" =  "false" ]; then
-        rm -rf /etc/nginx/sites-enabled/default || exit || echo "An error occurred. NGINX is not installed." || exit
         curl -o /etc/nginx/sites-enabled/phpmyadmin.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/phpmyadmin.conf || exit || echo "An error occurred. cURL is not installed." || exit
         sed -i -e "s@<domain>@${PHPMYADMIN_FQDN}@g" /etc/nginx/sites-enabled/phpmyadmin.conf || exit || echo "An error occurred. NGINX is not installed." || exit
         systemctl restart nginx || exit || echo "An error occurred. NGINX is not installed." || exit
-
-        apt install mariadb-server -y
-        PHPMYADMIN_USER=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
-        mariadb -u root -e "CREATE USER '$PHPMYADMIN_USER_LOCAL'@'localhost' IDENTIFIED BY '$PHPMYADMIN_USER';" && mariadb -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
         phpmyadmin_finish
         fi
 }
