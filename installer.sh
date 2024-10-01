@@ -314,7 +314,7 @@ panel_install(){
         mkdir /var/www
         mkdir /var/www/pterodactyl
         cd /var/www/pterodactyl
-        curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+        curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v1.11.5/panel.tar.gz
         tar -xzvf panel.tar.gz
         chmod -R 755 storage/* bootstrap/cache/
         cp .env.example .env
@@ -338,7 +338,7 @@ panel_install(){
     mkdir /var/www
     mkdir /var/www/pterodactyl
     cd /var/www/pterodactyl
-    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/download/v1.11.5/panel.tar.gz
     tar -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
     cp .env.example .env
