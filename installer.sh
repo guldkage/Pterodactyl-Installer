@@ -252,7 +252,7 @@ panel_install(){
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
         apt update
-        apt -y install software-properties-common curl ca-certificates gnupg2  lsb-release
+        apt -y install software-properties-common curl ca-certificates gnupg2 lsb-release
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" |  tee /etc/apt/sources.list.d/sury-php.list
         curl -fsSL  https://packages.sury.org/php/apt.gpg |  gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
         curl -fsSL https://packages.redis.io/gpg |  gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
@@ -326,7 +326,7 @@ panel_install(){
         fi
 
     apt update
-    apt install certbot -y
+    apt install certbot cron -y
 
     apt install -y mariadb-server tar unzip git redis-server
     sed -i 's/character-set-collations = utf8mb4=uca1400_ai_ci/character-set-collations = utf8mb4=utf8mb4_general_ci/' /etc/mysql/mariadb.conf.d/50-server.cnf
