@@ -240,7 +240,7 @@ panel_conf(){
 
 panel_install(){
     echo "" 
-    if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
+    if [ "$dist" = "ubuntu" ] && [[ "$version" =~ ^20\.04|22\.04|24\.04$ ]]; then
         apt update
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
@@ -248,7 +248,6 @@ panel_install(){
         echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" |  tee /etc/apt/sources.list.d/redis.list
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
         apt update
-         add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
     fi
     if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
         apt update
@@ -643,7 +642,7 @@ phpmyadmininstall(){
     apt install nginx certbot -y
     mkdir /var/www/phpmyadmin && cd /var/www/phpmyadmin || exit || echo "An error occurred. Could not create directory." || exit
     cd /var/www/phpmyadmin
-    if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
+    if [ "$dist" = "ubuntu" ] && [[ "$version" =~ ^20\.04|22\.04|24\.04$ ]]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup |  bash
@@ -942,7 +941,7 @@ switchdomains(){
 
 oscheck(){
     echo "Checking your OS.."
-    if { [ "$dist" = "ubuntu" ] && [ "$version" = "18.04" ] || [ "$version" = "20.04" ] || [ "$version" = "22.04" ]; } || { [ "$dist" = "centos" ] && [ "$version" = "7" ]; } || { [ "$dist" = "debian" ] && [ "$version" = "11" ] || [ "$version" = "12" ]; }; then
+    if { [ "$dist" = "ubuntu" ] && [ "$version" = "18.04" ] || [ "$version" = "20.04" ] || [ "$version" = "22.04" ] || [ "$version" = "24.04" ]; } || { [ "$dist" = "centos" ] && [ "$version" = "7" ]; } || { [ "$dist" = "debian" ] && [ "$version" = "11" ] || [ "$version" = "12" ]; }; then
         options
     else
         echo "Your OS, $dist $version, is not supported"
