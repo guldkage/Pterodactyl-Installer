@@ -21,12 +21,12 @@ Supports newest version of Pterodactyl! This script is one of the only ones that
 - Uninstall Wings
 - Autoinstall [ONLY NGINX & BETA]
 
-# Supported OS & Webserver
-Supported operating systems.
-
 # Support
 I have created a channel on my Discord Server where you can get support.
 https://discord.gg/3UUrgEhvJ2
+
+# Supported OS & Webserver
+Supported operating systems.
 
 | Operating System | Version               | Supported                          |   PHP |
 | ---------------- | ----------------------| ---------------------------------- | ----- |
