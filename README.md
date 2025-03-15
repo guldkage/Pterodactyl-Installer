@@ -28,8 +28,6 @@ Supported operating systems.
 | ---------------- | ----------------------| ---------------------------------- | ----- |
 | Ubuntu           | from 20.04 to 24.04   | :white_check_mark:                 | 8.3   |
 | Debian           | from 11 to 12         | :white_check_mark:                 | 8.3   |
-| CentOS           |       centos 7        | :white_check_mark:                 | 8.3   |
-| Rocky Linux      | no supported versions | :x:                                | :x:   |
 
 :warning: Be aware of using CentOS 7. It is EOL and there will not be added support in this script for any newer CentOS version. If you are running CentOS and you want to use this script, you should switch to a new distro, such as Debian or Ubuntu.
 
@@ -37,11 +35,9 @@ Supported operating systems.
 | ---------------- | --------------------| 
 | NGINX            | :white_check_mark:  |
 | Apache           | :white_check_mark:  |
-| LiteSpeed        | :x:                 |
-| Caddy            | :x:                 |
 
 # Contributors
-Copyright 2022-2023, [Malthe K](https://github.com/guldkage), me@malthe.cc
+Copyright 2022-2025, [Malthe K](https://github.com/guldkage), me@malthe.cc
 <br>
 Created and maintained by [Malthe K.](https://github.com/guldkage)
 
