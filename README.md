@@ -24,6 +24,10 @@ Supports newest version of Pterodactyl! This script is one of the only ones that
 # Supported OS & Webserver
 Supported operating systems.
 
+# Support
+I have created a channel on my Discord Server where you can get support.
+https://discord.gg/3UUrgEhvJ2
+
 | Operating System | Version               | Supported                          |   PHP |
 | ---------------- | ----------------------| ---------------------------------- | ----- |
 | Ubuntu           | from 20.04 to 24.04   | :white_check_mark:                 | 8.3   |
