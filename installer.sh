@@ -792,7 +792,6 @@ phpmyadmininstall() {
     if [ "$dist" = "ubuntu" ] && [[ "$version" =~ ^20\.04|22\.04|24\.04$ ]]; then
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg || { echo "Error installing dependencies"; exit 1; }
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash || { echo "Error setting up MariaDB repo"; exit 1; }
         apt update || { echo "Error updating package list"; exit 1; }
         add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe" || { echo "Error adding Ubuntu repository"; exit 1; }
     fi
