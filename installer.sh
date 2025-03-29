@@ -801,7 +801,6 @@ phpmyadmininstall() {
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list
         curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg || { echo "Error adding PHP repository"; exit 1; }
         apt update -y || { echo "Error updating package list"; exit 1; }
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash || { echo "Error setting up MariaDB repo"; exit 1; }
     fi
 
     if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
@@ -810,7 +809,6 @@ phpmyadmininstall() {
         wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg || { echo "Error downloading PHP GPG key"; exit 1; }
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
         apt update -y || { echo "Error updating package list"; exit 1; }
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | bash || { echo "Error setting up MariaDB repo"; exit 1; }
     fi
 
     wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz || { echo "Error downloading PHPMyAdmin"; exit 1; }
