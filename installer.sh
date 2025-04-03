@@ -465,7 +465,9 @@ panel_fqdn(){
 
     if [ -z "$DOMAIN_PANELCHECK" ]; then
         echo "[!] Could not resolve $FQDN to an IP."
-        return 1
+        echo "[!] If you run this locally and only using IP, ignore this."
+        echo "[!] Proceeding anyway in 10 seconds... Press CTRL+C to cancel."
+        sleep 10
     fi
 
     sleep 1s
