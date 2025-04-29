@@ -52,6 +52,15 @@ if ! [ -x "$(command -v curl)" ]; then
     exit 1
 fi
 
+if ! [ -x "$(command -v dig)" ]; then
+    echo ""
+    echo "[!] dig is required to run this script."
+    echo "To proceed, please install dnsutils on your machine."
+    echo ""
+    echo "apt install dnsutils"
+    exit 1
+fi
+
 ### Pterodactyl Panel Installation ###
 
 send_summary() {
