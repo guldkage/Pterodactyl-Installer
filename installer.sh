@@ -822,6 +822,8 @@ phpmyadmininstall() {
         apt update -y || { echo "Error updating package list"; exit 1; }
     fi
 
+    apt install php8.3 php8.3-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} -y
+
     wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz || { echo "Error downloading PHPMyAdmin"; exit 1; }
     tar xzf phpMyAdmin-5.2.1-all-languages.tar.gz || { echo "Error extracting PHPMyAdmin"; exit 1; }
     mv /var/www/phpmyadmin/phpMyAdmin-5.2.1-all-languages/* /var/www/phpmyadmin || { echo "Error moving PHPMyAdmin files"; exit 1; }
