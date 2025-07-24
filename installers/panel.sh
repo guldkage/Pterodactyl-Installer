@@ -693,7 +693,7 @@ panel_fqdn(){
     echo "[+] Fetching public IP..."
     
     IP_CHECK=$(curl -s -4 --max-time 3 https://api.malthe.cc/checkip || curl -s -4 --max-time 3 https://ipinfo.io/ip)
-    IPV6_CHECK=$(curl -s -6 --max-time 3 https://api.malthe.cc/checkip || curl -s -6 --max-time 3 https://v6.ipinfo.io/ip)
+    IPV6_CHECK=$(curl -s -6 --max-time 3 https://v6.ipinfo.io/ip || curl -s -6 --max-time 3 https://api.malthe.cc/checkip)
 
     if [ -z "$IP_CHECK" ] && [ -z "$IPV6_CHECK" ]; then
         echo "[ERROR] Failed to retrieve public IP."
