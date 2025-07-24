@@ -172,15 +172,21 @@ finish(){
         exit 1
     fi
 
-    echo "    Would you like to install Wings too? (Y/N)"
-    read -r WINGS_ON_PANEL
-
-     if [[ "$WINGS_ON_PANEL" =~ [Yy] ]]; then
-        bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/wings.sh)
-     elif [[ "$WINGS_ON_PANEL" =~ [Nn] ]]; then
-        echo "Bye!"
-        exit 0
-    fi
+    read -r -p "    Would you like to install Wings too? (Y/N): " WINGS_ON_PANEL
+    
+    case "${WINGS_ON_PANEL,,}" in
+        y|yes)
+            bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/wings.sh)
+            ;;
+        n|no)
+            echo "Bye!"
+            exit 0
+            ;;
+        *)
+            echo "Invalid input. Please enter Y or N."
+            exit 1
+            ;;
+    esac
 }
 
 panel_webserver(){
