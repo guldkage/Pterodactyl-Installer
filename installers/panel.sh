@@ -58,12 +58,24 @@ if [ -d "/var/www/pterodactyl" ]; then
         case "$CHOICE" in
             1)
                 echo "[!] Running automatic uninstallation..."
-                if [ -f "./installers/remove_panel.sh" ]; then
-                    bash ./installers/remove_panel.sh
+                if [ -d "/var/www/pterodactyl" ]; then
+                    rm -rf /var/www/pterodactyl || { echo "Error: Failed to remove panel files."; exit 1; }
                 else
-                    echo "[!] remove_panel.sh does not exist – cannot uninstall automatically."
-                    exit 1
+                    echo "Panel files not found, skipping removal."
                 fi
+        
+                [ -f "/etc/systemd/system/pteroq.service" ] && rm /etc/systemd/system/pteroq.service
+                [ -f "/etc/nginx/sites-enabled/pterodactyl.conf" ] && unlink /etc/nginx/sites-enabled/pterodactyl.conf
+                [ -f "/etc/apache2/sites-enabled/pterodactyl.conf" ] && unlink /etc/apache2/sites-enabled/pterodactyl.conf
+        
+                DB_NAME="panel"
+                USERS=("pterodactyl" "pterodactyluser")
+        
+                mariadb -u root -e "DROP DATABASE IF EXISTS \`${DB_NAME}\`;" || { echo "Could not delete database '${DB_NAME}'."; exit 1; }
+        
+                for user in "${USERS[@]}"; do
+                    mariadb -u root -e "DROP USER IF EXISTS '${user}'@'127.0.0.1';" || { echo "Could not delete user '${user}'."; exit 1; }
+                done
                 break
                 ;;
             2)
