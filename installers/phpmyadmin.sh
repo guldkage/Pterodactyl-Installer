@@ -300,17 +300,9 @@ phpmyadmininstall() {
         apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg || { echo "Error installing dependencies"; exit 1; }
         LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
         apt update || { echo "Error updating package list"; exit 1; }
-        add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe" || { echo "Error adding Ubuntu repository"; exit 1; }
     fi
 
-    if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
-        apt -y install software-properties-common curl ca-certificates gnupg2 lsb-release || { echo "Error installing dependencies"; exit 1; }
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list
-        curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg || { echo "Error adding PHP repository"; exit 1; }
-        apt update -y || { echo "Error updating package list"; exit 1; }
-    fi
-
-    if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
+    if [ "$dist" = "debian" ]; then
         apt -y install software-properties-common curl ca-certificates gnupg2 lsb-release || { echo "Error installing dependencies"; exit 1; }
         apt install -y apt-transport-https lsb-release ca-certificates wget || { echo "Error installing required packages"; exit 1; }
         wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg || { echo "Error downloading PHP GPG key"; exit 1; }
