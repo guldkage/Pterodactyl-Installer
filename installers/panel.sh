@@ -441,10 +441,6 @@ panel_install() {
             else
                 echo "PHP repository already exists, skipping."
             fi
-            if [[ "$version" == "20.04" ]]; then
-                echo "📦 Setting up MariaDB repository..."
-                curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash || { echo "❌ Failed to set up MariaDB repository!"; exit 1; }
-            fi
             ;;
 
         "debian")
