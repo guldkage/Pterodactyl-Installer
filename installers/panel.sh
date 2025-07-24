@@ -176,7 +176,26 @@ finish(){
     
     case "${WINGS_ON_PANEL,,}" in
         y|yes)
-            bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/wings.sh)
+            if ! command -v docker &> /dev/null; then
+                curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+                 systemctl enable --now docker
+            else
+                echo "Docker is already installed"
+            fi
+    
+            if ! mkdir -p /etc/pterodactyl; then
+                echo "Could not create directory." >&2
+                exit 1
+            fi
+    
+            curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")"
+            curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
+            chmod u+x /usr/local/bin/wings
+            echo ""
+            echo "[!] Pterodactyl Wings successfully installed."
+            echo "    As you have installed Panel & Wings at once, you can use your Panel URL ($appurl) as FQDN, which is $FQDN"
+            echo "    You can see a guide here to learn how to setup a node on your Pterodactyl Panel: https://docs.malthe.cc"
+            echo ""
             ;;
         n|no)
             echo "Bye!"
