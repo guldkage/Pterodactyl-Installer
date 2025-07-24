@@ -39,9 +39,9 @@ Supported operating systems.
 | Apache           | :white_check_mark:  |
 
 # Contributors
-Copyright 2022-2025, [Malthe K](https://github.com/guldkage), me@malthe.cc
+Copyright 2022-2025, [Malthe Kragh](https://github.com/guldkage), me@malthe.cc
 <br>
-Created and maintained by [Malthe K.](https://github.com/guldkage)
+Created and maintained by [Malthe Kragh](https://github.com/guldkage)
 
 # Support
 The script has been tested many times without any bug fixes, however they can still occur.
