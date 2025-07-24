@@ -13,7 +13,7 @@ Supports newest version of Pterodactyl! This script is one of the only ones that
 
 - Install Panel
 - Install Wings
-- Install Panel & Wings
+- Install Panel & Wings (agree to Wings installation after Install Panel)
 - Install PHPMyAdmin
 - Uninstall PHPMyAdmin
 - Switch Pterodactyl Domains
@@ -30,7 +30,7 @@ Supported operating systems.
 
 | Operating System | Version               | Supported                          |   PHP |
 | ---------------- | ----------------------| ---------------------------------- | ----- |
-| Ubuntu           | from 20.04 to 24.04   | :white_check_mark:                 | 8.3   |
+| Ubuntu           | from 22.04 to 24.04   | :white_check_mark:                 | 8.3   |
 | Debian           | from 11 to 12         | :white_check_mark:                 | 8.3   |
 
 | Webserver        | Supported           |
