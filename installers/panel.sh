@@ -65,6 +65,7 @@ if [ -d "/var/www/pterodactyl" ]; then
                 fi
         
                 [ -f "/etc/systemd/system/pteroq.service" ] && rm /etc/systemd/system/pteroq.service
+                [ -f "/root/panel_credentials.txt" ] && rm /root/panel_credentials.txt
                 [ -f "/etc/nginx/sites-enabled/pterodactyl.conf" ] && unlink /etc/nginx/sites-enabled/pterodactyl.conf
                 [ -f "/etc/apache2/sites-enabled/pterodactyl.conf" ] && unlink /etc/apache2/sites-enabled/pterodactyl.conf
         
