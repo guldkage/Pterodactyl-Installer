@@ -172,22 +172,14 @@ finish(){
         exit 1
     fi
 
-    if [ "$INSTALLBOTH" = "true" ]; then
-        WINGSNOQUESTIONS=true
-        wings
-    fi
+    echo "    Would you like to install Wings too? (Y/N)"
+    read -r WINGS_ON_PANEL
 
-    if [ "$INSTALLBOTH" = "false" ]; then
-        WINGSNOQUESTIONS=false
-        echo "    Would you like to install Wings too? (Y/N)"
-        read -r WINGS_ON_PANEL
-
-        if [[ "$WINGS_ON_PANEL" =~ [Yy] ]]; then
-            wings
-        elif [[ "$WINGS_ON_PANEL" =~ [Nn] ]]; then
-            echo "Bye!"
-            exit 0
-        fi
+     if [[ "$WINGS_ON_PANEL" =~ [Yy] ]]; then
+        bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/wings.sh)
+     elif [[ "$WINGS_ON_PANEL" =~ [Nn] ]]; then
+        echo "Bye!"
+        exit 0
     fi
 }
 
