@@ -207,7 +207,7 @@ finish(){
             echo ""
             echo "[!] Pterodactyl Wings successfully installed."
             echo "    As you have installed Panel & Wings at once, you can use your Panel URL ($appurl) as FQDN, which is $FQDN"
-            echo "    You can see a guide here to learn how to setup a node on your Pterodactyl Panel: https://docs.malthe.cc"
+            echo "    You can see a guide here to learn how to setup a node on your Pterodactyl Panel: https://pterodactyl-installer.gitbook.io/docs/guides/install-panel-and-wings-on-same-machine"
             echo ""
             ;;
         n|no)
