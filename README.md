@@ -8,6 +8,12 @@ The script must be run as root.
 
 Read about [Pterodactyl](https://pterodactyl.io/) here. This script is not associated with the official Pterodactyl Project.
 
+# Docs
+On the docs site, you can find guides as well as FAQ.
+More guides & FAQ answers will be added in the future.
+
+https://pterodactyl-installer.gitbook.io/docs/
+
 # Features
 Supports newest version of Pterodactyl! This script is one of the only ones that has a well-functioning Switch Domains feature.
 
