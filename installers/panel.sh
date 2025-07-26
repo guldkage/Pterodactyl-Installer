@@ -722,7 +722,7 @@ panel_fqdn(){
     echo ""
     echo "[+] Fetching public IP..."
     
-    IP_CHECK=$(curl -s -4 --max-time 3 https://api.malthe.cc/checkip || curl -s -4 --max-time 3 https://ipinfo.io/ip)
+    IP_CHECK=$(curl -s -4 --max-time 3 https://ipinfo.io/ip || curl -s -4 --max-time 3 https://api.malthe.cc/checkip)
     IPV6_CHECK=$(curl -s -6 --max-time 3 https://v6.ipinfo.io/ip || curl -s -6 --max-time 3 https://api.malthe.cc/checkip)
 
     if [ -z "$IP_CHECK" ] && [ -z "$IPV6_CHECK" ]; then
