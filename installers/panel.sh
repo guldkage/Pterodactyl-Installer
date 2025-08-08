@@ -707,10 +707,6 @@ panel_fqdn(){
         echo "[!] You entered an IPv4 address, not a domain name."
         echo "[!] SSL certificates won't work with IP addresses."
         SSLSTATUS=false
-    elif [[ "$FQDN" =~ ^([0-9a-f]{0,4}:){2,7}[0-9a-f]{0,4}$ ]]; then
-        echo "[!] You entered an IPv6 address, not a domain name."
-        echo "[!] SSL certificates won't work with IP addresses."
-        SSLSTATUS=false
     else
         if ! [[ "$FQDN" =~ ^[a-z0-9.-]+$ ]]; then
             echo "[!] Invalid characters detected in FQDN."
@@ -720,18 +716,16 @@ panel_fqdn(){
     fi
 
     echo ""
-    echo "[+] Fetching public IP..."
+    echo "[+] Fetching public IPv4..."
     
-    IP_CHECK=$(curl -s -4 https://ipinfo.io/ip)
-    IPV6_CHECK=$(curl -s -6 https://v6.ipinfo.io/ip)
+    IP_CHECK=$(curl -4 -s https://api.malthe.cc/checkip)
 
-    if [ -z "$IP_CHECK" ] && [ -z "$IPV6_CHECK" ]; then
-        echo "[ERROR] Failed to retrieve public IP."
+    if [ -z "$IP_CHECK" ]; then
+        echo "[ERROR] Failed to retrieve public IPv4."
         return 1
     fi
     
-    echo "[+] Detected Public IP: $IP_CHECK"
-    [ -n "$IPV6_CHECK" ] && echo "[+] Detected Public IPv6: $IPV6_CHECK"
+    echo "[+] Detected Public IPv4: $IP_CHECK"
     sleep 1s
     DOMAIN_PANELCHECK=$(dig +short "$FQDN" | head -n 1)
 
