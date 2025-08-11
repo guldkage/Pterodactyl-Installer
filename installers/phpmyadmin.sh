@@ -247,18 +247,16 @@ FQDN() {
     fi
 
     echo ""
-    echo "[+] Fetching public IP..."
+    echo "[+] Fetching public IPv4..."
     
-    IP_CHECK=$(curl -s -4 --max-time 3 https://api.malthe.cc/checkip || curl -s -4 --max-time 3 https://ipinfo.io/ip)
-    IPV6_CHECK=$(curl -s -6 --max-time 3 https://v6.ipinfo.io/ip || curl -s -6 --max-time 3 https://api.malthe.cc/checkip)
+    IP_CHECK=$(curl -4 -s https://api.malthe.cc/checkip)
 
-    if [ -z "$IP_CHECK" ] && [ -z "$IPV6_CHECK" ]; then
-        echo "[ERROR] Failed to retrieve public IP."
+    if [ -z "$IP_CHECK" ]; then
+        echo "[ERROR] Failed to retrieve public IPv4."
         return 1
     fi
     
-    echo "[+] Detected Public IP: $IP_CHECK"
-    [ -n "$IPV6_CHECK" ] && echo "[+] Detected Public IPv6: $IPV6_CHECK"
+    echo "[+] Detected Public IPv4: $IP_CHECK"
     sleep 1s
     DOMAIN_PANELCHECK=$(dig +short "$FQDN" | head -n 1)
 
@@ -272,22 +270,6 @@ FQDN() {
     sleep 1s
     echo "[+] $FQDN resolves to: $DOMAIN_PANELCHECK"
     sleep 1s
-    echo "[+] Checking if $DOMAIN_PANELCHECK is behind Cloudflare Proxy..."
-    
-    ORG_CHECK=$(curl -s "https://ipinfo.io/$DOMAIN_PANELCHECK/json" | grep -o '"org":.*' | cut -d '"' -f4)
-
-    if [[ "$ORG_CHECK" == *"Cloudflare"* ]]; then
-        echo "[!] Your FQDN is behind Cloudflare Proxy."
-        echo "[!] This is fine if you know what you are doing."
-        echo "[!] If you are using Cloudflare Flexible SSL, please set TRUSTED_PROXIES in .env after installation."
-        echo "[!]"
-        echo "[!] Proceeding anyway in 10 seconds... Press CTRL+C to cancel."
-        sleep 10
-        CLOUDFLARE_MATCHED=true
-    else
-        echo "[+] Your FQDN is NOT behind Cloudflare."
-    fi
-
     phpmyadmin_ssl
 }
 
