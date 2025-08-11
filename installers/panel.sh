@@ -739,22 +739,6 @@ panel_fqdn(){
     sleep 1s
     echo "[+] $FQDN resolves to: $DOMAIN_PANELCHECK"
     sleep 1s
-    echo "[+] Checking if $DOMAIN_PANELCHECK is behind Cloudflare Proxy..."
-    
-    ORG_CHECK=$(curl -s "https://ipinfo.io/$DOMAIN_PANELCHECK/json" | grep -o '"org":.*' | cut -d '"' -f4)
-
-    if [[ "$ORG_CHECK" == *"Cloudflare"* ]]; then
-        echo "[!] Your FQDN is behind Cloudflare Proxy."
-        echo "[!] This is fine if you know what you are doing."
-        echo "[!] If you are using Cloudflare Flexible SSL, please set TRUSTED_PROXIES in .env after installation."
-        echo "[!]"
-        echo "[!] Proceeding anyway in 10 seconds... Press CTRL+C to cancel."
-        sleep 10
-        CLOUDFLARE_MATCHED=true
-    else
-        echo "[+] Your FQDN is NOT behind Cloudflare."
-    fi
-
     panel_ssl
 }
 
