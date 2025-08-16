@@ -88,7 +88,7 @@ wings_fqdnask(){
     read -r WINGS_SSL
 
     if [[ "$WINGS_SSL" =~ [Yy] ]]; then
-        panel_fqdn
+        wings_fqdn
     fi
     if [[ "$WINGS_SSL" =~ [Nn] ]]; then
         WINGS_FQDN_STATUS=false
