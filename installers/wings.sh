@@ -170,3 +170,5 @@ wings_fqdn(){
     WINGS_FQDN_STATUS=true
     wings_full
 }
+
+wings_fqdnask
