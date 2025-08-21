@@ -37,7 +37,7 @@ Supported operating systems.
 | Operating System | Version               | Supported                          |   PHP |
 | ---------------- | ----------------------| ---------------------------------- | ----- |
 | Ubuntu           | from 22.04 to 24.04   | :white_check_mark:                 | 8.3   |
-| Debian           | from 11 to 12         | :white_check_mark:                 | 8.3   |
+| Debian           | from 11 to 13         | :white_check_mark:                 | 8.3   |
 
 | Webserver        | Supported           |
 | ---------------- | --------------------| 
