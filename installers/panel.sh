@@ -384,6 +384,9 @@ panel_conf() {
                 sed -i -e "s@ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem;@ssl_certificate ${CERTIFICATEPATH};@g" /etc/nginx/sites-enabled/pterodactyl.conf
                 sed -i -e "s@ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;@ssl_certificate_key ${PRIVATEKEYPATH};@g" /etc/nginx/sites-enabled/pterodactyl.conf
             fi
+            if [[ $(lsb_release -cs) == "trixie" ]]; then
+                sed -i '1d' /etc/nginx/sites-enabled/pterodactyl.conf
+            fi
             sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
             systemctl restart nginx
         elif [ "$WEBSERVER" == "Apache" ]; then
@@ -437,15 +440,18 @@ panel_install() {
 
     echo "Installing required base packages..."
 
+    distro_package=$(lsb_release -rs)
+
     base_packages=(
         wget
-        software-properties-common
         ca-certificates
         apt-transport-https
         gnupg
         curl
         lsb-release
     )
+
+    [[ "$distro_package" != "13" ]] && base_packages+=(software-properties-common)
 
     to_install=()
     for pkg in "${base_packages[@]}"; do
@@ -477,7 +483,7 @@ panel_install() {
             echo "Setting up for Debian $version..."
 
             case "$version" in
-                "11"|"12")
+                "11"|"12"|"13")
                     if [[ ! -f /etc/apt/sources.list.d/php.list || ! -f /etc/apt/trusted.gpg.d/sury-keyring.gpg ]]; then
                         echo "Adding PHP repository for Debian $version..."
                         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
@@ -499,10 +505,16 @@ panel_install() {
             ;;
     esac
 
+    DISTRO_CODENAME=$(lsb_release -cs)
+
+    if [[ "$DISTRO_CODENAME" == "trixie" ]]; then
+        DISTRO_CODENAME="bookworm"
+    fi
+
     if [[ ! -f /usr/share/keyrings/redis-archive-keyring.gpg || ! -f /etc/apt/sources.list.d/redis.list ]]; then
         echo "Adding Redis repository..."
         curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list
+        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $DISTRO_CODENAME main" | tee /etc/apt/sources.list.d/redis.list
     else
         echo "Redis repository and key already exist, skipping."
     fi
