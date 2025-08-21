@@ -62,7 +62,7 @@ oscheck() {
             ;;
         debian)
             case "$version" in
-                11|12)
+                11|12|13)
                     echo "Your OS, $dist $version, is supported"
                     echo ""
                     options
