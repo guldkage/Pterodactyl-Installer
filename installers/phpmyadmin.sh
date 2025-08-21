@@ -285,11 +285,17 @@ phpmyadmininstall() {
     fi
 
     if [ "$dist" = "debian" ]; then
-        apt -y install software-properties-common curl ca-certificates gnupg2 lsb-release || { echo "Error installing dependencies"; exit 1; }
-        apt install -y apt-transport-https lsb-release ca-certificates wget || { echo "Error installing required packages"; exit 1; }
+        DISTRO_VER=$(lsb_release -rs)
+        base_packages=(curl ca-certificates gnupg2 lsb-release apt-transport-https wget)
+        [[ "$DISTRO_VER" != "13" ]] && base_packages+=(software-properties-common)
+
+        apt update -y || { echo "Error updating package list"; exit 1; }
+        apt install -y "${base_packages[@]}" || { echo "Error installing packages"; exit 1; }
+
         wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg || { echo "Error downloading PHP GPG key"; exit 1; }
         echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
-        apt update -y || { echo "Error updating package list"; exit 1; }
+
+        apt update -y || { echo "Error updating package list after adding PHP repo"; exit 1; }
     fi
 
     apt install php8.3 php8.3-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip} -y
