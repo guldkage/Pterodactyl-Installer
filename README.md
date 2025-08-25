@@ -91,3 +91,6 @@ It also needs to be run on a fresh version of Ubuntu or Debian.
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh)  <fqdn> <ssl> <email> <username> <firstname <lastname> <password> <wings>
 ```
+
+# Community Scripts (Unofficial)
+You can take a look at community scripts: https://github.com/guldkage/Pterodactyl-Installer/tree/main/community%20scripts
