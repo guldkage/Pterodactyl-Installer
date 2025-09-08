@@ -730,14 +730,23 @@ panel_fqdn(){
     echo ""
     echo "[+] Fetching public IPv4..."
     
-    IP_CHECK=$(curl -4 -s https://api.malthe.cc/checkip)
+    PRIMARY_URL="https://api.malthe.cc/checkip"
+    SECONDARY_URL="https://ifconfig.me/ip"
+    
+    IP_CHECK=$(curl -4 -s --max-time 5 "$PRIMARY_URL")
+    
+    if [ -z "$IP_CHECK" ]; then
+        echo "[WARN] Primary resolver failed. Trying secondary..."
+        IP_CHECK=$(curl -4 -s --max-time 5 "$SECONDARY_URL")
+    fi
 
     if [ -z "$IP_CHECK" ]; then
         echo "[ERROR] Failed to retrieve public IPv4."
         return 1
+    else
+        echo "[+] Detetcted Public IPv4: $IP_CHECK"
     fi
     
-    echo "[+] Detected Public IPv4: $IP_CHECK"
     sleep 1s
     DOMAIN_PANELCHECK=$(dig +short "$FQDN" | head -n 1)
 
