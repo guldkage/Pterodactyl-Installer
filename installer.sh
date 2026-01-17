@@ -3,7 +3,7 @@
 ########################################################################
 #                                                                      #
 #            Pterodactyl Installer, Updater, Remover and More          #
-#            Copyright 2025, Malthe K, <me@malthe.cc> hej              # 
+#            Copyright 2026, Malthe K, <me@malthe.cc> hej              # 
 #  https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
@@ -86,7 +86,7 @@ options() {
     select opt in \
         "Install Panel" "Install Wings" \
         "Install PHPMyAdmin" "Remove PHPMyAdmin" \
-        "Remove Wings" "Remove Panel" "Switch Domain"; do
+        "Remove Wings" "Remove Panel" "Update Wings" "Update Panel" "Switch Domain"; do
         case $REPLY in
             1) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/panel.sh); return ;;
             2) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/wings.sh); return ;;
@@ -94,7 +94,9 @@ options() {
             4) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/remove_phpmyadmin.sh); return ;;
             5) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/remove_wings.sh); return ;;
             6) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/remove_panel.sh); return ;;
-            7) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/switch_domains.sh); return ;;
+            7) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/updatewings.sh); return ;;
+            8) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/updatepanel.sh); return ;;
+            9) bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/installers/switch_domains.sh); return ;;
             *) echo "Invalid option, try again." ;;
         esac
     done
@@ -106,15 +108,18 @@ clear
 cat <<EOF
 
 -------------------------------------------------------------------
-               Pterodactyl Installer @ v4.0
-         Copyright 2025, Malthe Kragh <me@malthe.cc>
+               Pterodactyl Installer @ v4.1
+         Copyright 2026, Malthe Kragh <me@malthe.cc>
  https://github.com/guldkage/Pterodactyl-Installer
 
  This script is not associated with the official Pterodactyl Panel.
-
+ 
+ Please do not ask for support on the official Pterodactyl discord.
+ Get support here instead: https://discord.gg/3UUrgEhvJ2
+ 
  Security notice:
  This script sends requests to
- api.malthe.cc/checkip and ipinfo.io for IP check
+ api.malthe.cc/checkip and ipinfo.io if first API fails for IP check
 -------------------------------------------------------------------
 
 EOF
