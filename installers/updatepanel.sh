@@ -36,7 +36,10 @@ if [ ! -d "/var/www/pterodactyl" ]; then
     exit 1
 fi
 
-cd /var/www/pterodactyl || exit 1
+if [ ! -d "/var/www/pterodactyl" ] || [ ! -f "/var/www/pterodactyl/artisan" ]; then
+    echo "[!] Pterodactyl Panel not found in /var/www/pterodactyl."
+    exit 1
+fi
 
 echo "[!] Checking for updates..."
 CURRENT_VERSION=$(php artisan p:info 2>/dev/null | grep "Panel Version" | awk '{print $NF}')
