@@ -1,10 +1,9 @@
-#!/bin/bash
 #!/usr/bin/env bash
 
 ########################################################################
 #                                                                      #
 #            Pterodactyl Installer, Updater, Remover and More          #
-#            Copyright 2025, Malthe K, <me@malthe.cc> hej              # 
+#            Copyright 2026, Malthe K, <me@malthe.cc>                  # 
 #  https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE #
 #                                                                      #
 #  This script is not associated with the official Pterodactyl Panel.  #
@@ -13,137 +12,174 @@
 ########################################################################
 
 ### VARIABLES ###
-
 dist="$(. /etc/os-release && echo "$ID")"
 version="$(. /etc/os-release && echo "$VERSION_ID")"
-USERPASSWORD=""
-WINGSNOQUESTIONS=false
+PANEL_PATH="/var/www/pterodactyl"
 
 ### OUTPUTS ###
-
-function trap_ctrlc ()
-{
-    echo ""
-    echo "Bye!"
+function trap_ctrlc () {
+    echo -e "\nBye!"
     exit 2
 }
 trap "trap_ctrlc" 2
 
 warning(){
     echo -e '\e[31m'"$1"'\e[0m';
-
 }
 
 ### CHECKS ###
-
 if [[ $EUID -ne 0 ]]; then
-    echo ""
-    echo "[!] Sorry, but you need to be root to run this script."
-    echo "Most of the time this can be done by typing sudo su in your terminal"
+    echo -e "\n[!] Sorry, but you need to be root to run this script."
     exit 1
 fi
 
-if ! [ -x "$(command -v curl)" ]; then
+if ! [ -x "$(command -v nginx)" ]; then
     echo ""
-    echo "[!] cURL is required to run this script."
-    echo "To proceed, please install cURL on your machine."
-    echo ""
-    echo "apt install curl"
+    warning "[✖] Nginx is not installed or not found."
+    echo "The Change Domain function only supports Nginx."
     exit 1
 fi
 
-if ! [ -x "$(command -v dig)" ]; then
-    echo ""
-    echo "[!] dig is required to run this script."
-    echo "To proceed, please install dnsutils on your machine."
-    echo ""
-    echo "apt install dnsutils"
-    exit 1
-fi
+for tool in curl dig sed awk grep; do
+    if ! [ -x "$(command -v $tool)" ]; then
+        echo "[!] $tool is required. Please install it to proceed."
+        exit 1
+    fi
+done
+
+### HELPER FUNCTIONS ###
+
+check_panel_access() {
+    local url=$1
+    echo "[!] Checking if the panel is accessible at $url..."
+    
+    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 --max-time 15 "$url")
+    
+    if [[ "$HTTP_STATUS" == "502" || "$HTTP_STATUS" == "504" || "$HTTP_STATUS" == "000" ]]; then
+        echo "[!] Connection issue ($HTTP_STATUS). Attempting service restart..."
+        systemctl restart php8.3-fpm
+        sleep 5
+        HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 "$url")
+    fi
+
+    if [[ "$HTTP_STATUS" == "200" ]]; then
+        echo "[✔] Panel is accessible!"
+        return 0
+    else
+        echo "[✖] Panel is inaccessible. Status: $HTTP_STATUS"
+        echo "--- Last 10 lines of Nginx error log ---"
+        tail -n 10 /var/log/nginx/error.log
+        return 1
+    fi
+}
 
 ### Switching Domains ###
 
 switch(){
-    if  [ "$SSLSWITCH" =  "true" ]; then
-        echo ""
-        echo "[!] Change domains"
-        echo ""
-        echo "    The script is now changing your Pterodactyl Domain."
-        echo "      This may take a couple seconds for the SSL part, as SSL certificates are being generated."
-        rm /etc/nginx/sites-enabled/pterodactyl.conf
-        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf || exit || warning "Pterodactyl Panel not installed!"
-        sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+    if [ ! -d "$PANEL_PATH" ] || [ ! -f "$PANEL_PATH/.env" ]; then
+        warning "[✖] Pterodactyl Panel not found in $PANEL_PATH"
+        exit 1
+    fi
+
+    if [ "$SSLSWITCH" = "true" ]; then
+        NEW_URL="https://${DOMAINSWITCH}"
+        CONF_URL="https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf"
+    else
+        NEW_URL="http://${DOMAINSWITCH}"
+        CONF_URL="https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf"
+    fi
+
+    echo "[!] Target URL: $NEW_URL"
+    echo "[!] Creating .env backup..."
+    cp "$PANEL_PATH/.env" "$PANEL_PATH/.env.bak"
+
+    echo "[!] Updating Nginx configuration..."
+    rm -f /etc/nginx/sites-enabled/pterodactyl.conf
+    if ! curl -s -o /etc/nginx/sites-enabled/pterodactyl.conf "$CONF_URL"; then
+        warning "[✖] Failed to download Nginx config."
+        exit 1
+    fi
+    sed -i "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+
+    if [ "$SSLSWITCH" = "true" ]; then
+        echo "[!] Generating SSL via Let's Encrypt..."
         systemctl stop nginx
-        certbot certonly --standalone -d $DOMAINSWITCH --staple-ocsp --no-eff-email -m $EMAILSWITCHDOMAINS --agree-tos || exit || warning "Errors accured."
+        if ! certbot certonly --standalone -d "$DOMAINSWITCH" --staple-ocsp --no-eff-email -m "$EMAILSWITCHDOMAINS" --agree-tos; then
+            warning "[✖] Certbot failed. Starting Nginx and aborting."
+            systemctl start nginx
+            exit 1
+        fi
         systemctl start nginx
-        echo ""
-        echo "[!] Change domains"
-        echo ""
-        echo "    Your domain has been switched to $DOMAINSWITCH"
-        echo "    This script does not update your APP URL, you can"
-        echo "    update it in /var/www/pterodactyl/.env"
-        echo ""
-        echo "    If using Cloudflare certifiates for your Panel, please read this:"
-        echo "    The script uses Lets Encrypt to complete the change of your domain,"
-        echo "    if you normally use Cloudflare Certificates,"
-        echo "    you can change it manually in its config which is in the same place as before."
-        echo ""
-        fi
-    if  [ "$SSLSWITCH" =  "false" ]; then
-        echo "[!] Switching your domain.. This wont take long!"
-        rm /etc/nginx/sites-enabled/pterodactyl.conf || exit || echo "An error occurred. Could not delete file." || exit
-        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf || exit || warning "Pterodactyl Panel not installed!"
-        sed -i -e "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+    else
         systemctl restart nginx
-        echo ""
-        echo "[!] Change domains"
-        echo ""
-        echo "    Your domain has been switched to $DOMAINSWITCH"
-        echo "    This script does not update your APP URL, you can"
-        echo "    update it in /var/www/pterodactyl/.env"
-        fi
+    fi
+
+    echo "[!] Updating APP_URL in .env..."
+    sed -i "s|^APP_URL=.*|APP_URL=$NEW_URL|g" "$PANEL_PATH/.env"
+    
+    cd "$PANEL_PATH" && php artisan config:clear
+
+    if check_panel_access "$NEW_URL"; then
+        echo -e "\n[✔] Domain switched successfully to $DOMAINSWITCH"
+        echo "[!] A backup of your old .env has been saved as $PANEL_PATH/.env.bak"
+    else
+        warning "[!] Process finished, but panel is not responding with 200 OK."
+    fi
 }
 
 switchemail(){
-    echo ""
-    echo "[!] Change domains"
-    echo "    To install your new domain certificate to your Panel, your email address must be shared with Let's Encrypt."
-    echo "    They will send you an email when your certificate is about to expire. A certificate lasts 90 days at a time and you can renew your certificates for free and easily, even with this script."
-    echo ""
-    echo "    When you created your certificate for your panel before, they also asked you for your email address. It's the exact same thing here, with your new domain."
-    echo "    Therefore, enter your email. If you do not feel like giving your email, then the script can not continue. Press CTRL + C to exit."
-    echo ""
-    echo "      Please enter your email"
-
+    echo -e "\n[!] Please enter your email for Let's Encrypt notifications:"
     read -r EMAILSWITCHDOMAINS
+    [ -z "$EMAILSWITCHDOMAINS" ] && warning "Email cannot be empty." && exit 1
     switch
 }
 
 switchssl(){
-    echo "[!] Select the one that describes your situation best"
-    warning "   [1] I want SSL on my Panel on my new domain"
-    warning "   [2] I don't want SSL on my Panel on my new domain"
+    echo -e "\n[!] Select SSL Option:"
+    echo "    [1] I want SSL on my Panel on my new domain"
+    echo "    [2] I don't want SSL on my Panel on my new domain"
     read -r option
     case $option in
-        1 ) option=1
-            SSLSWITCH=true
-            switchemail
-            ;;
-        2 ) option=2
-            SSLSWITCH=false
-            switch
-            ;;
-        * ) echo ""
-            echo "Please enter a valid option."
+        1 ) SSLSWITCH=true; switchemail ;;
+        2 ) SSLSWITCH=false; switch ;;
+        * ) echo "Please enter a valid option."; switchssl ;;
     esac
 }
 
-switchdomains(){
-    echo ""
-    echo "[!] Change domains"
-    echo "    Please enter the domain (panel.mydomain.ltd) you want to switch to."
+panel_fqdn(){
+    echo -e "\n[!] Please enter the new FQDN (panel.domain.tld) you want to switch to:"
     read -r DOMAINSWITCH
+    DOMAINSWITCH=$(echo "$DOMAINSWITCH" | tr '[:upper:]' '[:lower:]')
+
+    if [[ -z "$DOMAINSWITCH" || "$DOMAINSWITCH" == "localhost" || "$DOMAINSWITCH" == "127.0.0.1" ]]; then
+        warning "Invalid FQDN entered."
+        return 1
+    fi
+
+    echo "[+] Fetching public IP..."
+    IP_CHECK=$(curl -4 -s --max-time 5 "https://api.malthe.cc/checkip" || curl -4 -s --max-time 5 "https://ifconfig.me/ip")
+    
+    if [ -z "$IP_CHECK" ]; then
+        warning "[!] Could not detect public IP. DNS verification skipped."
+    else
+        echo "[+] Detected Public IP: $IP_CHECK"
+        echo "[+] Verifying DNS for $DOMAINSWITCH..."
+        DOMAIN_RESOLVE=$(dig +short "$DOMAINSWITCH" | head -n 1)
+
+        if [ -z "$DOMAIN_RESOLVE" ]; then
+            warning "[!] Could not resolve $DOMAINSWITCH. Ensure DNS is set up."
+            echo "    Proceeding in 10 seconds..."
+            sleep 10
+        elif [ "$DOMAIN_RESOLVE" != "$IP_CHECK" ]; then
+            warning "[!] DNS Mismatch! $DOMAINSWITCH -> $DOMAIN_RESOLVE (Expected: $IP_CHECK)"
+            echo "    This will cause SSL/Certbot to fail. Proceeding in 10 seconds..."
+            sleep 10
+        else
+            echo "[✔] DNS Verified: $DOMAINSWITCH points to $IP_CHECK"
+        fi
+    fi
+
     switchssl
 }
 
-switchdomains
+panel_fqdn
