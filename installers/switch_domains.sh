@@ -101,6 +101,11 @@ switch(){
     fi
     sed -i "s@<domain>@${DOMAINSWITCH}@g" /etc/nginx/sites-enabled/pterodactyl.conf
 
+    if grep -q "server_tokens off" /etc/nginx/nginx.conf; then
+        echo "[!] server_tokens off detected in nginx.conf. Removing from pterodactyl.conf to avoid duplicates..."
+        sed -i '/server_tokens off;/d' /etc/nginx/sites-enabled/pterodactyl.conf
+    fi
+
     if [ "$SSLSWITCH" = "true" ]; then
         echo "[!] Generating SSL via Let's Encrypt..."
         systemctl stop nginx
