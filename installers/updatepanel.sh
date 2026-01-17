@@ -35,6 +35,7 @@ if [ ! -d "/var/www/pterodactyl" ]; then
     echo "[✖] Directory /var/www/pterodactyl does not exist."
     exit 1
 fi
+cd /var/www/pterodactyl
 
 if [ ! -d "/var/www/pterodactyl" ] || [ ! -f "/var/www/pterodactyl/artisan" ]; then
     echo "[!] Pterodactyl Panel not found in /var/www/pterodactyl."
