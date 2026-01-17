@@ -31,6 +31,12 @@ for tool in curl uname chmod systemctl; do
     fi
 done
 
+if [ ! -f "/usr/local/bin/wings" ]; then
+    echo "[✖] Wings binary not found at /usr/local/bin/wings."
+    echo "[!] It looks like Wings is not installed on this server. Aborting update."
+    exit 1
+fi
+
 ARCH=$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")
 
 echo "[!] Stopping Wings..."
