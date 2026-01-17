@@ -153,34 +153,34 @@ finish(){
     echo ""
 
     echo "[!] Checking if the panel is accessible..."
-    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$appurl")
-
-    if [ "$HTTP_STATUS" == "502" ]; then
-        echo "[!] Bad Gateway detected! Restarting php8.3-fpm..."
+    HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 --max-time 15 "$appurl")
+    
+    if [[ "$HTTP_STATUS" == "502" || "$HTTP_STATUS" == "504" || "$HTTP_STATUS" == "000" ]]; then
+        echo "[!] Critical error or timeout ($HTTP_STATUS). Restarting php8.3-fpm..."
         systemctl restart php8.3-fpm
         sleep 5
-        HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$appurl")
+        HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 "$appurl")
     fi
-
-    if [[ "$HTTP_STATUS" != "200" ]]; then
-        echo "[!] Panel is still not accessible. Restarting webserver..."
+    
+    if [[ "$HTTP_STATUS" =~ ^5[0-9]{2}$ ]] || [[ "$HTTP_STATUS" == "000" ]]; then
+        echo "[!] Panel still failing with status $HTTP_STATUS. Restarting webserver..."
         if [[ "$WEBSERVER" == "NGINX" ]]; then
             systemctl restart nginx
         elif [[ "$WEBSERVER" == "Apache" ]]; then
             systemctl restart apache2
         fi
         sleep 5
-        HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" "$appurl")
+        HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" --connect-timeout 10 "$appurl")
     fi
-
+    
     if [[ "$HTTP_STATUS" == "200" ]]; then
         echo "[✔] Panel is accessible!"
     else
-        echo "[✖] Panel is still not accessible. Please check logs"
+        echo "[✖] Panel is inaccessible. Status: $HTTP_STATUS"
         if [[ "$WEBSERVER" == "NGINX" ]]; then
-            journalctl -u nginx --no-pager | tail -n 10
+            tail -n 15 /var/log/nginx/error.log
         elif [[ "$WEBSERVER" == "Apache" ]]; then
-            journalctl -u apache2 --no-pager | tail -n 10
+            tail -n 15 /var/log/apache2/error.log
         fi
         exit 1
     fi
@@ -248,21 +248,34 @@ panel_conf() {
     appurl=$([ "$SSLSTATUS" == true ] && echo "https://$FQDN" || echo "http://$FQDN")
 
     if [ -f "/root/panel_credentials.txt" ]; then
-        echo "Found existing panel_credentials.txt, importing DB passwords..."
-
+        echo "Found existing panel_credentials.txt, importing and testing..."
+    
         DBPASSWORD=$(grep -i "Database password:" /root/panel_credentials.txt | awk -F': ' '{print $2}')
         DBPASSWORDHOST=$(grep -i "Password for Database Host:" /root/panel_credentials.txt | awk -F': ' '{print $2}')
-
-        echo "Imported DBPASSWORD and DBPASSWORDHOST"
+    
+        if mariadb -u pterodactyl -h 127.0.0.1 -p"$DBPASSWORD" -e "use panel;" &> /dev/null; then
+            echo "[✔] Imported credentials work!"
+            RUN_DB_SETUP=false
+        else
+            echo "[!] Imported credentials failed. Re-generating..."
+            RUN_DB_SETUP=true
+        fi
     else
-        echo "Nothing to import"    
+        echo "Nothing to import"
+        RUN_DB_SETUP=true
+    fi
+    
+    if [ "$RUN_DB_SETUP" = true ]; then
         DBPASSWORD=$(head -c 64 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 16)
         DBPASSWORDHOST=$(head -c 64 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 16)
+        
         mariadb -u root -e "
+            CREATE DATABASE IF NOT EXISTS panel;
+            DROP USER IF EXISTS 'pterodactyluser'@'127.0.0.1';
+            DROP USER IF EXISTS 'pterodactyl'@'127.0.0.1';
             CREATE USER 'pterodactyluser'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORDHOST';
             GRANT ALL PRIVILEGES ON *.* TO 'pterodactyluser'@'127.0.0.1' WITH GRANT OPTION;
             CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';
-            CREATE DATABASE panel;
             GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;
             FLUSH PRIVILEGES;
         "
@@ -435,8 +448,24 @@ panel_install() {
     set -euo pipefail
     echo -e "\nStarting Pterodactyl Panel Installation...\n"
 
+    echo "Checking internet connectivity and DNS..."
+    if ! ping -c 1 -W 5 google.com > /dev/null 2>&1; then
+        echo "[!] DNS resolution failed. Checking if IP communication works..."
+        if ping -c 1 -W 5 8.8.8.8 > /dev/null 2>&1; then
+            echo "[✖] Internet is fine, but DNS is broken. Check /etc/resolv.conf"
+        else
+            echo "[✖] No internet access detected (Network is down)."
+        fi
+        exit 1
+    fi
+
     echo "Updating package lists..."
-    apt update -y
+    if ! apt update -y; then
+        echo "[!] Apt update failed. Cleaning up locks and retrying..."
+        rm -f /var/lib/apt/lists/lock
+        rm -f /var/lib/dpkg/lock*
+        apt update -y || { echo "[✖] Apt update failed twice. Check your sources.list"; exit 1; }
+    fi
 
     echo "Installing required base packages..."
 
@@ -518,9 +547,14 @@ panel_install() {
     else
         echo "Redis repository and key already exist, skipping."
     fi
-
-    echo "Updating package lists again..."
-    apt update -y
+    
+    echo "Updating package lists..."
+    if ! apt update -y; then
+        echo "[!] Apt update failed. Cleaning up locks and retrying..."
+        rm -f /var/lib/apt/lists/lock
+        rm -f /var/lib/dpkg/lock*
+        apt update -y || { echo "[✖] Apt update failed twice. Check your sources.list"; exit 1; }
+    fi
 
     echo "Installing required software..."
 
@@ -585,21 +619,38 @@ panel_install() {
         echo "Directory /var/www/pterodactyl already exists, skipping creation."
     fi
 
-    cd /var/www/pterodactyl
-
+    cd /var/www/pterodactyl || { echo "[✖] Directory not found"; exit 1; }
+    
     echo "Downloading Pterodactyl Panel..."
-    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
-    tar -xzvf panel.tar.gz
-
+    if ! curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz; then
+        echo "[✖] Failed to download panel"
+        exit 1
+    fi
+    
+    echo "Extracting files..."
+    if ! tar -xzvf panel.tar.gz; then
+        echo "[✖] Failed to extract panel"
+        exit 1
+    fi
+    
     echo "Setting permissions..."
-    chmod -R 755 storage/* bootstrap/cache/
-    cp .env.example .env
-
+    chmod -R 755 storage/* bootstrap/cache/ || echo "[!] Warning: Could not set permissions"
+    
+    if [ ! -f .env ]; then
+        cp .env.example .env || { echo "[✖] Failed to create .env file"; exit 1; }
+    fi
+    
     echo "Installing PHP dependencies..."
-    COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction
-
+    if ! COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction; then
+        echo "[✖] Composer installation failed"
+        exit 1
+    fi
+    
     echo "Generating application key..."
-    php artisan key:generate --force
+    if ! php artisan key:generate --force; then
+        echo "[✖] Failed to generate application key"
+        exit 1
+    fi
 
     case "$WEBSERVER" in
         "NGINX")
