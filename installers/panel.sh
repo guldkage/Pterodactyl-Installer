@@ -375,6 +375,11 @@ panel_conf() {
                 curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
                 sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
 
+                if grep -q "server_tokens off" /etc/nginx/nginx.conf; then
+                    echo "[!] server_tokens off detected in nginx.conf. Removing from pterodactyl.conf to avoid duplicates..."
+                    sed -i '/server_tokens off;/d' /etc/nginx/sites-enabled/pterodactyl.conf
+                fi
+
                 echo "SESSION_SECURE_COOKIE=false" >> /var/www/pterodactyl/.env
                 systemctl restart nginx
 
@@ -397,6 +402,12 @@ panel_conf() {
                 sed -i -e "s@ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem;@ssl_certificate ${CERTIFICATEPATH};@g" /etc/nginx/sites-enabled/pterodactyl.conf
                 sed -i -e "s@ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;@ssl_certificate_key ${PRIVATEKEYPATH};@g" /etc/nginx/sites-enabled/pterodactyl.conf
             fi
+
+            if grep -q "server_tokens off" /etc/nginx/nginx.conf; then
+                echo "[!] server_tokens off detected in nginx.conf. Removing from pterodactyl.conf to avoid duplicates..."
+                sed -i '/server_tokens off;/d' /etc/nginx/sites-enabled/pterodactyl.conf
+            fi
+            
             if [[ $(lsb_release -cs) == "trixie" ]]; then
                 sed -i '1d' /etc/nginx/sites-enabled/pterodactyl.conf
             fi
