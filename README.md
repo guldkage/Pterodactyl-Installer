@@ -71,7 +71,7 @@ Only use this if you know what you are doing!
 You can now install Pterodactyl using 1 command without having to manually type anything after running the command.
 
 ### [BETA] Generate Autoinstall Command
-You can use my [autoinstall command generator](https://malthe.cc/api/autoinstall/) to install Pterodactyl and Wings with 1 command.
+You can use my [autoinstall command generator](https://guldkage.github.io/Pterodactyl-Installer/) to install Pterodactyl and Wings with 1 command.
 
 ### Required fields
 ```
