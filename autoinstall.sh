@@ -1,152 +1,186 @@
-#!/bin/bash
 #!/usr/bin/env bash
 
-########################################################################
-#                                                                      #
-#            Pterodactyl Installer, Updater, Remover and More          #
-#            Copyright 2022, Malthe K, <me@malthe.cc>                  # 
-# https://github.com/guldkage/Pterodactyl-Installer/blob/main/LICENSE  #
-#                                                                      #
-#  This script is not associated with the official Pterodactyl Panel.  #
-#  You may not remove this line                                        #
-#                                                                      #
-########################################################################
+set -euo pipefail
+
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root."
+   exit 1
+fi
+
+# Variables from arguments
+FQDN="$1"
+SSLSTATUS="$2"
+EMAIL="$3"
+USERNAME="$4"
+FIRSTNAME="$5"
+LASTNAME="$6"
+PASSWORD="$7"
+WINGS="$8"
+WEBSERVER="NGINX"
 
 dist="$(. /etc/os-release && echo "$ID")"
 version="$(. /etc/os-release && echo "$VERSION_ID")"
 
+# --- HELPERS ---
 
-### This script is meant to be used: ###
-### ./install.sh <FQDN/URL to panel> <SSL true or false> <email> <username> <firstname> <lastname> <password> <wings true or false> ###
-
-finish(){
-    clear
-    echo ""
-    echo "[!] Panel installed."
-    echo ""
+retry() {
+    local n=1; local max=3; local delay=5
+    while true; do
+        "$@" && break || {
+            if [[ $n -lt $max ]]; then
+                ((n++))
+                echo "[!] Command failed. Retrying in $delay seconds ($n/$max)..."
+                sleep $delay
+            else
+                echo "[X] Command '$*' failed after $max attempts."
+                return 1
+            fi
+        }
+    done
 }
 
-panel_conf(){
-    [ "$SSL" == true ] && appurl="https://$FQDN"
-    [ "$SSL" == false ] && appurl="http://$FQDN"
-    DBPASSWORD=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1`
-    mariadb -u root -e "CREATE USER 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';" && mariadb -u root -e "CREATE DATABASE panel;" && mariadb -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' WITH GRANT OPTION;" && mariadb -u root -e "FLUSH PRIVILEGES;"
-    php artisan p:environment:setup --author="$EMAIL" --url="$appurl" --timezone="CET" --telemetry=false --cache="redis" --session="redis" --queue="redis" --redis-host="localhost" --redis-pass="null" --redis-port="6379" --settings-ui=true
-    php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
-    php artisan migrate --seed --force
-    php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1
-    chown -R www-data:www-data /var/www/pterodactyl/*
-    curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
-    (crontab -l ; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1")| crontab -
-    sudo systemctl enable --now redis-server
-    sudo systemctl enable --now pteroq.service
-    [ "$WINGS" == true ] && curl -sSL https://get.docker.com/ | CHANNEL=stable bash && systemctl enable --now docker && mkdir -p /etc/pterodactyl && apt-get -y install curl tar unzip && curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")" && curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service && chmod u+x /usr/local/bin/wings
-    if  [ "$SSL" =  "true" ]; then
-        rm -rf /etc/nginx/sites-enabled/default
-        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
-        sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-        systemctl stop nginx
-        certbot certonly --standalone -d $FQDN --staple-ocsp --no-eff-email -m $EMAIL --agree-tos
-        systemctl start nginx
-        finish
-        fi
-    if  [ "$SSL" =  "false" ]; then
-        rm -rf /etc/nginx/sites-enabled/default
-        curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx.conf
-        sed -i -e "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
-        systemctl restart nginx
-        finish
-        fi
+ensure_service() {
+    local service=$1
+    systemctl daemon-reload
+    systemctl enable "$service" >/dev/null 2>&1
+    systemctl restart "$service"
+    sleep 2
+    if ! systemctl is-active --quiet "$service"; then
+        return 1
+    fi
 }
 
-panel_install(){
-    echo "" 
-    apt update
-    apt install certbot -y
-    if  [ "$dist" =  "ubuntu" ] && [ "$version" = "20.04" ]; then
-        apt -y install software-properties-common curl apt-transport-https ca-certificates gnupg
-        LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
-        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
-        apt update
-        sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) universe"
+panel_install() {
+    echo -e "\nStarting Pterodactyl Panel Installation...\n"
+
+    if ! ping -c 1 -W 5 google.com > /dev/null 2>&1; then
+        if ! ping -c 1 -W 5 8.8.8.8 > /dev/null 2>&1; then
+            echo "[✖] No internet access detected."; exit 1
+        fi
+        echo "[✖] DNS broken. Check /etc/resolv.conf"; exit 1
     fi
-    if [ "$dist" = "debian" ] && [ "$version" = "11" ]; then
-        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
-        curl -fsSL  https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
-        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-        apt update -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+
+    echo "Updating package lists..."
+    if ! apt update -y; then
+        rm -f /var/lib/apt/lists/lock /var/lib/dpkg/lock*
+        apt update -y || { echo "[✖] Apt update failed twice."; exit 1; }
     fi
-    if [ "$dist" = "debian" ] && [ "$version" = "12" ]; then
-        apt -y install software-properties-common curl ca-certificates gnupg2 sudo lsb-release
-        sudo apt install -y apt-transport-https lsb-release ca-certificates wget
-        wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
-        curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
-        apt update -y
-        curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+
+    base_packages=(wget ca-certificates apt-transport-https gnupg curl lsb-release cron)
+    [[ "$version" != "13" ]] && base_packages+=(software-properties-common)
+    apt install -y "${base_packages[@]}"
+
+    case "$dist" in
+        "ubuntu")
+            LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+            ;;
+        "debian")
+            echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
+            curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+            ;;
+    esac
+
+    DISTRO_CODENAME=$(lsb_release -cs)
+    [[ "$DISTRO_CODENAME" == "trixie" ]] && DISTRO_CODENAME="bookworm"
+    curl -fsSL https://packages.redis.io/gpg | gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $DISTRO_CODENAME main" | tee /etc/apt/sources.list.d/redis.list
+
+    apt update -y
+    packages=(
+        mariadb-server tar unzip git redis-server certbot nginx
+        php8.3 php8.3-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
+    )
+    apt install -y "${packages[@]}"
+
+    if [ -f "/etc/mysql/mariadb.conf.d/50-server.cnf" ]; then
+        sed -i 's/character-set-collations = utf8mb4=uca1400_ai_ci/character-set-collations = utf8mb4=utf8mb4_general_ci/' /etc/mysql/mariadb.conf.d/50-server.cnf
+        systemctl restart mariadb
     fi
-    apt install -y mariadb-server tar unzip git redis-server
-    sed -i 's/character-set-collations = utf8mb4=uca1400_ai_ci/character-set-collations = utf8mb4=utf8mb4_general_ci/' /etc/mysql/mariadb.conf.d/50-server.cnf
-    systemctl restart mariadb
-    apt -y install php8.3 php8.3-{cli,gd,mysql,pdo,mbstring,tokenizer,bcmath,xml,fpm,curl,zip}
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    pause 0.5s
-    mkdir /var
-    mkdir /var/www
-    mkdir /var/www/pterodactyl
-    cd /var/www/pterodactyl
-    curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
+
+    mkdir -p /var/www/pterodactyl && cd /var/www/pterodactyl
+    retry curl -Lo panel.tar.gz https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
     tar -xzvf panel.tar.gz
     chmod -R 755 storage/* bootstrap/cache/
-    cp .env.example .env
-    command composer install --no-dev --optimize-autoloader --no-interaction
+    [ ! -f .env ] && cp .env.example .env
+    
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction
     php artisan key:generate --force
-    apt install nginx -y
-    panel_conf
+    
+    DBPASSWORD=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | fold -w 16 | head -n 1)
+    mariadb -u root -e "CREATE DATABASE IF NOT EXISTS panel;"
+    mariadb -u root -e "GRANT ALL PRIVILEGES ON panel.* TO 'pterodactyl'@'127.0.0.1' IDENTIFIED BY '$DBPASSWORD';"
+    
+    [ "$SSLSTATUS" == "true" ] && appurl="https://$FQDN" || appurl="http://$FQDN"
+    
+    php artisan p:environment:setup --author="$EMAIL" --url="$appurl" --timezone="CET" --telemetry=false --cache="redis" --session="redis" --queue="redis" --redis-host="localhost" --redis-pass="null" --redis-port="6379" --settings-ui=true
+    php artisan p:environment:database --host="127.0.0.1" --port="3306" --database="panel" --username="pterodactyl" --password="$DBPASSWORD"
+    php artisan migrate --seed --force --no-interaction
+    php artisan p:user:make --email="$EMAIL" --username="$USERNAME" --name-first="$FIRSTNAME" --name-last="$LASTNAME" --password="$PASSWORD" --admin=1 --no-interaction
+
+    if [ "$WINGS" == "true" ]; then
+        echo "Installing Wings..."
+        retry curl -sSL https://get.docker.com/ | CHANNEL=stable bash
+        ensure_service docker
+        mkdir -p /etc/pterodactyl
+        arch=$([[ "$(uname -m)" == "x86_64" ]] && echo "amd64" || echo "arm64")
+        retry curl -L -o /usr/local/bin/wings "https://github.com/pterodactyl/wings/releases/latest/download/wings_linux_$arch"
+        chmod u+x /usr/local/bin/wings
+        curl -o /etc/systemd/system/wings.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/wings.service
+        systemctl enable --now wings
+    fi
+
+    chown -R www-data:www-data /var/www/pterodactyl/*
+    curl -o /etc/systemd/system/pteroq.service https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pteroq.service
+    (crontab -l 2>/dev/null; echo "* * * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1") | crontab -
+    ensure_service redis-server
+    ensure_service pteroq.service
+
+    configure_webserver
 }
 
-#! /bin/sh -
+configure_webserver() {
+    rm -f /etc/nginx/sites-enabled/default
+    curl -fsSL -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/refs/heads/main/configs/pterodactyl-nginx.conf
+    sed -i "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+    systemctl reload nginx
 
-FQDN=`echo $1`
-SSL=`echo $2`
-EMAIL=`echo $3`
-USERNAME=`echo $4`
-FIRSTNAME=`echo $5`
-LASTNAME=`echo $6`
-PASSWORD=`echo $7`
-WINGS=`echo $8`
+    FAIL=false
+    if [ "$SSLSTATUS" == "true" ]; then
+        attempt=1
+        while [ $attempt -le 2 ]; do
+            apt install -y python3-certbot-nginx
+            if certbot --nginx --redirect --no-eff-email --email "$EMAIL" -d "$FQDN" --agree-tos; then
+                FAIL=false; break
+            else
+                FAIL=true; ((attempt++))
+            fi
+        done
 
-if [ -z "$FQDN" ] || [ -z "$SSL" ] || [ -z "$EMAIL" ] || [ -z "$USERNAME" ] || [ -z "$FIRSTNAME" ] || [ -z "$LASTNAME" ] || [ -z "$PASSWORD" ] || [ -z "$WINGS" ]; then
-    echo "Error! THe usage of this script is incorrect."
+        if [ "$FAIL" == "false" ]; then
+            curl -o /etc/nginx/sites-enabled/pterodactyl.conf https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/configs/pterodactyl-nginx-ssl.conf
+            [[ $(lsb_release -cs) == "trixie" ]] && sed -i '1d' /etc/nginx/sites-enabled/pterodactyl.conf
+            sed -i "s@<domain>@${FQDN}@g" /etc/nginx/sites-enabled/pterodactyl.conf
+        else
+            SSLSTATUS="false"
+        fi
+    fi
+
+    if [ "$SSLSTATUS" == "false" ]; then
+        echo "SESSION_SECURE_COOKIE=false" >> /var/www/pterodactyl/.env
+    fi
+
+    if grep -q "server_tokens off" /etc/nginx/nginx.conf; then
+        sed -i '/server_tokens off;/d' /etc/nginx/sites-enabled/pterodactyl.conf
+    fi
+
+    cd /var/www/pterodactyl && php artisan config:clear
+    systemctl restart nginx
+}
+
+if [ -z "$FQDN" ] || [ -z "$PASSWORD" ]; then
+    echo "Usage: ./script.sh <FQDN> <SSL true/false> <EMAIL> <USER> <FIRST> <LAST> <PASS> <WINGS true/false>"
     exit 1
 fi
 
-echo "Checking your OS.."
-if { [ "$dist" = "ubuntu" ] && [ "$version" = "20.04" ]; } || { [ "$dist" = "debian" ] && [ "$version" = "11" ] || [ "$version" = "12" ]; }; then
-    echo "Welcome to Autoinstall of Pterodactyl Panel"
-    echo "Quick summary before the install begins:"
-    echo ""
-    echo "FQDN (URL): $FQDN"
-    echo "SSL: $SSL"
-    echo "Preselected webserver: NGINX"
-    echo "Email $EMAIL"
-    echo "Username $USERNAME"
-    echo "First name $FIRSTNAME"
-    echo "Last name $LASTNAME"
-    echo "Password: $PASSWORD"
-    echo "Wings install: $WINGS"
-    echo ""
-    echo "Starting automatic installation in 5 seconds"
-    sleep 5s
-    panel_install
-else
-    echo "Your OS, $dist $version, is not supported"
-    exit 1
-fi
-
+panel_install
