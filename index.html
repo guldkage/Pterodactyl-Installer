@@ -1,25 +1,83 @@
-<h2>Pterodactyl Command Generator</h2>
-<input type="text" id="fqdn" placeholder="FQDN (panel.example.com)" oninput="generate()">
-<input type="text" id="ssl" placeholder="SSL (true/false)" oninput="generate()">
-<input type="text" id="email" placeholder="Email" oninput="generate()">
-<input type="text" id="user" placeholder="Username" oninput="generate()">
-<input type="text" id="pass" placeholder="Password" oninput="generate()">
-<input type="text" id="wings" placeholder="Wings (true/false)" oninput="generate()">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pterodactyl Command Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 flex items-center justify-center min-h-screen p-4">
 
-<p>Copy and paste this into your terminal:</p>
-<code id="output" style="background: #333; color: #fff; padding: 10px; display: block;">
-bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh)
-</code>
+    <div class="w-full max-w-2xl p-6 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <h5 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white text-center">Pterodactyl Command Generator</h5>
+        <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 text-center">Fill in the fields below to generate your autoinstall command.</p>
 
-<script>
-function generate() {
-    const f = document.getElementById('fqdn').value || '<fqdn>';
-    const s = document.getElementById('ssl').value || '<ssl>';
-    const e = document.getElementById('email').value || '<email>';
-    const u = document.getElementById('user').value || '<username>';
-    const p = document.getElementById('pass').value || '<password>';
-    const w = document.getElementById('wings').value || '<wings>';
-    
-    document.getElementById('output').innerText = `bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh) ${f} ${s} ${e} ${u} Admin User ${p} ${w}`;
-}
-</script>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Domain (FQDN)</label>
+                <input type="text" id="fqdn" oninput="gen()" placeholder="panel.example.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">SSL (Let's Encrypt)</label>
+                <select id="ssl" onchange="gen()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin Email</label>
+                <input type="email" id="email" oninput="gen()" placeholder="me@example.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                <input type="text" id="user" oninput="gen()" placeholder="admin" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Admin Password</label>
+                <input type="text" id="pass" oninput="gen()" placeholder="StrongPassword123" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            </div>
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Install Wings?</label>
+                <select id="wings" onchange="gen()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="relative">
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your Command:</label>
+            <div class="flex items-center">
+                <code id="cmd" class="w-full p-4 text-sm text-blue-600 bg-gray-100 border border-gray-300 rounded-lg dark:bg-gray-900 dark:text-blue-400 dark:border-gray-600 break-all">
+                    bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh)
+                </code>
+                <button onclick="copyCmd()" class="absolute right-2 top-9 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function gen() {
+            const f = document.getElementById('fqdn').value || 'panel.example.com';
+            const s = document.getElementById('ssl').value;
+            const e = document.getElementById('email').value || 'admin@example.com';
+            const u = document.getElementById('user').value || 'admin';
+            const p = document.getElementById('pass').value || 'password';
+            const w = document.getElementById('wings').value;
+            
+            const scriptUrl = "https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh";
+            document.getElementById('cmd').innerText = `bash <(curl -s ${scriptUrl}) ${f} ${s} ${e} ${u} Malthe K ${p} ${w}`;
+        }
+
+        function copyCmd() {
+            const text = document.getElementById('cmd').innerText;
+            navigator.clipboard.writeText(text);
+            alert("Command copied to clipboard!");
+        }
+        
+        gen();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+</body>
+</html>
