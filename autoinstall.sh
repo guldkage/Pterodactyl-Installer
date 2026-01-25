@@ -174,6 +174,7 @@ configure_webserver() {
 
     cd /var/www/pterodactyl && php artisan config:clear
     systemctl restart nginx
+    echo "Panel installed"
 }
 
 if [ -z "$FQDN" ] || [ -z "$PASSWORD" ]; then
