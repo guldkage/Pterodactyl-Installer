@@ -1,0 +1,25 @@
+<h2>Pterodactyl Command Generator</h2>
+<input type="text" id="fqdn" placeholder="FQDN (panel.example.com)" oninput="generate()">
+<input type="text" id="ssl" placeholder="SSL (true/false)" oninput="generate()">
+<input type="text" id="email" placeholder="Email" oninput="generate()">
+<input type="text" id="user" placeholder="Username" oninput="generate()">
+<input type="text" id="pass" placeholder="Password" oninput="generate()">
+<input type="text" id="wings" placeholder="Wings (true/false)" oninput="generate()">
+
+<p>Copy and paste this into your terminal:</p>
+<code id="output" style="background: #333; color: #fff; padding: 10px; display: block;">
+bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh)
+</code>
+
+<script>
+function generate() {
+    const f = document.getElementById('fqdn').value || '<fqdn>';
+    const s = document.getElementById('ssl').value || '<ssl>';
+    const e = document.getElementById('email').value || '<email>';
+    const u = document.getElementById('user').value || '<username>';
+    const p = document.getElementById('pass').value || '<password>';
+    const w = document.getElementById('wings').value || '<wings>';
+    
+    document.getElementById('output').innerText = `bash <(curl -s https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh) ${f} ${s} ${e} ${u} Admin User ${p} ${w}`;
+}
+</script>
