@@ -67,17 +67,18 @@
 
     <script>
         function gen() {
-            const f = document.getElementById('fqdn').value || 'panel.example.com';
-            const s = document.getElementById('ssl').value;
-            const e = document.getElementById('email').value || 'admin@example.com';
-            const u = document.getElementById('user').value || 'admin';
-            const p = document.getElementById('pass').value || 'password';
-            const f = document.getElementById('firstname').value || 'firstname';
-            const l = document.getElementById('lastname').value || 'lastname';
-            const w = document.getElementById('wings').value;
+            const domain = document.getElementById('fqdn').value || 'panel.example.com';
+            const ssl = document.getElementById('ssl').value;
+            const email = document.getElementById('email').value || 'admin@example.com';
+            const username = document.getElementById('user').value || 'admin';
+            const password = document.getElementById('pass').value || 'password';
+            const firstName = document.getElementById('firstname').value || 'firstname';
+            const lastName = document.getElementById('lastname').value || 'lastname';
+            const wings = document.getElementById('wings').value;
             
             const scriptUrl = "https://raw.githubusercontent.com/guldkage/Pterodactyl-Installer/main/autoinstall.sh";
-            document.getElementById('cmd').innerText = `bash <(curl -s ${scriptUrl}) ${f} ${s} ${e} ${u} ${f} ${l} ${p} ${w}`;
+            
+            document.getElementById('cmd').innerText = `bash <(curl -s ${scriptUrl}) ${domain} ${ssl} ${email} ${username} ${firstName} ${lastName} ${password} ${wings}`;
         }
 
         function copyCmd() {
